@@ -1,7 +1,7 @@
 ﻿# StableDiffusion.NET
 
-Based on
-https://github.com/seasonjs/stable-diffusion.cpp-build
+Based on   
+https://github.com/seasonjs/stable-diffusion.cpp-build   
 https://github.com/leejet/stable-diffusion.cpp
 
 ## Usage
