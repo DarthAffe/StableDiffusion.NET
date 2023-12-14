@@ -1,4 +1,6 @@
-﻿namespace StableDiffusion.NET;
+﻿using System;
+
+namespace StableDiffusion.NET;
 
 public sealed unsafe class StableDiffusionParameter : IDisposable
 {

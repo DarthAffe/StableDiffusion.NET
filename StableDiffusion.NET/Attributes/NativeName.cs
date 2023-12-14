@@ -1,4 +1,6 @@
-﻿namespace StableDiffusion.NET;
+﻿using System;
+
+namespace StableDiffusion.NET;
 
 [AttributeUsage(AttributeTargets.Field)]
 internal class NativeName : Attribute
