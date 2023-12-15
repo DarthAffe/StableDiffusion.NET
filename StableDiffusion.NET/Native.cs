@@ -14,7 +14,7 @@ internal unsafe partial class Native
 {
     #region Constants
 
-    private const string LIB_NAME = "sd-abi.dll";
+    private const string LIB_NAME = "sd-abi";
 
     #endregion
 
