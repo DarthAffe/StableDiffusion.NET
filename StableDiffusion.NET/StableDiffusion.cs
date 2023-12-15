@@ -41,22 +41,22 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         if (!success) throw new IOException("Failed to load model");
     }
 
-    public Image TextToImage(string prompt, StableDiffusionParameter parameter)
+    public StableDiffusionImage TextToImage(string prompt, StableDiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         byte* result = Native.stable_diffusion_predict_image(_ctx, parameter.ParamPtr, prompt);
-        return new Image(result, parameter.Width, parameter.Height);
+        return new StableDiffusionImage(result, parameter.Width, parameter.Height);
     }
 
-    public Image ImageToImage(string prompt, Span<byte> image, StableDiffusionParameter parameter)
+    public StableDiffusionImage ImageToImage(string prompt, Span<byte> image, StableDiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         fixed (byte* imagePtr = image)
         {
             byte* result = Native.stable_diffusion_image_predict_image(_ctx, parameter.ParamPtr, imagePtr, prompt);
-            return new Image(result, parameter.Width, parameter.Height);
+            return new StableDiffusionImage(result, parameter.Width, parameter.Height);
         }
     }
 

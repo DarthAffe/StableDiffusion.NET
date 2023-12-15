@@ -2,7 +2,7 @@
 
 namespace StableDiffusion.NET;
 
-public sealed unsafe class Image : IDisposable
+public sealed unsafe class StableDiffusionImage : IDisposable
 {
     #region Constants
 
@@ -33,14 +33,14 @@ public sealed unsafe class Image : IDisposable
 
     #region Constructors
 
-    internal Image(byte* ptr, int width, int height)
+    internal StableDiffusionImage(byte* ptr, int width, int height)
     {
         this._imagePtr = ptr;
         this.Width = width;
         this.Height = height;
     }
 
-    ~Image() => Dispose();
+    ~StableDiffusionImage() => Dispose();
 
     #endregion
 

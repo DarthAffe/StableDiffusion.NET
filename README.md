@@ -12,5 +12,5 @@ Run `build.bat` to build the native libs (modify params like CUDA-builds if need
 ```csharp
 using StableDiffusionModel sd = new(@"<path_to_model>", new ModelParameter());
 using StableDiffusionParameter parameter = new StableDiffusionParameter();
-using Image image = sd.TextToImage("<prompt>", parameter);
+using StableDiffusionImage image = sd.TextToImage("<prompt>", parameter);
 ```
