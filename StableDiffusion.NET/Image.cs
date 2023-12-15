@@ -12,12 +12,22 @@ public sealed unsafe class Image : IDisposable
 
     #region Properties & Fields
 
+    private bool _disposed;
+
     private readonly byte* _imagePtr;
 
     public int Width { get; }
     public int Height { get; }
 
-    public ReadOnlySpan<byte> Data => new(_imagePtr, Width * Height * BPP);
+    public ReadOnlySpan<byte> Data
+    {
+        get
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
+            return new ReadOnlySpan<byte>(_imagePtr, Width * Height * BPP);
+        }
+    }
 
     #endregion
 
@@ -38,9 +48,12 @@ public sealed unsafe class Image : IDisposable
 
     public void Dispose()
     {
+        if (_disposed) return;
+
         Native.stable_diffusion_free_buffer(_imagePtr);
 
         GC.SuppressFinalize(this);
+        _disposed = true;
     }
 
     #endregion

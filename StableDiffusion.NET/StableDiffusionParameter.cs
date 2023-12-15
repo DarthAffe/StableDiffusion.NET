@@ -6,6 +6,8 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
 {
     #region Properties & Fields
 
+    private bool _disposed;
+
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
     internal readonly Native.stable_diffusion_full_params* ParamPtr;
 #pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
@@ -16,6 +18,8 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         get => _negativePrompt;
         set
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
             _negativePrompt = value;
             Native.stable_diffusion_full_params_set_negative_prompt(ParamPtr, _negativePrompt);
         }
@@ -27,6 +31,8 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         get => _cfgScale;
         set
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
             _cfgScale = value;
             Native.stable_diffusion_full_params_set_cfg_scale(ParamPtr, _cfgScale);
         }
@@ -38,6 +44,8 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         get => _width;
         set
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
             _width = value;
             Native.stable_diffusion_full_params_set_width(ParamPtr, _width);
         }
@@ -49,6 +57,8 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         get => _height;
         set
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
             _height = value;
             Native.stable_diffusion_full_params_set_height(ParamPtr, _height);
         }
@@ -60,6 +70,8 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         get => _sampleMethod;
         set
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
             _sampleMethod = value;
             Native.stable_diffusion_full_params_set_sample_method(ParamPtr, _sampleMethod.GetNativeName() ?? "EULER_A");
         }
@@ -71,6 +83,8 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         get => _sampleSteps;
         set
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
             _sampleSteps = value;
             Native.stable_diffusion_full_params_set_sample_steps(ParamPtr, _sampleSteps);
         }
@@ -82,6 +96,8 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         get => _seed;
         set
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
             _seed = value;
             Native.stable_diffusion_full_params_set_seed(ParamPtr, _seed);
         }
@@ -93,6 +109,8 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         get => _batchCount;
         set
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
             _batchCount = value;
             Native.stable_diffusion_full_params_set_batch_count(ParamPtr, _batchCount);
         }
@@ -104,6 +122,8 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         get => _strength;
         set
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
             _strength = value;
             Native.stable_diffusion_full_params_set_strength(ParamPtr, _strength);
         }
@@ -138,9 +158,12 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
 
     public void Dispose()
     {
+        if (_disposed) return;
+
         Native.stable_diffusion_free_full_params(ParamPtr);
 
         GC.SuppressFinalize(this);
+        _disposed = true;
     }
 
     #endregion

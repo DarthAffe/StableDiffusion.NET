@@ -7,6 +7,8 @@ public sealed unsafe class StableDiffusionModel : IDisposable
 {
     #region Properties & Fields
 
+    private bool _disposed;
+
     private readonly string _modelPath;
     private readonly ModelParameter _parameter;
 
@@ -41,12 +43,16 @@ public sealed unsafe class StableDiffusionModel : IDisposable
 
     public Image TextToImage(string prompt, StableDiffusionParameter parameter)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         byte* result = Native.stable_diffusion_predict_image(_ctx, parameter.ParamPtr, prompt);
         return new Image(result, parameter.Width, parameter.Height);
     }
 
     public Image ImageToImage(string prompt, Span<byte> image, StableDiffusionParameter parameter)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         fixed (byte* imagePtr = image)
         {
             byte* result = Native.stable_diffusion_image_predict_image(_ctx, parameter.ParamPtr, imagePtr, prompt);
@@ -56,9 +62,12 @@ public sealed unsafe class StableDiffusionModel : IDisposable
 
     public void Dispose()
     {
+        if (_disposed) return;
+
         Native.stable_diffusion_free(_ctx);
 
         GC.SuppressFinalize(this);
+        _disposed = true;
     }
 
     public static string GetSystemInfo() => Native.stable_diffusion_get_system_info();
