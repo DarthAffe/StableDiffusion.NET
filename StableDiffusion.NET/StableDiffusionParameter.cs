@@ -20,8 +20,11 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            _negativePrompt = value;
-            Native.stable_diffusion_full_params_set_negative_prompt(ParamPtr, _negativePrompt);
+            if (_negativePrompt != value)
+            {
+                _negativePrompt = value;
+                Native.stable_diffusion_full_params_set_negative_prompt(ParamPtr, _negativePrompt);
+            }
         }
     }
 
@@ -33,8 +36,11 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            _cfgScale = value;
-            Native.stable_diffusion_full_params_set_cfg_scale(ParamPtr, _cfgScale);
+            if (Math.Abs(_cfgScale - value) > 0.0001)
+            {
+                _cfgScale = value;
+                Native.stable_diffusion_full_params_set_cfg_scale(ParamPtr, _cfgScale);
+            }
         }
     }
 
@@ -46,8 +52,11 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            _width = value;
-            Native.stable_diffusion_full_params_set_width(ParamPtr, _width);
+            if (_width != value)
+            {
+                _width = value;
+                Native.stable_diffusion_full_params_set_width(ParamPtr, _width);
+            }
         }
     }
 
@@ -59,8 +68,11 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            _height = value;
-            Native.stable_diffusion_full_params_set_height(ParamPtr, _height);
+            if (_height != value)
+            {
+                _height = value;
+                Native.stable_diffusion_full_params_set_height(ParamPtr, _height);
+            }
         }
     }
 
@@ -72,8 +84,11 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            _sampleMethod = value;
-            Native.stable_diffusion_full_params_set_sample_method(ParamPtr, _sampleMethod.GetNativeName() ?? "EULER_A");
+            if (_sampleMethod != value)
+            {
+                _sampleMethod = value;
+                Native.stable_diffusion_full_params_set_sample_method(ParamPtr, _sampleMethod.GetNativeName() ?? "EULER_A");
+            }
         }
     }
 
@@ -85,8 +100,11 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            _sampleSteps = value;
-            Native.stable_diffusion_full_params_set_sample_steps(ParamPtr, _sampleSteps);
+            if (_sampleSteps != value)
+            {
+                _sampleSteps = value;
+                Native.stable_diffusion_full_params_set_sample_steps(ParamPtr, _sampleSteps);
+            }
         }
     }
 
@@ -98,8 +116,11 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            _seed = value;
-            Native.stable_diffusion_full_params_set_seed(ParamPtr, _seed);
+            if (_seed != value)
+            {
+                _seed = value;
+                Native.stable_diffusion_full_params_set_seed(ParamPtr, _seed);
+            }
         }
     }
 
@@ -111,8 +132,11 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            _batchCount = value;
-            Native.stable_diffusion_full_params_set_batch_count(ParamPtr, _batchCount);
+            if (_batchCount != value)
+            {
+                _batchCount = value;
+                Native.stable_diffusion_full_params_set_batch_count(ParamPtr, _batchCount);
+            }
         }
     }
 
@@ -124,8 +148,11 @@ public sealed unsafe class StableDiffusionParameter : IDisposable
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            _strength = value;
-            Native.stable_diffusion_full_params_set_strength(ParamPtr, _strength);
+            if (Math.Abs(_strength - value) > 0.0001)
+            {
+                _strength = value;
+                Native.stable_diffusion_full_params_set_strength(ParamPtr, _strength);
+            }
         }
     }
 
