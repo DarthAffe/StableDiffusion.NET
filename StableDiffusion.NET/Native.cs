@@ -66,11 +66,11 @@ internal unsafe partial class Native
     internal static partial void stable_diffusion_full_params_set_strength(stable_diffusion_full_params* @params, float strength);
 
     [LibraryImport(LIB_NAME, EntryPoint = "stable_diffusion_init")]
-    internal static partial stable_diffusion_ctx* stable_diffusion_init(int n_threads, [MarshalAs(UnmanagedType.I1)] bool vae_decode_only, [MarshalAs(UnmanagedType.LPStr)] string taesd_path, [MarshalAs(UnmanagedType.I1)] bool free_params_immediately, [MarshalAs(UnmanagedType.LPStr)] string lora_model_dir, [MarshalAs(UnmanagedType.LPStr)] string rng_type);
+    internal static partial stable_diffusion_ctx* stable_diffusion_init(int n_threads, [MarshalAs(UnmanagedType.I1)] bool vae_decode_only, [MarshalAs(UnmanagedType.LPStr)] string taesd_path, [MarshalAs(UnmanagedType.LPStr)] string esrgan_path, [MarshalAs(UnmanagedType.I1)] bool free_params_immediately, [MarshalAs(UnmanagedType.I1)] bool vae_tiling, [MarshalAs(UnmanagedType.LPStr)] string lora_model_dir, [MarshalAs(UnmanagedType.LPStr)] string rng_type);
 
     [LibraryImport(LIB_NAME, EntryPoint = "stable_diffusion_load_from_file")]
     [return: MarshalAs(UnmanagedType.I1)]
-    internal static partial bool stable_diffusion_load_from_file(stable_diffusion_ctx* ctx, [MarshalAs(UnmanagedType.LPStr)] string file_path, [MarshalAs(UnmanagedType.LPStr)] string vae_path, [MarshalAs(UnmanagedType.LPStr)] string wtype, [MarshalAs(UnmanagedType.LPStr)] string schedule);
+    internal static partial bool stable_diffusion_load_from_file(stable_diffusion_ctx* ctx, [MarshalAs(UnmanagedType.LPStr)] string file_path, [MarshalAs(UnmanagedType.LPStr)] string vae_path, [MarshalAs(UnmanagedType.LPStr)] string wtype, [MarshalAs(UnmanagedType.LPStr)] string schedule, int clip_skip);
 
     [LibraryImport(LIB_NAME, EntryPoint = "stable_diffusion_predict_image")]
     internal static partial byte* stable_diffusion_predict_image(stable_diffusion_ctx* ctx, stable_diffusion_full_params* @params, [MarshalAs(UnmanagedType.LPStr)] string prompt);

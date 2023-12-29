@@ -34,10 +34,10 @@ public sealed unsafe class StableDiffusionModel : IDisposable
 
     private void Initialize()
     {
-        _ctx = Native.stable_diffusion_init(_parameter.ThreadCount, _parameter.VaeDecodeOnly, _parameter.TaesdPath, false, _parameter.LoraModelDir, _parameter.RngType.GetNativeName() ?? "STD_DEFAULT_RNG");
+        _ctx = Native.stable_diffusion_init(_parameter.ThreadCount, _parameter.VaeDecodeOnly, _parameter.TaesdPath, _parameter.ESRGANPath, false, _parameter.VaeTiling, _parameter.LoraModelDir, _parameter.RngType.GetNativeName() ?? "STD_DEFAULT_RNG");
         if (_ctx == null) throw new NullReferenceException("Failed to initialize Stable Diffusion");
 
-        bool success = Native.stable_diffusion_load_from_file(_ctx, _modelPath, _parameter.VaePath, _parameter.Quantization.GetNativeName() ?? "DEFAULT", _parameter.Schedule.GetNativeName() ?? "DEFAULT");
+        bool success = Native.stable_diffusion_load_from_file(_ctx, _modelPath, _parameter.VaePath, _parameter.Quantization.GetNativeName() ?? "DEFAULT", _parameter.Schedule.GetNativeName() ?? "DEFAULT", _parameter.ClipSkip);
         if (!success) throw new IOException("Failed to load model");
     }
 

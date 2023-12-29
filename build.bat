@@ -1,10 +1,10 @@
 if not exist stable-diffusion.cpp-build (
-    git clone https://github.com/seasonjs/stable-diffusion.cpp-build
+    git clone https://github.com/DarthAffe/stable-diffusion.cpp-build
 )
 
 cd stable-diffusion.cpp-build
 git fetch
-git checkout 4b95d98404bbfe91698fd41b0f514656e358163a
+git checkout b518ce72f1ba448f164e58961b1513ccacc95006
 
 if not exist build (
     mkdir build
