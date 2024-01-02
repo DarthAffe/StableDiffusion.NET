@@ -1,23 +1,20 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace StableDiffusion.NET;
 
 public sealed unsafe class StableDiffusionImage : IDisposable
 {
-    #region Constants
-
-    public const int BPP = 3;
-
-    #endregion
-
     #region Properties & Fields
 
     private bool _disposed;
 
-    private readonly byte* _imagePtr;
+    internal readonly Native.sd_image_t* Image;
 
     public int Width { get; }
     public int Height { get; }
+    public int Bpp { get; }
+    public int Stride { get; }
 
     public ReadOnlySpan<byte> Data
     {
@@ -25,7 +22,7 @@ public sealed unsafe class StableDiffusionImage : IDisposable
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
 
-            return new ReadOnlySpan<byte>(_imagePtr, Width * Height * BPP);
+            return new ReadOnlySpan<byte>(Image->data, Width * Height * Bpp);
         }
     }
 
@@ -33,11 +30,14 @@ public sealed unsafe class StableDiffusionImage : IDisposable
 
     #region Constructors
 
-    internal StableDiffusionImage(byte* ptr, int width, int height)
+    internal unsafe StableDiffusionImage(Native.sd_image_t* image)
     {
-        this._imagePtr = ptr;
-        this.Width = width;
-        this.Height = height;
+        this.Image = image;
+
+        Width = (int)image->width;
+        Height = (int)image->height;
+        Bpp = (int)image->channel;
+        Stride = Width * Bpp;
     }
 
     ~StableDiffusionImage() => Dispose();
@@ -50,8 +50,9 @@ public sealed unsafe class StableDiffusionImage : IDisposable
     {
         if (_disposed) return;
 
-        Native.stable_diffusion_free_buffer(_imagePtr);
-
+        Marshal.FreeHGlobal((nint)Image->data);
+        Marshal.FreeHGlobal((nint)Image);
+        
         GC.SuppressFinalize(this);
         _disposed = true;
     }

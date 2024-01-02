@@ -8,13 +8,14 @@ public class ModelParameter
     public bool VaeDecodeOnly { get; set; } = false;
     public bool VaeTiling { get; set; } = false;
     public string TaesdPath { get; set; } = string.Empty;
-    public string ESRGANPath { get; set; } = string.Empty;
     public string LoraModelDir { get; set; } = string.Empty;
     public RngType RngType { get; set; } = RngType.Standard;
     public string VaePath { get; set; } = string.Empty;
-    public Quantization Quantization { get; set; } = Quantization.Default;
+
+    //TODO DarthAffe 01.01.2024: K-Quants doesn't seem to work so far
+    public Quantization Quantization { get; set; } = Quantization.F16;
+
     public Schedule Schedule { get; set; } = Schedule.Default;
-    public int ClipSkip { get; set; } = -1;
 
     #endregion
 }

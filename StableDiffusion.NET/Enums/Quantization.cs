@@ -2,27 +2,23 @@
 
 public enum Quantization
 {
-    [NativeName("DEFAULT")]
-    Default,
-
-    [NativeName("F32")]
-    F32,
-
-    [NativeName("F16")]
-    F16,
-
-    [NativeName("Q4_0")]
-    Q4_0,
-
-    [NativeName("Q4_1")]
-    Q4_1,
-
-    [NativeName("Q5_0")]
-    Q5_0,
-
-    [NativeName("Q5_1")]
-    Q5_1,
-
-    [NativeName("Q8_0")]
-    Q8_0
+    F32 = 0,
+    F16 = 1,
+    Q4_0 = 2,
+    Q4_1 = 3,
+    // Q4_2 = 4, support has been removed
+    // Q4_3 (5) support has been removed
+    Q5_0 = 6,
+    Q5_1 = 7,
+    Q8_0 = 8,
+    Q8_1 = 9,
+    Q2_K = 10,
+    Q3_K = 11,
+    Q4_K = 12,
+    Q5_K = 13,
+    Q6_K = 14,
+    Q8_K = 15,
+    I8,
+    I16,
+    I32,
 }
