@@ -21,6 +21,12 @@ internal unsafe partial class Native
 
     #endregion
 
+    #region Delegates
+
+    internal delegate void sd_log_cb_t(sd_log_level_t level, [MarshalAs(UnmanagedType.LPStr)] string text, void* data);
+
+    #endregion
+
     #region DLL-Import
 
     internal struct sd_ctx_t;
@@ -97,6 +103,9 @@ internal unsafe partial class Native
     internal static partial sd_image_t upscale(upscaler_ctx_t* upscaler_ctx,
                                                sd_image_t input_image,
                                                int upscale_factor);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_set_log_callback")]
+    internal static partial void sd_set_log_callback(sd_log_cb_t sd_log_cb, void* data);
 
     #endregion
 }

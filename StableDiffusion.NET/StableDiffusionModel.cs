@@ -18,7 +18,18 @@ public sealed unsafe class StableDiffusionModel : IDisposable
 
     #endregion
 
+    #region Events
+
+    public static event EventHandler<StableDiffusionLogEventArgs>? Log;
+
+    #endregion
+
     #region Constructors
+
+    static StableDiffusionModel()
+    {
+        Native.sd_set_log_callback(OnNativeLog, null);
+    }
 
     public StableDiffusionModel(string modelPath, ModelParameter parameter, UpscalerModelParameter? upscalerParameter = null)
     {
@@ -176,6 +187,15 @@ public sealed unsafe class StableDiffusionModel : IDisposable
     }
 
     public static int GetNumPhysicalCores() => Native.get_num_physical_cores();
+
+    private static void OnNativeLog(LogLevel level, string text, void* data)
+    {
+        try
+        {
+            Log?.Invoke(null, new StableDiffusionLogEventArgs(level, text));
+        }
+        catch { /**/ }
+    }
 
     #endregion
 }
