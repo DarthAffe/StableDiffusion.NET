@@ -180,6 +180,9 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         _disposed = true;
     }
 
+    public static void Convert(string modelPath, string vaePath, Quantization quantization, string outputPath)
+        => Native.convert(modelPath, vaePath, outputPath, quantization);
+
     public static string GetSystemInfo()
     {
         void* s = Native.sd_get_system_info();

@@ -104,6 +104,12 @@ internal unsafe partial class Native
                                                sd_image_t input_image,
                                                int upscale_factor);
 
+    [LibraryImport(LIB_NAME, EntryPoint = "convert")]
+    internal static partial void convert([MarshalAs(UnmanagedType.LPStr)] string input_path,
+                                         [MarshalAs(UnmanagedType.LPStr)] string vae_path,
+                                         [MarshalAs(UnmanagedType.LPStr)] string output_path,
+                                         sd_type_t output_type);
+
     [LibraryImport(LIB_NAME, EntryPoint = "sd_set_log_callback")]
     internal static partial void sd_set_log_callback(sd_log_cb_t sd_log_cb, void* data);
 
