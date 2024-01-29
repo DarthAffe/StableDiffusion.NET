@@ -51,14 +51,17 @@ internal unsafe partial class Native
     internal static partial sd_ctx_t* new_sd_ctx([MarshalAs(UnmanagedType.LPStr)] string model_path,
                                                  [MarshalAs(UnmanagedType.LPStr)] string vae_path,
                                                  [MarshalAs(UnmanagedType.LPStr)] string taesd_path,
+                                                 [MarshalAs(UnmanagedType.LPStr)] string control_net_path_c_str,
                                                  [MarshalAs(UnmanagedType.LPStr)] string lora_model_dir,
+                                                 [MarshalAs(UnmanagedType.LPStr)] string embed_dir_c_str,
                                                  [MarshalAs(UnmanagedType.I1)] bool vae_decode_only,
                                                  [MarshalAs(UnmanagedType.I1)] bool vae_tiling,
                                                  [MarshalAs(UnmanagedType.I1)] bool free_params_immediately,
                                                  int n_threads,
                                                  sd_type_t wtype,
                                                  rng_type_t rng_type,
-                                                 schedule_t s);
+                                                 schedule_t s,
+                                                 [MarshalAs(UnmanagedType.I1)] bool keep_control_net_cpu);
 
     [LibraryImport(LIB_NAME, EntryPoint = "free_sd_ctx")]
     internal static partial void free_sd_ctx(sd_ctx_t* sd_ctx);
@@ -74,7 +77,9 @@ internal unsafe partial class Native
                                                 sample_method_t sample_method,
                                                 int sample_steps,
                                                 long seed,
-                                                int batch_count);
+                                                int batch_count,
+                                                sd_image_t* control_cond,
+                                                float control_strength);
 
     [LibraryImport(LIB_NAME, EntryPoint = "img2img")]
     internal static partial sd_image_t* img2img(sd_ctx_t* sd_ctx,

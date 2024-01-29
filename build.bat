@@ -4,7 +4,7 @@ if not exist stable-diffusion.cpp (
 
 cd stable-diffusion.cpp
 git fetch
-git checkout c6071fa82fb1d0e688f75c9a3d870fe71d3a7a1d
+git checkout 36ec16ac9937d393d0ba8939640352cee430efb7
 git submodule init
 git submodule update
 

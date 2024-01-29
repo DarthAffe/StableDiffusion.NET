@@ -13,6 +13,8 @@ public sealed class StableDiffusionParameter
     public long Seed { get; set; } = -1;
     public float Strength { get; set; } = 0.7f;
     public int ClipSkip { get; set; } = -1;
+    public byte[]? ControlNetImage { get; set; } = null;
+    public float ControlNetStrength { get; set; } = 0.9f;
 
     #endregion
 }

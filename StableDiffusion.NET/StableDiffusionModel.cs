@@ -51,14 +51,17 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         _ctx = Native.new_sd_ctx(_modelPath,
                                  _parameter.VaePath,
                                  _parameter.TaesdPath,
+                                 _parameter.ControlNetPath,
                                  _parameter.LoraModelDir,
+                                 _parameter.EmbeddingsDirectory,
                                  _parameter.VaeDecodeOnly,
                                  _parameter.VaeTiling,
                                   false,
                                  _parameter.ThreadCount,
                                  _parameter.Quantization,
                                  _parameter.RngType,
-                                 _parameter.Schedule);
+                                 _parameter.Schedule,
+                                 _parameter.KeepControlNetOnCPU);
         if (_ctx == null) throw new NullReferenceException("Failed to initialize Stable Diffusion");
 
         if (_upscalerParameter != null)
@@ -74,23 +77,58 @@ public sealed unsafe class StableDiffusionModel : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        Native.sd_image_t* result = Native.txt2img(_ctx,
-                                                   prompt,
-                                                   parameter.NegativePrompt,
-                                                   parameter.ClipSkip,
-                                                   parameter.CfgScale,
-                                                   parameter.Width,
-                                                   parameter.Height,
-                                                   parameter.SampleMethod,
-                                                   parameter.SampleSteps,
-                                                   parameter.Seed,
-                                                   1);
+        Native.sd_image_t* result;
+        if ((parameter.ControlNetImage == null) || (parameter.ControlNetImage.Length == 0))
+        {
+            result = Native.txt2img(_ctx,
+                                    prompt,
+                                    parameter.NegativePrompt,
+                                    parameter.ClipSkip,
+                                    parameter.CfgScale,
+                                    parameter.Width,
+                                    parameter.Height,
+                                    parameter.SampleMethod,
+                                    parameter.SampleSteps,
+                                    parameter.Seed,
+                                    1,
+                                    null,
+                                    0);
+        }
+        else
+        {
+            fixed (byte* imagePtr = parameter.ControlNetImage)
+            {
+                Native.sd_image_t controlNetImage = new()
+                {
+                    width = (uint)parameter.Width,
+                    height = (uint)parameter.Height,
+                    channel = 3,
+                    data = imagePtr
+                };
+
+                result = Native.txt2img(_ctx,
+                                        prompt,
+                                        parameter.NegativePrompt,
+                                        parameter.ClipSkip,
+                                        parameter.CfgScale,
+                                        parameter.Width,
+                                        parameter.Height,
+                                        parameter.SampleMethod,
+                                        parameter.SampleSteps,
+                                        parameter.Seed,
+                                        1,
+                                        &controlNetImage,
+                                        parameter.ControlNetStrength);
+            }
+        }
 
         return new StableDiffusionImage(result);
     }
 
     public StableDiffusionImage ImageToImage(string prompt, in ReadOnlySpan<byte> image, StableDiffusionParameter parameter)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         fixed (byte* imagePtr = image)
         {
             Native.sd_image_t img = new()
@@ -110,6 +148,8 @@ public sealed unsafe class StableDiffusionModel : IDisposable
 
     private StableDiffusionImage ImageToImage(string prompt, Native.sd_image_t image, StableDiffusionParameter parameter)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         Native.sd_image_t* result = Native.img2img(_ctx,
                                                    image,
                                                    prompt,
