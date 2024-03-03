@@ -24,6 +24,7 @@ internal unsafe partial class Native
     #region Delegates
 
     internal delegate void sd_log_cb_t(sd_log_level_t level, [MarshalAs(UnmanagedType.LPStr)] string text, void* data);
+    internal delegate void sd_progress_cb_t(int step, int steps, float time, void* data);
 
     #endregion
 
@@ -96,6 +97,22 @@ internal unsafe partial class Native
                                                 long seed,
                                                 int batch_count);
 
+    [LibraryImport(LIB_NAME, EntryPoint = "img2vid")]
+    internal static partial sd_image_t* img2vid(sd_ctx_t* sd_ctx,
+                                                sd_image_t init_image,
+                                                int width,
+                                                int height,
+                                                int video_frames,
+                                                int motion_bucket_id,
+                                                int fps,
+                                                float augmentation_level,
+                                                float min_cfg,
+                                                float cfg_scale,
+                                                sample_method_t sample_method,
+                                                int sample_steps,
+                                                float strength,
+                                                long seed);
+
     [LibraryImport(LIB_NAME, EntryPoint = "new_upscaler_ctx")]
     internal static partial upscaler_ctx_t* new_upscaler_ctx([MarshalAs(UnmanagedType.LPStr)] string esrgan_path,
                                                              int n_threads,
@@ -115,8 +132,21 @@ internal unsafe partial class Native
                                          [MarshalAs(UnmanagedType.LPStr)] string output_path,
                                          sd_type_t output_type);
 
+    [LibraryImport(LIB_NAME, EntryPoint = "convert")]
+    internal static partial byte* preprocess_canny(byte* img,
+                                                   int width,
+                                                   int height,
+                                                   float high_threshold,
+                                                   float low_threshold,
+                                                   float weak,
+                                                   float strong,
+                                                   [MarshalAs(UnmanagedType.I1)] bool inverse);
+
     [LibraryImport(LIB_NAME, EntryPoint = "sd_set_log_callback")]
     internal static partial void sd_set_log_callback(sd_log_cb_t sd_log_cb, void* data);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_set_progress_callback")]
+    internal static partial void sd_set_progress_callback(sd_progress_cb_t cb, void* data);
 
     #endregion
 }

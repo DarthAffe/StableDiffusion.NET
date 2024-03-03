@@ -21,6 +21,7 @@ public sealed unsafe class StableDiffusionModel : IDisposable
     #region Events
 
     public static event EventHandler<StableDiffusionLogEventArgs>? Log;
+    public static event EventHandler<StableDiffusionProgressEventArgs>? Progress;
 
     #endregion
 
@@ -29,6 +30,7 @@ public sealed unsafe class StableDiffusionModel : IDisposable
     static StableDiffusionModel()
     {
         Native.sd_set_log_callback(OnNativeLog, null);
+        Native.sd_set_progress_callback(OnNativeProgress, null);
     }
 
     public StableDiffusionModel(string modelPath, ModelParameter parameter, UpscalerModelParameter? upscalerParameter = null)
@@ -78,7 +80,71 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         Native.sd_image_t* result;
-        if ((parameter.ControlNetImage == null) || (parameter.ControlNetImage.Length == 0))
+        if (parameter.ControlNet.IsEnabled)
+        {
+            fixed (byte* imagePtr = parameter.ControlNet.Image)
+            {
+
+                if (parameter.ControlNet.CannyPreprocess)
+                {
+                    Native.sd_image_t controlNetImage = new()
+                    {
+                        width = (uint)parameter.Width,
+                        height = (uint)parameter.Height,
+                        channel = 3,
+                        data = Native.preprocess_canny(imagePtr,
+                                                       parameter.Width,
+                                                       parameter.Height,
+                                                       parameter.ControlNet.CannyHighThreshold,
+                                                       parameter.ControlNet.CannyLowThreshold,
+                                                       parameter.ControlNet.CannyWeak,
+                                                       parameter.ControlNet.CannyStrong,
+                                                       parameter.ControlNet.CannyInverse)
+                    };
+
+                    result = Native.txt2img(_ctx,
+                                            prompt,
+                                            parameter.NegativePrompt,
+                                            parameter.ClipSkip,
+                                            parameter.CfgScale,
+                                            parameter.Width,
+                                            parameter.Height,
+                                            parameter.SampleMethod,
+                                            parameter.SampleSteps,
+                                            parameter.Seed,
+                                            1,
+                                            &controlNetImage,
+                                            parameter.ControlNet.Strength);
+
+                    Marshal.FreeHGlobal((nint)controlNetImage.data);
+                }
+                else
+                {
+                    Native.sd_image_t controlNetImage = new()
+                    {
+                        width = (uint)parameter.Width,
+                        height = (uint)parameter.Height,
+                        channel = 3,
+                        data = imagePtr
+                    };
+
+                    result = Native.txt2img(_ctx,
+                                            prompt,
+                                            parameter.NegativePrompt,
+                                            parameter.ClipSkip,
+                                            parameter.CfgScale,
+                                            parameter.Width,
+                                            parameter.Height,
+                                            parameter.SampleMethod,
+                                            parameter.SampleSteps,
+                                            parameter.Seed,
+                                            1,
+                                            &controlNetImage,
+                                            parameter.ControlNet.Strength);
+                }
+            }
+        }
+        else
         {
             result = Native.txt2img(_ctx,
                                     prompt,
@@ -93,33 +159,6 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                     1,
                                     null,
                                     0);
-        }
-        else
-        {
-            fixed (byte* imagePtr = parameter.ControlNetImage)
-            {
-                Native.sd_image_t controlNetImage = new()
-                {
-                    width = (uint)parameter.Width,
-                    height = (uint)parameter.Height,
-                    channel = 3,
-                    data = imagePtr
-                };
-
-                result = Native.txt2img(_ctx,
-                                        prompt,
-                                        parameter.NegativePrompt,
-                                        parameter.ClipSkip,
-                                        parameter.CfgScale,
-                                        parameter.Width,
-                                        parameter.Height,
-                                        parameter.SampleMethod,
-                                        parameter.SampleSteps,
-                                        parameter.Seed,
-                                        1,
-                                        &controlNetImage,
-                                        parameter.ControlNetStrength);
-            }
         }
 
         return new StableDiffusionImage(result);
@@ -236,6 +275,15 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         try
         {
             Log?.Invoke(null, new StableDiffusionLogEventArgs(level, text));
+        }
+        catch { /**/ }
+    }
+
+    private static void OnNativeProgress(int step, int steps, float time, void* data)
+    {
+        try
+        {
+            Progress?.Invoke(null, new StableDiffusionProgressEventArgs(step, steps, time));
         }
         catch { /**/ }
     }

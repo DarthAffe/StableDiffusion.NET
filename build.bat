@@ -4,7 +4,7 @@ if not exist stable-diffusion.cpp (
 
 cd stable-diffusion.cpp
 git fetch
-git checkout 36ec16ac9937d393d0ba8939640352cee430efb7
+git checkout 1ce9470f27d480c6aa5d43c0af5b60db99454252
 git submodule init
 git submodule update
 
@@ -14,8 +14,29 @@ if not exist build (
 
 cd build
 
-rem remove -DSD_CUBLAS=ON to disable cuda support
-cmake .. -DBUILD_SHARED_LIBS=ON -DSD_BUILD_EXAMPLES=OFF -DSD_CUBLAS=ON 
+Rem ----------------------------------------------------------------------------
+rem Pick one of the builds below.
+
+rem # cuda12 #
+cmake .. -DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON -DSD_BUILD_EXAMPLES=OFF
+
+rem # rocm5.5 #
+rem cmake .. -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DSD_HIPBLAS=ON -DCMAKE_BUILD_TYPE=Release -DAMDGPU_TARGETS="gfx1100;gfx1102;gfx1030" -DSD_BUILD_SHARED_LIBS=ON -DSD_BUILD_EXAMPLES=OFF
+
+rem # avx512 #
+rem cmake .. -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON -DSD_BUILD_EXAMPLES=OFF
+
+rem # avx2 #
+rem cmake .. -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON -DSD_BUILD_EXAMPLES=OFF
+
+rem # avx #
+rem cmake .. -DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON -DSD_BUILD_EXAMPLES=OFF
+
+rem # noavx #
+rem cmake .. -DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON -DSD_BUILD_EXAMPLES=OFF
+
+Rem ----------------------------------------------------------------------------
+
 cmake --build . --config Release
 
 cd ..\..
