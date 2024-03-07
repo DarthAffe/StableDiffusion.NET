@@ -132,7 +132,7 @@ internal unsafe partial class Native
                                          [MarshalAs(UnmanagedType.LPStr)] string output_path,
                                          sd_type_t output_type);
 
-    [LibraryImport(LIB_NAME, EntryPoint = "convert")]
+    [LibraryImport(LIB_NAME, EntryPoint = "preprocess_canny")]
     internal static partial byte* preprocess_canny(byte* img,
                                                    int width,
                                                    int height,
