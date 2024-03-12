@@ -15,6 +15,7 @@ public sealed class StableDiffusionParameter
     public int ClipSkip { get; set; } = -1;
 
     public StableDiffusionControlNetParameter ControlNet { get; } = new();
+    public PhotoMakerParameter PhotoMaker { get; } = new();
 
     #endregion
 }
@@ -31,4 +32,11 @@ public sealed class StableDiffusionControlNetParameter
     public float CannyWeak { get; set; } = 0.8f;
     public float CannyStrong { get; set; } = 1.0f;
     public bool CannyInverse { get; set; } = false;
+}
+
+public sealed class PhotoMakerParameter
+{
+    public string InputIdImageDirectory { get; set; } = string.Empty;
+    public float StyleRatio { get; set; } = 20f;
+    public bool NormalizeInput { get; set; } = false;
 }

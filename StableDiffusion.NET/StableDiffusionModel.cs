@@ -56,6 +56,7 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                  _parameter.ControlNetPath,
                                  _parameter.LoraModelDir,
                                  _parameter.EmbeddingsDirectory,
+                                 _parameter.StackedIdEmbeddingsDirectory,
                                  _parameter.VaeDecodeOnly,
                                  _parameter.VaeTiling,
                                   false,
@@ -63,7 +64,9 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                  _parameter.Quantization,
                                  _parameter.RngType,
                                  _parameter.Schedule,
-                                 _parameter.KeepControlNetOnCPU);
+                                 _parameter.KeepClipOnCPU,
+                                 _parameter.KeepControlNetOnCPU,
+                                 _parameter.KeepVaeOnCPU);
         if (_ctx == null) throw new NullReferenceException("Failed to initialize Stable Diffusion");
 
         if (_upscalerParameter != null)
@@ -114,7 +117,10 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                             parameter.Seed,
                                             1,
                                             &controlNetImage,
-                                            parameter.ControlNet.Strength);
+                                            parameter.ControlNet.Strength,
+                                            parameter.PhotoMaker.StyleRatio,
+                                            parameter.PhotoMaker.NormalizeInput,
+                                            parameter.PhotoMaker.InputIdImageDirectory);
 
                     Marshal.FreeHGlobal((nint)controlNetImage.data);
                 }
@@ -140,7 +146,10 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                             parameter.Seed,
                                             1,
                                             &controlNetImage,
-                                            parameter.ControlNet.Strength);
+                                            parameter.ControlNet.Strength,
+                                            parameter.PhotoMaker.StyleRatio,
+                                            parameter.PhotoMaker.NormalizeInput,
+                                            parameter.PhotoMaker.InputIdImageDirectory);
                 }
             }
         }
@@ -158,7 +167,10 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                     parameter.Seed,
                                     1,
                                     null,
-                                    0);
+                                    0,
+                                    parameter.PhotoMaker.StyleRatio,
+                                    parameter.PhotoMaker.NormalizeInput,
+                                    parameter.PhotoMaker.InputIdImageDirectory);
         }
 
         return new StableDiffusionImage(result);
