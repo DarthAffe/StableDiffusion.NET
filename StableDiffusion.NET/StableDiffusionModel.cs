@@ -7,6 +7,11 @@ public sealed unsafe class StableDiffusionModel : IDisposable
 {
     #region Properties & Fields
 
+    // ReSharper disable NotAccessedField.Local - They are important, the delegate can be collected if it's not stored!
+    private static readonly Native.sd_log_cb_t LOG_CALLBACK;
+    private static readonly Native.sd_progress_cb_t PROGRESS_CALLBACK;
+    // ReSharper restore NotAccessedField.Local
+
     private bool _disposed;
 
     private readonly string _modelPath;
@@ -29,8 +34,8 @@ public sealed unsafe class StableDiffusionModel : IDisposable
 
     static StableDiffusionModel()
     {
-        Native.sd_set_log_callback(OnNativeLog, null);
-        Native.sd_set_progress_callback(OnNativeProgress, null);
+        Native.sd_set_log_callback(LOG_CALLBACK = OnNativeLog, null);
+        Native.sd_set_progress_callback(PROGRESS_CALLBACK = OnNativeProgress, null);
     }
 
     public StableDiffusionModel(string modelPath, ModelParameter parameter, UpscalerModelParameter? upscalerParameter = null)
