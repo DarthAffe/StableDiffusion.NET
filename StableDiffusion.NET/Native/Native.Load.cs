@@ -40,7 +40,7 @@ internal static partial class Native
     {
         GetPlatformPathParts(out string os, out string fileExtension, out string libPrefix);
 
-        foreach (IBackend backend in Backends.ActiveBackends.OrderBy(x => x.Priority))
+        foreach (IBackend backend in Backends.ActiveBackends.OrderByDescending(x => x.Priority))
         {
             string path = Path.Combine("runtimes", os, "native", backend.PathPart, $"{libPrefix}{LIB_NAME}{fileExtension}");
 
