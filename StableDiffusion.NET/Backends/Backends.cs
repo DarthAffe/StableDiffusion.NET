@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace StableDiffusion.NET;
@@ -23,6 +24,12 @@ public static class Backends
 
     #endregion
 
+    #region Events
+
+    public static event EventHandler<LibraryPathCreatingEventArgs>? LibraryPathCreating;
+
+    #endregion
+
     #region Methods
 
     public static bool RegisterBackend(IBackend backend)
@@ -39,6 +46,26 @@ public static class Backends
 
     public static bool UnregisterBackend(IBackend backend)
         => CUSTOM_BACKENDS.Remove(backend);
+
+    internal static string GetFullPath(string os, string backend, string libName)
+    {
+        string path = Path.Combine("runtimes", os, "native", backend, libName);
+        return OnLibraryPathCreating(path);
+    }
+
+    private static string OnLibraryPathCreating(string path)
+    {
+        try
+        {
+            LibraryPathCreatingEventArgs args = new(path);
+            LibraryPathCreating?.Invoke(null, args);
+            return args.Path;
+        }
+        catch
+        {
+            return path;
+        }
+    }
 
     #endregion
 }
