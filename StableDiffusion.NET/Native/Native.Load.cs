@@ -42,7 +42,8 @@ internal static partial class Native
 
         foreach (IBackend backend in Backends.ActiveBackends.OrderByDescending(x => x.Priority))
         {
-            string path = Path.Combine("runtimes", os, "native", backend.PathPart, $"{libPrefix}{LIB_NAME}{fileExtension}");
+            string path = Backends.GetFullPath(os, backend.PathPart, $"{libPrefix}{LIB_NAME}{fileExtension}");
+            if (string.IsNullOrWhiteSpace(path)) continue;
 
             string fullPath = TryFindPath(path);
             nint result = TryLoad(fullPath);
