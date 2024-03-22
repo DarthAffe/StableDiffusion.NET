@@ -112,8 +112,15 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     public MainWindowViewModel()
     {
-        StableDiffusionModel.Log += (_, args) => LogLine($"LOG [{args.Level}]: {args.Text}", false);
-        StableDiffusionModel.Progress += (_, args) => LogLine($"PROGRESS {args.Step} / {args.Steps} ({(args.Progress * 100):N2} %) {args.IterationsPerSecond:N2} it/s ({args.Time})");
+        try
+        {
+            StableDiffusionModel.Log += (_, args) => LogLine($"LOG [{args.Level}]: {args.Text}", false);
+            StableDiffusionModel.Progress += (_, args) => LogLine($"PROGRESS {args.Step} / {args.Steps} ({(args.Progress * 100):N2} %) {args.IterationsPerSecond:N2} it/s ({args.Time})");
+        }
+        catch (Exception ex)
+        {
+            LogLine($"Failed to load stable-diffussion.cpp libraries!{Environment.NewLine}{ex.Message}");
+        }
     }
 
     #endregion
