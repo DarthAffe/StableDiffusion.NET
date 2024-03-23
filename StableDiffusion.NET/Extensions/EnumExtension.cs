@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace StableDiffusion.NET.Extensions;
+namespace StableDiffusion.NET;
 
 internal static class EnumExtension
 {

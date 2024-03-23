@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using StableDiffusion.NET.Extensions;
 
 namespace StableDiffusion.NET;
 
