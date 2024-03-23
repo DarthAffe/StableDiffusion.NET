@@ -91,7 +91,7 @@ public readonly ref struct ReadOnlyRefEnumerable<T>
     {
         this._step = step;
 
-        _span = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(reference), length);
+        _span = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in reference), length);
     }
 
     #endregion
