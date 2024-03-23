@@ -20,6 +20,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
         set => SetProperty(ref _modelPath, value);
     }
 
+    private string _vaePath = string.Empty;
+    public string VaePath
+    {
+        get => _vaePath;
+        set => SetProperty(ref _vaePath, value);
+    }
+
     private string _prompt = string.Empty;
     public string Prompt
     {
@@ -62,7 +69,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         set => SetProperty(ref _steps, value);
     }
 
-    private int _seed = 0;
+    private int _seed = -1;
     public int Seed
     {
         get => _seed;
@@ -106,6 +113,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
     private ActionCommand? _selectModelCommand;
     public ActionCommand SelectModelCommand => _selectModelCommand ??= new ActionCommand(SelectModel);
 
+    private ActionCommand? _selectVaeCommand;
+    public ActionCommand SelectVaeCommand => _selectVaeCommand ??= new ActionCommand(SelectVae);
+
     #endregion
 
     #region Constructors
@@ -136,7 +146,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             _model?.Dispose();
 
             LogLine($"Loading model '{ModelPath}'");
-            _model = await Task.Run(() => new StableDiffusionModel(ModelPath, new ModelParameter()));
+            _model = await Task.Run(() => new StableDiffusionModel(ModelPath, new ModelParameter { VaePath = VaePath }));
         }
         catch (Exception ex)
         {
@@ -202,6 +212,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
         OpenFileDialog openFileDialog = new() { Filter = "Stable Diffusion Model|*.*" };
         if (openFileDialog.ShowDialog() == true)
             ModelPath = openFileDialog.FileName;
+    }
+
+    private void SelectVae()
+    {
+        OpenFileDialog openFileDialog = new() { Filter = "Stable Diffusion VAE|*.*" };
+        if (openFileDialog.ShowDialog() == true)
+            VaePath = openFileDialog.FileName;
     }
 
     private void LogLine(string line, bool appendNewLine = true)

@@ -35,6 +35,12 @@
                 <TextBox Text="{Binding ModelPath}" />
             </DockPanel>
 
+            <Label Content="Vae-Path (Optional)"/>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectVaeCommand}" IsEnabled="{Binding IsReady}" />
+                <TextBox Text="{Binding VaePath}" />
+            </DockPanel>
+
             <Button Margin="0,8"  Content="Load Model" Command="{Binding LoadModelCommand}" IsEnabled="{Binding IsReady}" />
 
             <Separator />
