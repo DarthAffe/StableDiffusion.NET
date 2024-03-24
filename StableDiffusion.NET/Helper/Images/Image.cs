@@ -14,7 +14,7 @@ public sealed class Image<TColor> : IImage
     #region Properties & Fields
 
     private readonly byte[] _buffer;
-    
+
     private readonly int _x;
     private readonly int _y;
     private readonly int _stride;
@@ -216,13 +216,8 @@ public sealed class Image<TColor> : IImage
         /// <inheritdoc />
         public int Length => _length;
 
-#if NET7_0_OR_GREATER
         /// <inheritdoc />
         public int SizeInBytes => Length * TColor.ColorFormat.BytesPerPixel;
-#else
-        /// <inheritdoc />
-        public int SizeInBytes => Length * default(TColor).Net6ColorFormat.BytesPerPixel;
-#endif
 
         #endregion
 
@@ -359,13 +354,8 @@ public sealed class Image<TColor> : IImage
         /// <inheritdoc />
         public int Length => _length;
 
-#if NET7_0_OR_GREATER
         /// <inheritdoc />
         public int SizeInBytes => Length * TColor.ColorFormat.BytesPerPixel;
-#else
-        /// <inheritdoc />
-        public int SizeInBytes => Length * default(TColor).Net6ColorFormat.BytesPerPixel;
-#endif
 
         #endregion
 
