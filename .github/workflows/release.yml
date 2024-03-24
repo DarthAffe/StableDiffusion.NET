@@ -1,4 +1,4 @@
-name: Release
+name: release
 
 on:
   workflow_dispatch:
@@ -51,7 +51,5 @@ jobs:
                   
     - name: Nuget Push
       id: nuget_push
-      run: |
-        dotnet nuget push **\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
-        dotnet nuget push **\*.snupkg --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push **\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
      
