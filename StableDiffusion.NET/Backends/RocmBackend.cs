@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using StableDiffusion.NET.Helper;
 
 namespace StableDiffusion.NET;
 
@@ -12,14 +13,16 @@ public partial class RocmBackend : IBackend
 
     public int Priority => 10;
 
-    public bool IsAvailable => (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                             /*|| RuntimeInformation.IsOSPlatform(OSPlatform.Linux)*/)
-                            && (RuntimeInformation.OSArchitecture == Architecture.X64)
-                            && RocmVersion is 5;
+    public bool IsAvailable => ((RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                              && RocmVersion is 5)
+                             || (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+                              && RocmVersion is 6))
+                            && (RuntimeInformation.OSArchitecture == Architecture.X64);
 
     public string PathPart => RocmVersion switch
     {
         5 => "rocm5",
+        6 => "rocm6",
         _ => string.Empty
     };
 
@@ -46,7 +49,6 @@ public partial class RocmBackend : IBackend
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 string? rocmPath = Environment.GetEnvironmentVariable("HIP_PATH");
-
                 if (rocmPath == null) return -1;
 
                 Match match = GetWindowsVersionRegex().Match(rocmPath);
@@ -55,7 +57,12 @@ public partial class RocmBackend : IBackend
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                //TODO DarthAffe 23.03.2024: Get some info where it's located on linux
+                string? hipconfig = ProcessHelper.RunCommand("hipconfig");
+                if (hipconfig == null) return -1;
+
+                Match match = GetLinuxVersionRegex().Match(hipconfig);
+                if (match.Success)
+                    version = match.Groups["version"].Value;
             }
 
             if (string.IsNullOrEmpty(version))
@@ -72,6 +79,9 @@ public partial class RocmBackend : IBackend
 
     [GeneratedRegex(@".*?\\(?<version>\d+.\d*)\\")]
     private static partial Regex GetWindowsVersionRegex();
+
+    [GeneratedRegex(@"HIP_PATH\s*:\s*[\w\/]+-(?<version>[\d.]+)$")]
+    private static partial Regex GetLinuxVersionRegex();
 
     #endregion
 }
