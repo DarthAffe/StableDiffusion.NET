@@ -4,6 +4,53 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <Authors>Darth Affe</Authors>
+    <Company>Wyrez</Company>
+    <Language>en-US</Language>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Title>StableDiffusion.NET</Title>
+    <AssemblyName>StableDiffusion.NET</AssemblyName>
+    <AssemblyTitle>StableDiffusion.NET</AssemblyTitle>
+    <PackageId>StableDiffusion.NET</PackageId>
+    <RootNamespace>StableDiffusion.NET</RootNamespace>
+    <Description>Stable-Diffusion for .NET based on stable-diffusion.cpp</Description>
+    <Summary>Stable-Diffusion for .NET based on stable-diffusion.cpp</Summary>
+    <Copyright>Copyright © Darth Affe 2024</Copyright>
+    <PackageCopyright>Copyright © Darth Affe 2024</PackageCopyright>
+    <PackageIcon>sd_net.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/DarthAffe/StableDiffusion.NET</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>Github</RepositoryType>
+    <RepositoryUrl>https://github.com/DarthAffe/StableDiffusion.NET</RepositoryUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+
+    <Version>0.0.1</Version>
+    <AssemblyVersion>0.0.1</AssemblyVersion>
+    <FileVersion>0.0.1</FileVersion>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSource>True</IncludeSource>
+    <IncludeSymbols>True</IncludeSymbols>
+    <DebugType>portable</DebugType>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <Optimize>true</Optimize>
+    <NoWarn>$(NoWarn);CS1591;CS1572;CS1573</NoWarn>
+    <DefineConstants>RELEASE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="sd_net.png" Link="sd_net.png" Pack="true" PackagePath="\" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>
