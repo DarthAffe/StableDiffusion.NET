@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest 
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore --configuration Release /p:Version=${{ github.event.inputs.version }}
+      
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --configuration Release
+
+    - name: Upload Nuget Build Artifact
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        name: StableDiffusion.NET-Nuget
+        path: StableDiffusion.NET\bin\Release\*.nupkg
+        if-no-files-found: error
+
+    - name: List files
+      run: tree
+
+    - name: Release
+      uses: softprops/action-gh-release@v2.0.4
+      with:
+        tag_name: ${{ github.event.inputs.version }}
+        generate_release_notes: true
+        files: StableDiffusion.NET/bin/Release/net8.0/StableDiffusion.NET.dll
+                  
+    - name: Nuget Push
+      id: nuget_push
+      run: |
+        dotnet nuget push **\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push **\*.snupkg --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+     
