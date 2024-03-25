@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>StableDifffusion.NET.Backend.Cpu</id>
+    <version>$version$</version>
+    <title>StableDifffusion.NET.Backend.Cpu</title>
+    <authors>Darth Affe &amp; stable-diffusion.cpp Authors</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <icon>sd_net_cpu.png</icon>
+    <projectUrl>https://github.com/DarthAffe/StableDiffusion.NET</projectUrl>
+    <description>CPU-Backend for StableDiffusion.NET.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright © Darth Affe 2024</copyright>
+    <readme>readme.md</readme>
+  </metadata>
+
+  <files>
+    <file src="StableDiffusion.NET.Backend.props" target="build/net8.0/StableDiffusion.NET.Backend.Cpu.props" />
+
+    <file src="windows-noavx/stable-diffusion.dll" target="runtimes\win-x64\native\stable-diffusion.dll" />
+    <file src="windows-avx/stable-diffusion.dll" target="runtimes\win-x64\native\avx\stable-diffusion.dll" />
+    <file src="windows-avx2/stable-diffusion.dll" target="runtimes\win-x64\native\avx2\stable-diffusion.dll" />
+    <file src="windows-avx512/stable-diffusion.dll" target="runtimes\win-x64\native\avx512\stable-diffusion.dll" />
+
+    <file src="linux-noavx/libstable-diffusion.so" target="runtimes\linux-x64\native\libstable-diffusion.so" />
+    <file src="linux-avx/libstable-diffusion.so" target="runtimes\linux-x64\native\avx\libstable-diffusion.so" />
+    <file src="linux-avx2/libstable-diffusion.so" target="runtimes\linux-x64\native\avx2\libstable-diffusion.so" />
+    <file src="linux-avx512/libstable-diffusion.so" target="runtimes\linux-x64\native\avx512\libstable-diffusion.so" />
+
+    <file src="osx-noavx/libstable-diffusion.dylib" target="runtimes\osx-x64\native\libstable-diffusion.dylib" />
+    <file src="osx-avx/libstable-diffusion.dylib" target="runtimes\osx-x64\native\avx\libstable-diffusion.dylib" />
+    <file src="osx-avx2/libstable-diffusion.dylib" target="runtimes\osx-x64\native\avx2\libstable-diffusion.dylib" />
+    <file src="osx-avx512/libstable-diffusion.dylib" target="runtimes\osx-x64\native\avx512\libstable-diffusion.dylib" />
+    
+    <file src="sd_net_cpu.png" target="sd_net_cpu.png" />
+    <file src="readme.md" target="readme.md" />
+    <file src="ggml.txt" target="ggml.txt" />
+    <file src="stable-diffusion.cpp.txt" target="stable-diffusion.cpp.txt" />
+  </files>
+</package>
