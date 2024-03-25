@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StableDiffusion.NET", "Stab
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{8961F5D8-3F50-4027-8862-635FCA1E1568}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageCreationUI", "ImageCreationUI\ImageCreationUI.csproj", "{EB73E250-D2F7-469A-80BF-02C5078546A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageCreationUI", "Examples\ImageCreationUI\ImageCreationUI.csproj", "{EB73E250-D2F7-469A-80BF-02C5078546A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
