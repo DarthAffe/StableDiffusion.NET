@@ -1,10 +1,12 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace StableDiffusion.NET;
 
+[PublicAPI]
 public static class Backends
 {
     #region Properties & Fields

@@ -101,7 +101,12 @@ internal unsafe partial class Native
                                                 int sample_steps,
                                                 float strength,
                                                 long seed,
-                                                int batch_count);
+                                                int batch_count,
+                                                sd_image_t* control_cond,
+                                                float control_strength,
+                                                float style_strength,
+                                                [MarshalAs(UnmanagedType.I1)] bool normalize_input,
+                                                [MarshalAs(UnmanagedType.LPStr)] string input_id_images_path);
 
     [LibraryImport(LIB_NAME, EntryPoint = "img2vid")]
     internal static partial sd_image_t* img2vid(sd_ctx_t* sd_ctx,

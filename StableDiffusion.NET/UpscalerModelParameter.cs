@@ -1,5 +1,8 @@
-﻿namespace StableDiffusion.NET;
+﻿using JetBrains.Annotations;
 
+namespace StableDiffusion.NET;
+
+[PublicAPI]
 public class UpscalerModelParameter
 {
     #region Properties & Fields

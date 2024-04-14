@@ -1,5 +1,8 @@
-﻿namespace StableDiffusion.NET;
+﻿using JetBrains.Annotations;
 
+namespace StableDiffusion.NET;
+
+[PublicAPI]
 public sealed class StableDiffusionParameter
 {
     #region Properties & Fields
@@ -20,6 +23,7 @@ public sealed class StableDiffusionParameter
     #endregion
 }
 
+[PublicAPI]
 public sealed class StableDiffusionControlNetParameter
 {
     public bool IsEnabled => Image?.Length > 0;
@@ -34,6 +38,7 @@ public sealed class StableDiffusionControlNetParameter
     public bool CannyInverse { get; set; } = false;
 }
 
+[PublicAPI]
 public sealed class PhotoMakerParameter
 {
     public string InputIdImageDirectory { get; set; } = string.Empty;

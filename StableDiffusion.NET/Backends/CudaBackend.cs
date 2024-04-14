@@ -5,9 +5,11 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 
 namespace StableDiffusion.NET;
 
+[PublicAPI]
 public partial class CudaBackend : IBackend
 {
     #region Constants

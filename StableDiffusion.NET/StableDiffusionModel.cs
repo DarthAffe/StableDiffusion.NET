@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 
 namespace StableDiffusion.NET;
 
+[PublicAPI]
 public sealed unsafe class StableDiffusionModel : IDisposable
 {
     #region Properties & Fields
@@ -206,20 +208,102 @@ public sealed unsafe class StableDiffusionModel : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        Native.sd_image_t* result = Native.img2img(_ctx,
-                                                   image,
-                                                   prompt,
-                                                   parameter.NegativePrompt,
-                                                   parameter.ClipSkip,
-                                                   parameter.CfgScale,
-                                                   parameter.Width,
-                                                   parameter.Height,
-                                                   parameter.SampleMethod,
-                                                   parameter.SampleSteps,
-                                                   parameter.Strength,
-                                                   parameter.Seed,
-                                                   1);
+        Native.sd_image_t* result;
+        if (parameter.ControlNet.IsEnabled)
+        {
+            fixed (byte* imagePtr = parameter.ControlNet.Image)
+            {
 
+                if (parameter.ControlNet.CannyPreprocess)
+                {
+                    Native.sd_image_t controlNetImage = new()
+                    {
+                        width = (uint)parameter.Width,
+                        height = (uint)parameter.Height,
+                        channel = 3,
+                        data = Native.preprocess_canny(imagePtr,
+                                                       parameter.Width,
+                                                       parameter.Height,
+                                                       parameter.ControlNet.CannyHighThreshold,
+                                                       parameter.ControlNet.CannyLowThreshold,
+                                                       parameter.ControlNet.CannyWeak,
+                                                       parameter.ControlNet.CannyStrong,
+                                                       parameter.ControlNet.CannyInverse)
+                    };
+
+                    result = Native.img2img(_ctx,
+                                            image,
+                                            prompt,
+                                            parameter.NegativePrompt,
+                                            parameter.ClipSkip,
+                                            parameter.CfgScale,
+                                            parameter.Width,
+                                            parameter.Height,
+                                            parameter.SampleMethod,
+                                            parameter.SampleSteps,
+                                            parameter.Strength,
+                                            parameter.Seed,
+                                            1,
+                                            &controlNetImage,
+                                            parameter.ControlNet.Strength,
+                                            parameter.PhotoMaker.StyleRatio,
+                                            parameter.PhotoMaker.NormalizeInput,
+                                            parameter.PhotoMaker.InputIdImageDirectory);
+
+                    Marshal.FreeHGlobal((nint)controlNetImage.data);
+                }
+                else
+                {
+                    Native.sd_image_t controlNetImage = new()
+                    {
+                        width = (uint)parameter.Width,
+                        height = (uint)parameter.Height,
+                        channel = 3,
+                        data = imagePtr
+                    };
+
+                    result = Native.img2img(_ctx,
+                                            image,
+                                            prompt,
+                                            parameter.NegativePrompt,
+                                            parameter.ClipSkip,
+                                            parameter.CfgScale,
+                                            parameter.Width,
+                                            parameter.Height,
+                                            parameter.SampleMethod,
+                                            parameter.SampleSteps,
+                                            parameter.Strength,
+                                            parameter.Seed,
+                                            1,
+                                            &controlNetImage,
+                                            parameter.ControlNet.Strength,
+                                            parameter.PhotoMaker.StyleRatio,
+                                            parameter.PhotoMaker.NormalizeInput,
+                                            parameter.PhotoMaker.InputIdImageDirectory);
+                }
+            }
+        }
+        else
+        {
+            result = Native.img2img(_ctx,
+                                    image,
+                                    prompt,
+                                    parameter.NegativePrompt,
+                                    parameter.ClipSkip,
+                                    parameter.CfgScale,
+                                    parameter.Width,
+                                    parameter.Height,
+                                    parameter.SampleMethod,
+                                    parameter.SampleSteps,
+                                    parameter.Strength,
+                                    parameter.Seed,
+                                    1,
+                                    null,
+                                    0,
+                                    parameter.PhotoMaker.StyleRatio,
+                                    parameter.PhotoMaker.NormalizeInput,
+                                    parameter.PhotoMaker.InputIdImageDirectory);
+        }
 
         return new StableDiffusionImage(result);
     }

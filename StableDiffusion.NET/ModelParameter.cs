@@ -1,5 +1,8 @@
-﻿namespace StableDiffusion.NET;
+﻿using JetBrains.Annotations;
 
+namespace StableDiffusion.NET;
+
+[PublicAPI]
 public class ModelParameter
 {
     #region Properties & Fields

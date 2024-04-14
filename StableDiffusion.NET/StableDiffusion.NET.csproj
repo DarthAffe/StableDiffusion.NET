@@ -53,4 +53,8 @@
     <Content Include="sd_net.png" Link="sd_net.png" Pack="true" PackagePath="\" />
     <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+  </ItemGroup>
 </Project>

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Runtime.InteropServices;
 
 namespace StableDiffusion.NET;
 
+[PublicAPI]
 public sealed unsafe class StableDiffusionImage : IDisposable
 {
     #region Properties & Fields

@@ -1,5 +1,8 @@
-﻿namespace StableDiffusion.NET;
+﻿using JetBrains.Annotations;
 
+namespace StableDiffusion.NET;
+
+[PublicAPI]
 public interface IBackend
 {
     bool IsEnabled { get; set; }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using StableDiffusion.NET.Helper;
 
 namespace StableDiffusion.NET;
 
+[PublicAPI]
 public partial class RocmBackend : IBackend
 {
     #region Properties & Fields
