@@ -82,7 +82,7 @@ public partial class RocmBackend : IBackend
     [GeneratedRegex(@".*?\\(?<version>\d+.\d*)\\")]
     private static partial Regex GetWindowsVersionRegex();
 
-    [GeneratedRegex(@"HIP_PATH\s*:\s*[\w\/]+-(?<version>[\d.]+)$")]
+    [GeneratedRegex(@"HIP version\s*:\s*(?<version>[\d.]+(?:-\w+)?)")]
     private static partial Regex GetLinuxVersionRegex();
 
     #endregion
