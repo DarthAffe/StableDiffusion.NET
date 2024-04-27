@@ -1,8 +1,10 @@
-﻿using System.Drawing;
+﻿using System.Buffers;
+using System.Drawing;
 using System.Drawing.Imaging;
 using StableDiffusion.NET.Helper.Images.Colors;
 using StableDiffusion.NET.Helper.Images;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace ImageCreationUI;
 
@@ -41,5 +43,35 @@ public static class ImageExtension
         bitmap.Save(ms, ImageFormat.Png);
 
         return ms.ToArray();
+    }
+
+    public static unsafe Image<ColorRGB> ToImage(this Bitmap bitmap)
+    {
+        int width = bitmap.Width;
+        int height = bitmap.Height;
+
+        byte[] buffer = new byte[height * width * ColorRGB.ColorFormat.BytesPerPixel];
+        Span<ColorRGB> colorBuffer = MemoryMarshal.Cast<byte, ColorRGB>(buffer);
+
+        Rectangle rect = new(0, 0, bitmap.Width, bitmap.Height);
+        BitmapData bmpData = bitmap.LockBits(rect, ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+        nint ptr = bmpData.Scan0;
+        for (int y = 0; y < height; y++)
+        {
+            Span<ColorBGR> source = new((void*)ptr, bmpData.Stride);
+            Span<ColorRGB> target = colorBuffer.Slice(y * width, width);
+            for (int x = 0; x < width; x++)
+            {
+                ColorBGR srcColor = source[x];
+                target[x] = new ColorRGB(srcColor.R, srcColor.G, srcColor.B);
+            }
+
+            ptr += bmpData.Stride;
+        }
+
+        bitmap.UnlockBits(bmpData);
+
+        return new Image<ColorRGB>(buffer, 0, 0, width, height, width);
     }
 }
