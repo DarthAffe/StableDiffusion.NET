@@ -10,11 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="StableDifffusion.NET.Backend.Cpu" Version="1.0.0" />
-    <PackageReference Include="StableDifffusion.NET.Backend.Cuda" Version="1.0.0" />
-    <PackageReference Include="StableDifffusion.NET.Backend.Rocm" Version="1.0.0" />
-    <PackageReference Include="StableDiffusion.NET" Version="1.0.0" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+    <PackageReference Include="StableDifffusion.NET.Backend.Cpu" Version="1.2.0" />
+    <PackageReference Include="StableDifffusion.NET.Backend.Cuda" Version="1.2.0" />
+    <PackageReference Include="StableDifffusion.NET.Backend.Rocm" Version="1.2.0" />
+    <PackageReference Include="StableDifffusion.NET" Version="1.2.0" />
   </ItemGroup>
 
 </Project>

@@ -5,14 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImageCreationUI"
         xmlns:converter="clr-namespace:ImageCreationUI.Converter"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+        xmlns:sd="clr-namespace:StableDiffusion.NET;assembly=StableDiffusion.NET"
         mc:Ignorable="d"
-        Title="StableDiffusion.NET" Width="1280" Height="720">
+        Title="StableDiffusion.NET" Width="1280" Height="800">
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
 
     <Window.Resources>
         <converter:ImageToImageSourceConverter x:Key="ImageToImageSourceConverter" />
+
+        <ObjectDataProvider x:Key="ScheduleDataSource"
+                            ObjectType="{x:Type sys:Enum}"
+                            MethodName="GetValues">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="sd:Schedule" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <ObjectDataProvider x:Key="SamplerDataSource"
+                            ObjectType="{x:Type sys:Enum}"
+                            MethodName="GetValues">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="sd:Sampler" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </Window.Resources>
 
     <Grid>
@@ -29,17 +47,20 @@
 
             <Separator />
 
-            <Label Content="Model-Path"/>
+            <Label Content="Model-Path" />
             <DockPanel>
                 <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectModelCommand}" IsEnabled="{Binding IsReady}" />
                 <TextBox Text="{Binding ModelPath}" />
             </DockPanel>
 
-            <Label Content="Vae-Path (Optional)"/>
+            <Label Content="Vae-Path (Optional)" />
             <DockPanel>
                 <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectVaeCommand}" IsEnabled="{Binding IsReady}" />
                 <TextBox Text="{Binding VaePath}" />
             </DockPanel>
+
+            <Label Content="Schedule" />
+            <ComboBox ItemsSource="{Binding Source={StaticResource ScheduleDataSource}}" SelectedItem="{Binding Schedule}" />
 
             <Button Margin="0,8"  Content="Load Model" Command="{Binding LoadModelCommand}" IsEnabled="{Binding IsReady}" />
 
@@ -75,6 +96,9 @@
                 <Label Width="50" Content="Seed" />
                 <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Seed}" />
             </StackPanel>
+
+            <Label Content="Sample-Method" />
+            <ComboBox ItemsSource="{Binding Source={StaticResource SamplerDataSource}}" SelectedItem="{Binding SampleMethod}" />
 
             <Button Margin="0,16,0,0" Content="Create Image" Command="{Binding CreateImageCommand}" IsEnabled="{Binding IsReady}" />
             <Button Margin="0,16,0,0" Content="Save Image" Command="{Binding SaveImageCommand}" IsEnabled="{Binding IsReady}" />

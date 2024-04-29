@@ -27,6 +27,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
         set => SetProperty(ref _vaePath, value);
     }
 
+    private Schedule _schedule = Schedule.Default;
+    public Schedule Schedule
+    {
+        get => _schedule;
+        set => SetProperty(ref _schedule, value);
+    }
+
     private string _prompt = string.Empty;
     public string Prompt
     {
@@ -74,6 +81,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
     {
         get => _seed;
         set => SetProperty(ref _seed, value);
+    }
+
+    private Sampler _sampleMethod = Sampler.Euler_A;
+    public Sampler SampleMethod
+    {
+        get => _sampleMethod;
+        set => SetProperty(ref _sampleMethod, value);
     }
 
     private IImage? _image;
@@ -146,7 +160,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             _model?.Dispose();
 
             LogLine($"Loading model '{ModelPath}'");
-            _model = await Task.Run(() => new StableDiffusionModel(ModelPath, new ModelParameter { VaePath = VaePath }));
+            _model = await Task.Run(() => new StableDiffusionModel(ModelPath, new ModelParameter { VaePath = VaePath, Schedule = Schedule }));
         }
         catch (Exception ex)
         {
@@ -172,7 +186,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 Height = Height,
                 CfgScale = Cfg,
                 SampleSteps = Steps,
-                Seed = Seed
+                Seed = Seed,
+                SampleMethod = SampleMethod
             }));
 
             Image = image?.ToImage();
