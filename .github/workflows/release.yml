@@ -24,13 +24,13 @@ jobs:
         dotnet-version: 8.0.x
         
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore StableDiffusion.NET
       
     - name: Build
-      run: dotnet build --no-restore --configuration Release /p:Version=${{ github.event.inputs.version }}
+      run: dotnet build StableDiffusion.NET --no-restore --configuration Release /p:Version=${{ github.event.inputs.version }}
       
     - name: Test
-      run: dotnet test --no-build --verbosity normal --configuration Release
+      run: dotnet test StableDiffusion.NET --no-build --verbosity normal --configuration Release
 
     - name: Upload Nuget Build Artifact
       uses: actions/upload-artifact@v4.3.1
