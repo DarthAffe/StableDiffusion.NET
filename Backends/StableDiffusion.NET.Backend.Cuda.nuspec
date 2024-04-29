@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
-    <id>StableDifffusion.NET.Backend.Cuda</id>
+    <id>StableDiffusion.NET.Backend.Cuda</id>
     <version>$version$</version>
-    <title>StableDifffusion.NET.Backend.Cuda</title>
+    <title>StableDiffusion.NET.Backend.Cuda</title>
     <authors>Darth Affe &amp; stable-diffusion.cpp Authors</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
@@ -20,7 +20,7 @@
 
     <file src="windows-cuda11/stable-diffusion.dll" target="runtimes\win-x64\native\cuda11\stable-diffusion.dll" />
     <file src="windows-cuda12/stable-diffusion.dll" target="runtimes\win-x64\native\cuda12\stable-diffusion.dll" />
-	
+    
     <file src="linux-cuda11/libstable-diffusion.so" target="runtimes\linux-x64\native\cuda11\libstable-diffusion.so" />
     <file src="linux-cuda12/libstable-diffusion.so" target="runtimes\linux-x64\native\cuda12\libstable-diffusion.so" />
     

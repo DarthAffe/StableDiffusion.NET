@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
-    <id>StableDifffusion.NET.Backend.Cpu</id>
+    <id>StableDiffusion.NET.Backend.Cpu</id>
     <version>$version$</version>
-    <title>StableDifffusion.NET.Backend.Cpu</title>
+    <title>StableDiffusion.NET.Backend.Cpu</title>
     <authors>Darth Affe &amp; stable-diffusion.cpp Authors</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
-    <id>StableDifffusion.NET.Backend.Rocm</id>
+    <id>StableDiffusion.NET.Backend.Rocm</id>
     <version>$version$</version>
-    <title>StableDifffusion.NET.Backend.Rocm</title>
+    <title>StableDiffusion.NET.Backend.Rocm</title>
     <authors>Darth Affe &amp; stable-diffusion.cpp Authors</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
@@ -19,7 +19,7 @@
     <file src="StableDiffusion.NET.Backend.props" target="build/net8.0/StableDiffusion.NET.Backend.Rocm.props" />
 
     <file src="windows-rocm5/stable-diffusion.dll" target="runtimes\win-x64\native\rocm5\stable-diffusion.dll" />
-	
+    
     <file src="linux-rocm6/libstable-diffusion.so" target="runtimes\linux-x64\native\rocm6\libstable-diffusion.so" />
     
     <file src="sd_net_rocm.png" target="sd_net_rocm.png" />
