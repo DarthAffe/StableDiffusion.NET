@@ -42,6 +42,11 @@ public sealed unsafe class StableDiffusionModel : IDisposable
 
     public StableDiffusionModel(string modelPath, ModelParameter parameter, UpscalerModelParameter? upscalerParameter = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(modelPath, nameof(modelPath));
+
+        parameter.Validate();
+        upscalerParameter?.Validate();
+
         this._modelPath = modelPath;
         this._parameter = parameter;
         this._upscalerParameter = upscalerParameter;
@@ -88,6 +93,9 @@ public sealed unsafe class StableDiffusionModel : IDisposable
     public StableDiffusionImage TextToImage(string prompt, StableDiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentNullException.ThrowIfNull(prompt);
+
+        parameter.Validate();
 
         Native.sd_image_t* result;
         if (parameter.ControlNet.IsEnabled)
@@ -186,6 +194,9 @@ public sealed unsafe class StableDiffusionModel : IDisposable
     public StableDiffusionImage ImageToImage(string prompt, in ReadOnlySpan<byte> image, StableDiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentNullException.ThrowIfNull(prompt);
+
+        parameter.Validate();
 
         fixed (byte* imagePtr = image)
         {
@@ -207,9 +218,12 @@ public sealed unsafe class StableDiffusionModel : IDisposable
     private StableDiffusionImage ImageToImage(string prompt, Native.sd_image_t image, StableDiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentNullException.ThrowIfNull(prompt);
+
+        parameter.Validate();
 
         Native.sd_image_t* result;
-        if (parameter.ControlNet.IsEnabled)
+        if (parameter!.ControlNet.IsEnabled)
         {
             fixed (byte* imagePtr = parameter.ControlNet.Image)
             {
@@ -361,7 +375,14 @@ public sealed unsafe class StableDiffusionModel : IDisposable
     }
 
     public static void Convert(string modelPath, string vaePath, Quantization quantization, string outputPath)
-        => Native.convert(modelPath, vaePath, outputPath, quantization);
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(nameof(modelPath));
+        ArgumentException.ThrowIfNullOrWhiteSpace(nameof(outputPath));
+        ArgumentNullException.ThrowIfNull(vaePath);
+        if (!Enum.IsDefined(quantization)) throw new ArgumentOutOfRangeException(nameof(quantization));
+
+        Native.convert(modelPath, vaePath, outputPath, quantization);
+    }
 
     public static string GetSystemInfo()
     {
