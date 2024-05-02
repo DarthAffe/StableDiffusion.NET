@@ -223,7 +223,7 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         parameter.Validate();
 
         Native.sd_image_t* result;
-        if (parameter!.ControlNet.IsEnabled)
+        if (parameter.ControlNet.IsEnabled)
         {
             fixed (byte* imagePtr = parameter.ControlNet.Image)
             {
