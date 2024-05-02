@@ -9,6 +9,8 @@ public static class ParameterExtension
     public static void Validate(this StableDiffusionParameter parameter)
     {
         ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentNullException.ThrowIfNull(parameter.ControlNet, nameof(StableDiffusionParameter.ControlNet));
+        ArgumentNullException.ThrowIfNull(parameter.PhotoMaker, nameof(StableDiffusionParameter.PhotoMaker));
         ArgumentNullException.ThrowIfNull(parameter.NegativePrompt, nameof(StableDiffusionParameter.NegativePrompt));
 
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.Width, nameof(StableDiffusionParameter.Width));
@@ -20,10 +22,8 @@ public static class ParameterExtension
 
         if (!Enum.IsDefined(parameter.SampleMethod)) throw new ArgumentOutOfRangeException(nameof(StableDiffusionParameter.SampleMethod));
 
-        // ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
-        parameter.ControlNet?.Validate();
-        parameter.PhotoMaker?.Validate();
-        // ReSharper restore ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+        parameter.ControlNet.Validate();
+        parameter.PhotoMaker.Validate();
     }
 
     public static void Validate(this StableDiffusionControlNetParameter parameter)
