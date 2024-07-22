@@ -57,9 +57,9 @@ jobs:
       - name: Install cuda-toolkit
         id: cuda-toolkit-12
         if: ${{ matrix.build == 'cuda12' }}
-        uses: Jimver/cuda-toolkit@v0.2.14
+        uses: Jimver/cuda-toolkit@v0.2.16
         with:
-          cuda: '12.5.1'
+          cuda: '12.5.0'
           method: network
           sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust", "visual_studio_integration"]'
           use-github-cache: false
