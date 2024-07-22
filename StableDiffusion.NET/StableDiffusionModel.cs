@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using HPPH;
 using JetBrains.Annotations;
 
 namespace StableDiffusion.NET;
@@ -90,7 +91,7 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         }
     }
 
-    public StableDiffusionImage TextToImage(string prompt, StableDiffusionParameter parameter)
+    public IImage<ColorRGB> TextToImage(string prompt, StableDiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(prompt);
@@ -100,16 +101,15 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         Native.sd_image_t* result;
         if (parameter.ControlNet.IsEnabled)
         {
-            fixed (byte* imagePtr = parameter.ControlNet.Image)
+            fixed (byte* imagePtr = parameter.ControlNet.Image!.ToRawArray())
             {
-
                 if (parameter.ControlNet.CannyPreprocess)
                 {
                     Native.sd_image_t controlNetImage = new()
                     {
-                        width = (uint)parameter.Width,
-                        height = (uint)parameter.Height,
-                        channel = 3,
+                        width = (uint)parameter.ControlNet.Image.Width,
+                        height = (uint)parameter.ControlNet.Image.Height,
+                        channel = (uint)parameter.ControlNet.Image.ColorFormat.BytesPerPixel,
                         data = Native.preprocess_canny(imagePtr,
                                                        parameter.Width,
                                                        parameter.Height,
@@ -143,9 +143,9 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                 {
                     Native.sd_image_t controlNetImage = new()
                     {
-                        width = (uint)parameter.Width,
-                        height = (uint)parameter.Height,
-                        channel = 3,
+                        width = (uint)parameter.ControlNet.Image.Width,
+                        height = (uint)parameter.ControlNet.Image.Height,
+                        channel = (uint)parameter.ControlNet.Image.ColorFormat.BytesPerPixel,
                         data = imagePtr
                     };
 
@@ -188,34 +188,21 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                     parameter.PhotoMaker.InputIdImageDirectory);
         }
 
-        return new StableDiffusionImage(result);
+        return ImageHelper.ToImage(result);
     }
 
-    public StableDiffusionImage ImageToImage(string prompt, in ReadOnlySpan<byte> image, StableDiffusionParameter parameter)
+    public IImage<ColorRGB> ImageToImage(string prompt, IImage<ColorRGB> image, StableDiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(prompt);
 
         parameter.Validate();
 
-        fixed (byte* imagePtr = image)
-        {
-            Native.sd_image_t img = new()
-            {
-                width = (uint)parameter.Width,
-                height = (uint)parameter.Height,
-                channel = 3,
-                data = imagePtr
-            };
-
-            return ImageToImage(prompt, img, parameter);
-        }
+        fixed (byte* imagePtr = image.AsRefImage())
+            return ImageToImage(prompt, image.ToSdImage(imagePtr), parameter);
     }
 
-    public StableDiffusionImage ImageToImage(string prompt, StableDiffusionImage image, StableDiffusionParameter parameter)
-        => ImageToImage(prompt, *image.Image, parameter);
-
-    private StableDiffusionImage ImageToImage(string prompt, Native.sd_image_t image, StableDiffusionParameter parameter)
+    private IImage<ColorRGB> ImageToImage(string prompt, Native.sd_image_t image, StableDiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(prompt);
@@ -225,16 +212,15 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         Native.sd_image_t* result;
         if (parameter.ControlNet.IsEnabled)
         {
-            fixed (byte* imagePtr = parameter.ControlNet.Image)
+            fixed (byte* imagePtr = parameter.ControlNet.Image!.ToRawArray())
             {
-
                 if (parameter.ControlNet.CannyPreprocess)
                 {
                     Native.sd_image_t controlNetImage = new()
                     {
-                        width = (uint)parameter.Width,
-                        height = (uint)parameter.Height,
-                        channel = 3,
+                        width = (uint)parameter.ControlNet.Image.Width,
+                        height = (uint)parameter.ControlNet.Image.Height,
+                        channel = (uint)parameter.ControlNet.Image.ColorFormat.BytesPerPixel,
                         data = Native.preprocess_canny(imagePtr,
                                                        parameter.Width,
                                                        parameter.Height,
@@ -270,9 +256,9 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                 {
                     Native.sd_image_t controlNetImage = new()
                     {
-                        width = (uint)parameter.Width,
-                        height = (uint)parameter.Height,
-                        channel = 3,
+                        width = (uint)parameter.ControlNet.Image.Width,
+                        height = (uint)parameter.ControlNet.Image.Height,
+                        channel = (uint)parameter.ControlNet.Image.ColorFormat.BytesPerPixel,
                         data = imagePtr
                     };
 
@@ -319,46 +305,27 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                     parameter.PhotoMaker.InputIdImageDirectory);
         }
 
-        return new StableDiffusionImage(result);
+        return ImageHelper.ToImage(result);
     }
 
-    public StableDiffusionImage Upscale(StableDiffusionImage image, int upscaleFactor)
+    public IImage<ColorRGB> Upscale(IImage<ColorRGB> image, int upscaleFactor)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(upscaleFactor, 0, nameof(upscaleFactor));
 
         if (_upscalerCtx == null) throw new NullReferenceException("The upscaler is not initialized.");
 
-        return Upscale(*image.Image, upscaleFactor);
-    }
-
-    public StableDiffusionImage Upscale(in ReadOnlySpan<byte> image, int width, int height, int upscaleFactor)
-    {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(upscaleFactor, 0, nameof(upscaleFactor));
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(width, 0, nameof(upscaleFactor));
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(height, 0, nameof(upscaleFactor));
-
-        if (_upscalerCtx == null) throw new NullReferenceException("The upscaler is not initialized.");
-
-        fixed (byte* imagePtr = image)
+        fixed (byte* imagePtr = image.ConvertTo<ColorRGB>().AsRefImage())
         {
-            Native.sd_image_t srcImage = new()
-            {
-                width = (uint)width,
-                height = (uint)height,
-                channel = 3,
-                data = imagePtr
-            };
-
-            return Upscale(srcImage, upscaleFactor);
+            Native.sd_image_t result = Native.upscale(_upscalerCtx, image.ToSdImage(imagePtr), upscaleFactor);
+            return ImageHelper.ToImage(&result);
         }
     }
 
-    private StableDiffusionImage Upscale(Native.sd_image_t image, int upscaleFactor)
+    private IImage<ColorRGB> Upscale(Native.sd_image_t image, int upscaleFactor)
     {
         Native.sd_image_t result = Native.upscale(_upscalerCtx, image, upscaleFactor);
-        return new StableDiffusionImage(&result);
+        return ImageHelper.ToImage(&result);
     }
 
     public void Dispose()

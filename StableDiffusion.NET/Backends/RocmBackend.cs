@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
-using StableDiffusion.NET.Helper;
 
 namespace StableDiffusion.NET;
 

@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using HPPH;
+using JetBrains.Annotations;
 
 namespace StableDiffusion.NET;
 
@@ -26,9 +27,9 @@ public sealed class StableDiffusionParameter
 [PublicAPI]
 public sealed class StableDiffusionControlNetParameter
 {
-    public bool IsEnabled => Image?.Length > 0;
+    public bool IsEnabled => Image != null;
 
-    public byte[]? Image { get; set; } = null;
+    public IImage<ColorRGB>? Image { get; set; } = null;
     public float Strength { get; set; } = 0.9f;
     public bool CannyPreprocess { get; set; } = false;
     public float CannyHighThreshold { get; set; } = 0.08f;
