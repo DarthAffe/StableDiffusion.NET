@@ -4,7 +4,8 @@ using System.IO;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using StableDiffusion.NET.Helper.Images;
+using HPPH;
+using HPPH.System.Drawing;
 
 namespace ImageCreationUI.Converter;
 
@@ -13,7 +14,7 @@ public class ImageToImageSourceConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        Bitmap? bitmap = (value as IImage)?.ToBitmap();
+        using Bitmap? bitmap = (value as IImage)?.ToBitmap();
         if (bitmap == null) return null;
 
         using MemoryStream ms = new();
