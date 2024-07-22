@@ -15,5 +15,10 @@ If you want to add your own native-libraries or need more control over which bac
 ### Example
 ```csharp
 using StableDiffusionModel sd = new(@"<path_to_model>", new ModelParameter());
-using StableDiffusionImage image = sd.TextToImage("<prompt>", new StableDiffusionParameter());
+IImage<ColorRGB> image = sd.TextToImage("<prompt>", new StableDiffusionParameter());
 ```
+
+
+To process the resulting image further you can write your own extensions or install one of the [HPPH](https://github.com/DarthAffe/HPPH)-extension sets:   
+[HPPH.System.Drawing](https://www.nuget.org/packages/HPPH.System.Drawing)   
+[HPPH.SkiaSharp](https://www.nuget.org/packages/HPPH.SkiaSharp)
