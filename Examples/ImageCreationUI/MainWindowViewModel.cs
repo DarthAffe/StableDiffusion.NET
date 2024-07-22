@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
+using HPPH;
+using HPPH.System.Drawing;
 using Microsoft.Win32;
 using StableDiffusion.NET;
-using StableDiffusion.NET.Helper.Images;
 
 namespace ImageCreationUI;
 
@@ -90,6 +92,33 @@ public class MainWindowViewModel : INotifyPropertyChanged
         set => SetProperty(ref _sampleMethod, value);
     }
 
+    private string _image2ImageSourcePath = string.Empty;
+    public string Image2ImageSourcePath
+    {
+        get => _image2ImageSourcePath;
+        set
+        {
+            if (SetProperty(ref _image2ImageSourcePath, value))
+            {
+                try
+                {
+                    Image2ImageSource = ImageHelper.LoadImage(value).ConvertTo<ColorRGB>();
+                }
+                catch
+                {
+                    Image2ImageSource = null;
+                }
+            }
+        }
+    }
+
+    private IImage<ColorRGB>? _image2ImageSource;
+    public IImage<ColorRGB>? Image2ImageSource
+    {
+        get => _image2ImageSource;
+        set => SetProperty(ref _image2ImageSource, value);
+    }
+
     private IImage? _image;
     public IImage? Image
     {
@@ -129,6 +158,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     private ActionCommand? _selectVaeCommand;
     public ActionCommand SelectVaeCommand => _selectVaeCommand ??= new ActionCommand(SelectVae);
+
+    private ActionCommand? _selectImage2ImageSourceCommand;
+    public ActionCommand SelectImage2ImageSourceCommand => _selectImage2ImageSourceCommand ??= new ActionCommand(SelectImage2ImageSource);
 
     #endregion
 
@@ -178,19 +210,35 @@ public class MainWindowViewModel : INotifyPropertyChanged
         {
             IsReady = false;
 
-            LogLine("Creating image ...");
-            using StableDiffusionImage? image = await Task.Run(() => _model?.TextToImage(Prompt, new StableDiffusionParameter
+            if (Image2ImageSource == null)
             {
-                NegativePrompt = AntiPrompt,
-                Width = Width,
-                Height = Height,
-                CfgScale = Cfg,
-                SampleSteps = Steps,
-                Seed = Seed,
-                SampleMethod = SampleMethod
-            }));
+                LogLine("Creating image ...");
+                Image = await Task.Run(() => _model?.TextToImage(Prompt, new StableDiffusionParameter
+                {
+                    NegativePrompt = AntiPrompt,
+                    Width = Width,
+                    Height = Height,
+                    CfgScale = Cfg,
+                    SampleSteps = Steps,
+                    Seed = Seed,
+                    SampleMethod = SampleMethod
+                }));
+            }
+            else
+            {
+                LogLine("Manipulating image ...");
+                Image = await Task.Run(() => _model?.ImageToImage(Prompt, Image2ImageSource, new StableDiffusionParameter
+                {
+                    NegativePrompt = AntiPrompt,
+                    Width = Width,
+                    Height = Height,
+                    CfgScale = Cfg,
+                    SampleSteps = Steps,
+                    Seed = Seed,
+                    SampleMethod = SampleMethod
+                }));
+            }
 
-            Image = image?.ToImage();
             LogLine("done!");
         }
         catch (Exception ex)
@@ -234,6 +282,19 @@ public class MainWindowViewModel : INotifyPropertyChanged
         OpenFileDialog openFileDialog = new() { Filter = "Stable Diffusion VAE|*.*" };
         if (openFileDialog.ShowDialog() == true)
             VaePath = openFileDialog.FileName;
+    }
+
+    private void SelectImage2ImageSource()
+    {
+        IEnumerable<string> codecs = ["All Files (*.*)|*.*", .. ImageCodecInfo.GetImageDecoders().Select(c =>
+                                      {
+                                          string codecName = c.CodecName![8..].Replace("Codec", "Files").Trim();
+                                          return $"{codecName} ({c.FilenameExtension})|{c.FilenameExtension}";
+                                      })];
+
+        OpenFileDialog openFileDialog = new() { Filter = string.Join('|', codecs) };
+        if (openFileDialog.ShowDialog() == true)
+            Image2ImageSourcePath = openFileDialog.FileName;
     }
 
     private void LogLine(string line, bool appendNewLine = true)

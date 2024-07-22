@@ -72,30 +72,44 @@
             <Label Content="AntiPrompt" />
             <TextBox Height="80" TextWrapping="Wrap" Text="{Binding AntiPrompt}" />
 
-            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                <Label Width="50" Content="Width" />
-                <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Width}" />
-            </StackPanel>
+            <DockPanel LastChildFill="True">
+                <StackPanel DockPanel.Dock="Left">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
+                        <Label Width="50" Content="Width" />
+                        <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Width}" />
+                    </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                <Label Width="50" Content="Height" />
-                <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Height}" />
-            </StackPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
+                        <Label Width="50" Content="Height" />
+                        <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Height}" />
+                    </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                <Label Width="50" Content="Cfg" />
-                <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Cfg}" />
-            </StackPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
+                        <Label Width="50" Content="Cfg" />
+                        <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Cfg}" />
+                    </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                <Label Width="50" Content="Steps" />
-                <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Steps}" />
-            </StackPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
+                        <Label Width="50" Content="Steps" />
+                        <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Steps}" />
+                    </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                <Label Width="50" Content="Seed" />
-                <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Seed}" />
-            </StackPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
+                        <Label Width="50" Content="Seed" />
+                        <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Seed}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <DockPanel Margin="16,0,0,0" LastChildFill="True">
+                    <Label DockPanel.Dock="Top" Content="Image2Image Source" />
+                    <DockPanel DockPanel.Dock="Top" >
+                        <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectImage2ImageSourceCommand}" IsEnabled="{Binding IsReady}" />
+                        <TextBox Text="{Binding Image2ImageSourcePath}" />
+                    </DockPanel>
+
+                    <Image Source="{Binding Image2ImageSource, Converter={StaticResource ImageToImageSourceConverter}}" />
+                </DockPanel>
+            </DockPanel>
 
             <Label Content="Sample-Method" />
             <ComboBox ItemsSource="{Binding Source={StaticResource SamplerDataSource}}" SelectedItem="{Binding SampleMethod}" />
