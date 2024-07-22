@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace StableDiffusion.NET.Helper;
+namespace StableDiffusion.NET;
 
 internal static class ProcessHelper
 {

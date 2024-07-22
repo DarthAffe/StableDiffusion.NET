@@ -55,6 +55,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+    <PackageReference Include="HPPH" Version="1.0.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" />
   </ItemGroup>
 </Project>
