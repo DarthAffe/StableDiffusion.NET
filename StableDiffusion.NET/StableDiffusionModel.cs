@@ -91,6 +91,15 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         }
     }
 
+    /// <summary>
+    /// Manually load the native stable diffusion library.
+    /// Once set, it will continue to be used for all instances.
+    /// </summary>
+    /// <param name="libraryPath">Path to the stable diffusion library.</param>
+    /// <returns>Bool if the library loaded.</returns>
+    public static bool LoadNativeLibrary(string libraryPath)
+        => Native.LoadNativeLibrary(libraryPath);
+
     public IImage<ColorRGB> TextToImage(string prompt, StableDiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);

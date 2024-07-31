@@ -26,6 +26,18 @@ internal static partial class Native
 
     #region Methods
 
+    internal static bool LoadNativeLibrary(string libraryPath)
+    {
+        if (_loadedLibraryHandle != nint.Zero) return true;
+        if (NativeLibrary.TryLoad(libraryPath, out nint handle))
+        {
+            _loadedLibraryHandle = handle;
+            return true;
+        }
+
+        return false;
+    }
+
     private static nint ResolveDllImport(string libraryname, Assembly assembly, DllImportSearchPath? searchpath)
     {
         if (libraryname != LIB_NAME) return nint.Zero;
