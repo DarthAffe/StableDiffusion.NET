@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
-    <id>StableDiffusion.NET.Backend.Cuda</id>
+    <id>StableDiffusion.NET.Backend.Cuda11.Linux</id>
     <version>$version$</version>
-    <title>StableDiffusion.NET.Backend.Cuda</title>
+    <title>StableDiffusion.NET.Backend.Cuda11.Linux</title>
     <authors>Darth Affe &amp; stable-diffusion.cpp Authors</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <icon>sd_net_cuda.png</icon>
     <projectUrl>https://github.com/DarthAffe/StableDiffusion.NET</projectUrl>
-    <description>CUDA-Backend (11 and 12) for StableDiffusion.NET.</description>
+    <description>CUDA 11 Linux Backend for StableDiffusion.NET.</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright © Darth Affe 2024</copyright>
     <readme>readme.md</readme>
-  
-    <dependencies>
-      <dependency id="StableDiffusion.NET.Backend.Cuda11.Windows" version="$version$" />
-      <dependency id="StableDiffusion.NET.Backend.Cuda12.Windows" version="$version$" />
-      <dependency id="StableDiffusion.NET.Backend.Cuda11.Linux" version="$version$" />
-      <dependency id="StableDiffusion.NET.Backend.Cuda12.Linux" version="$version$" />
-    </dependencies>
   </metadata>
 
   <files>
+    <file src="StableDiffusion.NET.Backend.props" target="build/net8.0/StableDiffusion.NET.Backend.Cuda.props" />
+    
+    <file src="linux-cuda11/libstable-diffusion.so" target="runtimes\linux-x64\native\cuda11\libstable-diffusion.so" />
+    
     <file src="sd_net_cuda.png" target="sd_net_cuda.png" />
     <file src="readme.md" target="readme.md" />
+    <file src="ggml.txt" target="ggml.txt" />
+    <file src="stable-diffusion.cpp.txt" target="stable-diffusion.cpp.txt" />
   </files>
 </package>
