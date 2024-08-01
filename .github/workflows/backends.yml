@@ -270,6 +270,10 @@ jobs:
         id: pack
         run: |
           nuget pack ./Backends/StableDiffusion.NET.Backend.Cpu.nuspec -version ${{ github.event.inputs.version }}
+          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda11.Windows.nuspec -version ${{ github.event.inputs.version }}
+          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Windows.nuspec -version ${{ github.event.inputs.version }}
+          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda11.Linux.nuspec -version ${{ github.event.inputs.version }}
+          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Linux.nuspec -version ${{ github.event.inputs.version }}
           nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda.nuspec -version ${{ github.event.inputs.version }}
           nuget pack ./Backends/StableDiffusion.NET.Backend.Rocm.nuspec -version ${{ github.event.inputs.version }}
           
