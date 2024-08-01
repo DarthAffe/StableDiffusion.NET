@@ -207,13 +207,13 @@ jobs:
       matrix:
         include:
           - build: 'noavx'
-            defines: '-DCMAKE_OSX_ARCHITECTURES="x86_64" -DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx'
-            defines: '-DCMAKE_OSX_ARCHITECTURES="x86_64" -DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx2'
-            defines: '-DCMAKE_OSX_ARCHITECTURES="x86_64" -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx512'
-            defines: '-DCMAKE_OSX_ARCHITECTURES="x86_64" -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
    
     steps:          
       - name: Checkout
