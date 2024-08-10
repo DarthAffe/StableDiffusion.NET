@@ -101,6 +101,51 @@ jobs:
         uses: actions/upload-artifact@v4.3.1
         with:
           name: windows-${{ matrix.build }}
+          path: .\build\bin\stable-diffusion.dll  
+          
+  windows-sycl:
+    runs-on: windows-latest
+    
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      WINDOWS_BASEKIT_URL: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/7dff44ba-e3af-4448-841c-0d616c8da6e7/w_BaseKit_p_2024.1.0.595_offline.exe
+      WINDOWS_DPCPP_MKL: intel.oneapi.win.cpp-dpcpp-common:intel.oneapi.win.mkl.devel
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          repository: 'leejet/stable-diffusion.cpp'
+          ref: '${{ github.event.inputs.commit }}'
+          submodules: recursive            
+          
+      - name: Checkout Install Script
+        id: checkoutInstallScript
+        uses: actions/checkout@v4.1.2
+        with:
+          path: scripts
+          sparse-checkout: |
+            Backends/install-oneapi.bat
+            Backends/win-build-sycl.bat
+          sparse-checkout-cone-mode: false
+        
+      - name: Install Sycl tools
+        id: installSyclCompiler
+        run:  scripts/Backends/install-oneapi.bat $WINDOWS_BASEKIT_URL $WINDOWS_DPCPP_MKL
+          
+      - name: Build
+        id: cmake_build
+        run: scripts/Backends/win-build-sycl.bat
+              
+      - name: Upload artifact
+        id: upload_artifact
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: windows-sycl
           path: .\build\bin\stable-diffusion.dll
 
   linux:
@@ -119,7 +164,9 @@ jobs:
           - build: 'cuda11'
             defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'cuda12'
-            defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON'            
+          - build: 'sycl'
+            defines: '-DSD_SYCL=ON -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DSD_BUILD_SHARED_LIBS=ON'
             
     steps:
       - name: Checkout
@@ -150,8 +197,32 @@ jobs:
           use-github-cache: false
           use-local-cache: false
    
+      - name: Install Sycl tools
+        id: installSyclCompiler
+        if: ${{ matrix.build == 'sycl' }}
+        shell: bash
+        run: |        
+          cd /tmp
+          wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          sudo add-apt-repository "deb https://apt.repos.intel.com/oneapi all main"
+          sudo apt update
+          sudo apt install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-mkl-devel
+   
+      - name: Build
+        id: cmake_build_sycl
+        if: ${{ matrix.build == 'sycl' }}
+        run: |
+          source /opt/intel/oneapi/setvars.sh
+          mkdir build
+          cd build
+          cmake .. ${{ matrix.defines }}
+          cmake --build . --config Release
+   
       - name: Build
         id: cmake_build
+        if: ${{ matrix.build != 'sycl' }}
         run: |
           mkdir build
           cd build
@@ -244,6 +315,7 @@ jobs:
 
     needs:
       - windows
+      - windows-sycl
       - linux
       - linux-hip
       - osx
@@ -276,6 +348,7 @@ jobs:
           nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Linux.nuspec -version ${{ github.event.inputs.version }}
           nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda.nuspec -version ${{ github.event.inputs.version }}
           nuget pack ./Backends/StableDiffusion.NET.Backend.Rocm.nuspec -version ${{ github.event.inputs.version }}
+          nuget pack ./Backends/StableDiffusion.NET.Backend.Sycl.nuspec -version ${{ github.event.inputs.version }}
           
       - name: Upload artifacts
         id: upload_artifacts

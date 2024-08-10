@@ -175,7 +175,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            LogLine($"Failed to load stable-diffussion.cpp libraries!{Environment.NewLine}{ex.Message}");
+            LogLine($"Failed to load stable-diffusion.cpp libraries!{Environment.NewLine}{ex.Message}");
         }
     }
 
