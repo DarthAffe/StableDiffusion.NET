@@ -7,7 +7,7 @@ public sealed class DiffusionParameter
 {
     #region Properties & Fields
 
-    public static DiffusionParameter StableDiffusionDefault => new() { Width = 512, Height = 512, CfgScale = 7.5f, Guidance = 1f, SampleSteps = 25, SampleMethod = Sampler.Euler_A };
+    public static DiffusionParameter SD1Default => new() { Width = 512, Height = 512, CfgScale = 7.5f, Guidance = 1f, SampleSteps = 25, SampleMethod = Sampler.Euler_A };
     public static DiffusionParameter SDXLDefault => new() { Width = 1024, Height = 1024, CfgScale = 7f, Guidance = 1f, SampleSteps = 30, SampleMethod = Sampler.Euler_A };
     public static DiffusionParameter FluxDefault => new() { Width = 1024, Height = 1024, CfgScale = 1, Guidance = 3.5f, SampleSteps = 20, SampleMethod = Sampler.Euler };
 
