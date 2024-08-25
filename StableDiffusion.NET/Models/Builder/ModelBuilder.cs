@@ -6,6 +6,6 @@ namespace StableDiffusion.NET;
 public static class ModelBuilder
 {
     public static StableDiffusionModelBuilder StableDiffusion(string modelPath) => new(modelPath);
-    public static FluxModelBuilder Flux(string diffusionModelPath, string clipLPath, string t5xxlPath) => new(diffusionModelPath, clipLPath, t5xxlPath);
+    public static FluxModelBuilder Flux(string diffusionModelPath, string clipLPath, string t5xxlPath, string vaePath) => new(diffusionModelPath, clipLPath, t5xxlPath, vaePath);
     public static ESRGANModelBuilder ESRGAN(string modelPath) => new(modelPath);
 }

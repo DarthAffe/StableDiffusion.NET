@@ -15,9 +15,9 @@ public sealed class FluxModelBuilder : IDiffusionModelBuilder, IQuantizedModelBu
 
     #region Constructors
 
-    public FluxModelBuilder(string diffusionModelPath, string clipLPath, string t5xxlPath)
+    public FluxModelBuilder(string diffusionModelPath, string clipLPath, string t5xxlPath, string vaePath)
     {
-        Parameter = new DiffusionModelParameter { DiffusionModelType = DiffusionModelType.Flux, DiffusionModelPath = diffusionModelPath, ClipLPath = clipLPath, T5xxlPath = t5xxlPath };
+        Parameter = new DiffusionModelParameter { DiffusionModelType = DiffusionModelType.Flux, DiffusionModelPath = diffusionModelPath, ClipLPath = clipLPath, T5xxlPath = t5xxlPath, VaePath = vaePath };
     }
 
     #endregion

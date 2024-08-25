@@ -9,7 +9,7 @@ public static class DiffusionModelBuilderExtension
     public static T WithVae<T>(this T builder, string vaePath)
         where T : IDiffusionModelBuilder
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(vaePath);
+        ArgumentNullException.ThrowIfNull(vaePath);
 
         if (!string.IsNullOrWhiteSpace(builder.Parameter.TaesdPath)) throw new ArgumentException("TAESD is already enabled. VAE and TAESD are mutually exclusive.", nameof(vaePath));
 
@@ -21,7 +21,7 @@ public static class DiffusionModelBuilderExtension
     public static T WithTaesd<T>(this T builder, string taesdPath)
         where T : IDiffusionModelBuilder
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(taesdPath);
+        ArgumentNullException.ThrowIfNull(taesdPath);
 
         if (!string.IsNullOrWhiteSpace(builder.Parameter.VaePath)) throw new ArgumentException("VAE is already enabled. TAESD and VAE are mutually exclusive.", nameof(taesdPath));
 
@@ -33,7 +33,7 @@ public static class DiffusionModelBuilderExtension
     public static T WithLoraSupport<T>(this T builder, string loraModelDirectory)
         where T : IDiffusionModelBuilder
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(loraModelDirectory);
+        ArgumentNullException.ThrowIfNull(loraModelDirectory);
 
         builder.Parameter.LoraModelDirectory = loraModelDirectory;
 
@@ -43,7 +43,7 @@ public static class DiffusionModelBuilderExtension
     public static T WithEmbeddingSupport<T>(this T builder, string embeddingsDirectory)
         where T : IDiffusionModelBuilder
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(embeddingsDirectory);
+        ArgumentNullException.ThrowIfNull(embeddingsDirectory);
 
         builder.Parameter.EmbeddingsDirectory = embeddingsDirectory;
 
@@ -53,7 +53,7 @@ public static class DiffusionModelBuilderExtension
     public static T WithControlNet<T>(this T builder, string controlNetPath)
         where T : IDiffusionModelBuilder
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(controlNetPath);
+        ArgumentNullException.ThrowIfNull(controlNetPath);
 
         builder.Parameter.ControlNetPath = controlNetPath;
 
