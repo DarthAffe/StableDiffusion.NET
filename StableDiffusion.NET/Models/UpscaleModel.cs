@@ -11,7 +11,7 @@ public sealed unsafe class UpscaleModel : IDisposable
 
     private bool _disposed;
 
-    private readonly UpscaleModelParameter _parameter;
+    public UpscaleModelParameter ModelParameter { get; }
 
     private Native.upscaler_ctx_t* _ctx;
 
@@ -19,13 +19,13 @@ public sealed unsafe class UpscaleModel : IDisposable
 
     #region Constructors
 
-    public UpscaleModel(UpscaleModelParameter parameter)
+    public UpscaleModel(UpscaleModelParameter modelParameter)
     {
-        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentNullException.ThrowIfNull(modelParameter, nameof(modelParameter));
 
-        parameter.Validate();
+        modelParameter.Validate();
 
-        this._parameter = parameter;
+        this.ModelParameter = modelParameter;
 
         Initialize();
     }
@@ -38,9 +38,9 @@ public sealed unsafe class UpscaleModel : IDisposable
 
     private void Initialize()
     {
-        _ctx = Native.new_upscaler_ctx(_parameter.ModelPath,
-                                       _parameter.ThreadCount,
-                                       _parameter.Quantization);
+        _ctx = Native.new_upscaler_ctx(ModelParameter.ModelPath,
+                                       ModelParameter.ThreadCount,
+                                       ModelParameter.Quantization);
 
         if (_ctx == null) throw new NullReferenceException("Failed to initialize upscale-model.");
     }

@@ -12,7 +12,7 @@ public sealed unsafe class DiffusionModel : IDisposable
 
     private bool _disposed;
 
-    private readonly DiffusionModelParameter _parameter;
+    public DiffusionModelParameter ModelParameter { get; }
 
     private Native.sd_ctx_t* _ctx;
 
@@ -20,13 +20,13 @@ public sealed unsafe class DiffusionModel : IDisposable
 
     #region Constructors
 
-    public DiffusionModel(DiffusionModelParameter parameter)
+    public DiffusionModel(DiffusionModelParameter modelParameter)
     {
-        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentNullException.ThrowIfNull(modelParameter, nameof(modelParameter));
 
-        parameter.Validate();
+        modelParameter.Validate();
 
-        this._parameter = parameter;
+        this.ModelParameter = modelParameter;
 
         Initialize();
     }
@@ -39,34 +39,34 @@ public sealed unsafe class DiffusionModel : IDisposable
 
     private void Initialize()
     {
-        _ctx = Native.new_sd_ctx(_parameter.ModelPath,
-                                 _parameter.ClipLPath,
-                                 _parameter.T5xxlPath,
-                                 _parameter.DiffusionModelPath,
-                                 _parameter.VaePath,
-                                 _parameter.TaesdPath,
-                                 _parameter.ControlNetPath,
-                                 _parameter.LoraModelDirectory,
-                                 _parameter.EmbeddingsDirectory,
-                                 _parameter.StackedIdEmbeddingsDirectory,
-                                 _parameter.VaeDecodeOnly,
-                                 _parameter.VaeTiling,
+        _ctx = Native.new_sd_ctx(ModelParameter.ModelPath,
+                                 ModelParameter.ClipLPath,
+                                 ModelParameter.T5xxlPath,
+                                 ModelParameter.DiffusionModelPath,
+                                 ModelParameter.VaePath,
+                                 ModelParameter.TaesdPath,
+                                 ModelParameter.ControlNetPath,
+                                 ModelParameter.LoraModelDirectory,
+                                 ModelParameter.EmbeddingsDirectory,
+                                 ModelParameter.StackedIdEmbeddingsDirectory,
+                                 ModelParameter.VaeDecodeOnly,
+                                 ModelParameter.VaeTiling,
                                  false,
-                                 _parameter.ThreadCount,
-                                 _parameter.Quantization,
-                                 _parameter.RngType,
-                                 _parameter.Schedule,
-                                 _parameter.KeepClipOnCPU,
-                                 _parameter.KeepControlNetOnCPU,
-                                 _parameter.KeepVaeOnCPU);
+                                 ModelParameter.ThreadCount,
+                                 ModelParameter.Quantization,
+                                 ModelParameter.RngType,
+                                 ModelParameter.Schedule,
+                                 ModelParameter.KeepClipOnCPU,
+                                 ModelParameter.KeepControlNetOnCPU,
+                                 ModelParameter.KeepVaeOnCPU);
 
         if (_ctx == null) throw new NullReferenceException("Failed to initialize diffusion-model.");
     }
 
-    public DiffusionParameter GetDefaultParameter() => _parameter.DiffusionModelType switch
+    public DiffusionParameter GetDefaultParameter() => ModelParameter.DiffusionModelType switch
     {
         DiffusionModelType.None => new DiffusionParameter(),
-        DiffusionModelType.StableDiffusion => DiffusionParameter.StableDiffusionDefault,
+        DiffusionModelType.StableDiffusion => DiffusionParameter.SDXLDefault,
         DiffusionModelType.Flux => DiffusionParameter.FluxDefault,
         _ => throw new ArgumentOutOfRangeException()
     };
