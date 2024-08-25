@@ -1,61 +1,37 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using HPPH;
+using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 
 namespace StableDiffusion.NET;
 
 [PublicAPI]
-public sealed unsafe class StableDiffusionModel : IDisposable
+public sealed unsafe class DiffusionModel : IDisposable
 {
     #region Properties & Fields
 
-    // ReSharper disable NotAccessedField.Local - They are important, the delegate can be collected if it's not stored!
-    private static readonly Native.sd_log_cb_t LOG_CALLBACK;
-    private static readonly Native.sd_progress_cb_t PROGRESS_CALLBACK;
-    // ReSharper restore NotAccessedField.Local
-
     private bool _disposed;
 
-    private readonly string _modelPath;
-    private readonly ModelParameter _parameter;
-    private readonly UpscalerModelParameter? _upscalerParameter;
+    private readonly DiffusionModelParameter _parameter;
 
     private Native.sd_ctx_t* _ctx;
-    private Native.upscaler_ctx_t* _upscalerCtx;
-
-    #endregion
-
-    #region Events
-
-    public static event EventHandler<StableDiffusionLogEventArgs>? Log;
-    public static event EventHandler<StableDiffusionProgressEventArgs>? Progress;
 
     #endregion
 
     #region Constructors
 
-    static StableDiffusionModel()
+    public DiffusionModel(DiffusionModelParameter parameter)
     {
-        Native.sd_set_log_callback(LOG_CALLBACK = OnNativeLog, null);
-        Native.sd_set_progress_callback(PROGRESS_CALLBACK = OnNativeProgress, null);
-    }
-
-    public StableDiffusionModel(string modelPath, ModelParameter parameter, UpscalerModelParameter? upscalerParameter = null)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(modelPath, nameof(modelPath));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
 
         parameter.Validate();
-        upscalerParameter?.Validate();
 
-        this._modelPath = modelPath;
         this._parameter = parameter;
-        this._upscalerParameter = upscalerParameter;
 
         Initialize();
     }
 
-    ~StableDiffusionModel() => Dispose();
+    ~DiffusionModel() => Dispose();
 
     #endregion
 
@@ -63,16 +39,19 @@ public sealed unsafe class StableDiffusionModel : IDisposable
 
     private void Initialize()
     {
-        _ctx = Native.new_sd_ctx(_modelPath,
+        _ctx = Native.new_sd_ctx(_parameter.ModelPath,
+                                 _parameter.ClipLPath,
+                                 _parameter.T5xxlPath,
+                                 _parameter.DiffusionModelPath,
                                  _parameter.VaePath,
                                  _parameter.TaesdPath,
                                  _parameter.ControlNetPath,
-                                 _parameter.LoraModelDir,
+                                 _parameter.LoraModelDirectory,
                                  _parameter.EmbeddingsDirectory,
                                  _parameter.StackedIdEmbeddingsDirectory,
                                  _parameter.VaeDecodeOnly,
                                  _parameter.VaeTiling,
-                                  false,
+                                 false,
                                  _parameter.ThreadCount,
                                  _parameter.Quantization,
                                  _parameter.RngType,
@@ -80,28 +59,22 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                  _parameter.KeepClipOnCPU,
                                  _parameter.KeepControlNetOnCPU,
                                  _parameter.KeepVaeOnCPU);
-        if (_ctx == null) throw new NullReferenceException("Failed to initialize Stable Diffusion");
 
-        if (_upscalerParameter != null)
-        {
-            _upscalerCtx = Native.new_upscaler_ctx(_upscalerParameter.ESRGANPath,
-                                                   _upscalerParameter.ThreadCount,
-                                                   _upscalerParameter.Quantization);
-            if (_upscalerCtx == null) throw new NullReferenceException("Failed to initialize Stable Diffusion");
-        }
+        if (_ctx == null) throw new NullReferenceException("Failed to initialize diffusion-model.");
     }
 
-    /// <summary>
-    /// Manually load the native stable diffusion library.
-    /// Once set, it will continue to be used for all instances.
-    /// </summary>
-    /// <param name="libraryPath">Path to the stable diffusion library.</param>
-    /// <returns>Bool if the library loaded.</returns>
-    public static bool LoadNativeLibrary(string libraryPath)
-        => Native.LoadNativeLibrary(libraryPath);
-
-    public IImage<ColorRGB> TextToImage(string prompt, StableDiffusionParameter parameter)
+    public DiffusionParameter GetDefaultParameter() => _parameter.DiffusionModelType switch
     {
+        DiffusionModelType.None => new DiffusionParameter(),
+        DiffusionModelType.StableDiffusion => DiffusionParameter.StableDiffusionDefault,
+        DiffusionModelType.Flux => DiffusionParameter.FluxDefault,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+
+    public IImage<ColorRGB> TextToImage(string prompt, DiffusionParameter? parameter = null)
+    {
+        parameter ??= GetDefaultParameter();
+
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(prompt);
 
@@ -110,15 +83,18 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         Native.sd_image_t* result;
         if (parameter.ControlNet.IsEnabled)
         {
-            fixed (byte* imagePtr = parameter.ControlNet.Image!.ToRawArray())
+            if (parameter.ControlNet.Image is not IImage<ColorRGB> controlNetImage)
+                controlNetImage = parameter.ControlNet.Image!.ConvertTo<ColorRGB>();
+
+            fixed (byte* imagePtr = controlNetImage.ToRawArray())
             {
                 if (parameter.ControlNet.CannyPreprocess)
                 {
-                    Native.sd_image_t controlNetImage = new()
+                    Native.sd_image_t nativeControlNetImage = new()
                     {
-                        width = (uint)parameter.ControlNet.Image.Width,
-                        height = (uint)parameter.ControlNet.Image.Height,
-                        channel = (uint)parameter.ControlNet.Image.ColorFormat.BytesPerPixel,
+                        width = (uint)controlNetImage.Width,
+                        height = (uint)controlNetImage.Height,
+                        channel = (uint)controlNetImage.ColorFormat.BytesPerPixel,
                         data = Native.preprocess_canny(imagePtr,
                                                        parameter.Width,
                                                        parameter.Height,
@@ -134,27 +110,28 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                             parameter.NegativePrompt,
                                             parameter.ClipSkip,
                                             parameter.CfgScale,
+                                            parameter.Guidance,
                                             parameter.Width,
                                             parameter.Height,
                                             parameter.SampleMethod,
                                             parameter.SampleSteps,
                                             parameter.Seed,
                                             1,
-                                            &controlNetImage,
+                                            &nativeControlNetImage,
                                             parameter.ControlNet.Strength,
                                             parameter.PhotoMaker.StyleRatio,
                                             parameter.PhotoMaker.NormalizeInput,
                                             parameter.PhotoMaker.InputIdImageDirectory);
 
-                    Marshal.FreeHGlobal((nint)controlNetImage.data);
+                    Marshal.FreeHGlobal((nint)nativeControlNetImage.data);
                 }
                 else
                 {
-                    Native.sd_image_t controlNetImage = new()
+                    Native.sd_image_t nativeControlNetImage = new()
                     {
-                        width = (uint)parameter.ControlNet.Image.Width,
-                        height = (uint)parameter.ControlNet.Image.Height,
-                        channel = (uint)parameter.ControlNet.Image.ColorFormat.BytesPerPixel,
+                        width = (uint)controlNetImage.Width,
+                        height = (uint)controlNetImage.Height,
+                        channel = (uint)controlNetImage.ColorFormat.BytesPerPixel,
                         data = imagePtr
                     };
 
@@ -163,13 +140,14 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                             parameter.NegativePrompt,
                                             parameter.ClipSkip,
                                             parameter.CfgScale,
+                                            parameter.Guidance,
                                             parameter.Width,
                                             parameter.Height,
                                             parameter.SampleMethod,
                                             parameter.SampleSteps,
                                             parameter.Seed,
                                             1,
-                                            &controlNetImage,
+                                            &nativeControlNetImage,
                                             parameter.ControlNet.Strength,
                                             parameter.PhotoMaker.StyleRatio,
                                             parameter.PhotoMaker.NormalizeInput,
@@ -184,6 +162,7 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                     parameter.NegativePrompt,
                                     parameter.ClipSkip,
                                     parameter.CfgScale,
+                                    parameter.Guidance,
                                     parameter.Width,
                                     parameter.Height,
                                     parameter.SampleMethod,
@@ -200,18 +179,23 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         return ImageHelper.ToImage(result);
     }
 
-    public IImage<ColorRGB> ImageToImage(string prompt, IImage<ColorRGB> image, StableDiffusionParameter parameter)
+    public IImage<ColorRGB> ImageToImage(string prompt, IImage image, DiffusionParameter? parameter = null)
     {
+        parameter ??= GetDefaultParameter();
+
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(prompt);
 
         parameter.Validate();
 
-        fixed (byte* imagePtr = image.AsRefImage())
-            return ImageToImage(prompt, image.ToSdImage(imagePtr), parameter);
+        if (image is not IImage<ColorRGB> refImage)
+            refImage = image.ConvertTo<ColorRGB>();
+
+        fixed (byte* imagePtr = refImage.AsRefImage())
+            return ImageToImage(prompt, refImage.ToSdImage(imagePtr), parameter);
     }
 
-    private IImage<ColorRGB> ImageToImage(string prompt, Native.sd_image_t image, StableDiffusionParameter parameter)
+    private IImage<ColorRGB> ImageToImage(string prompt, Native.sd_image_t image, DiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(prompt);
@@ -221,15 +205,18 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         Native.sd_image_t* result;
         if (parameter.ControlNet.IsEnabled)
         {
-            fixed (byte* imagePtr = parameter.ControlNet.Image!.ToRawArray())
+            if (parameter.ControlNet.Image is not IImage<ColorRGB> controlNetImage)
+                controlNetImage = parameter.ControlNet.Image!.ConvertTo<ColorRGB>();
+
+            fixed (byte* imagePtr = controlNetImage.ToRawArray())
             {
                 if (parameter.ControlNet.CannyPreprocess)
                 {
-                    Native.sd_image_t controlNetImage = new()
+                    Native.sd_image_t nativeControlNetImage = new()
                     {
-                        width = (uint)parameter.ControlNet.Image.Width,
-                        height = (uint)parameter.ControlNet.Image.Height,
-                        channel = (uint)parameter.ControlNet.Image.ColorFormat.BytesPerPixel,
+                        width = (uint)controlNetImage.Width,
+                        height = (uint)controlNetImage.Height,
+                        channel = (uint)controlNetImage.ColorFormat.BytesPerPixel,
                         data = Native.preprocess_canny(imagePtr,
                                                        parameter.Width,
                                                        parameter.Height,
@@ -246,6 +233,7 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                             parameter.NegativePrompt,
                                             parameter.ClipSkip,
                                             parameter.CfgScale,
+                                            parameter.Guidance,
                                             parameter.Width,
                                             parameter.Height,
                                             parameter.SampleMethod,
@@ -253,17 +241,17 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                             parameter.Strength,
                                             parameter.Seed,
                                             1,
-                                            &controlNetImage,
+                                            &nativeControlNetImage,
                                             parameter.ControlNet.Strength,
                                             parameter.PhotoMaker.StyleRatio,
                                             parameter.PhotoMaker.NormalizeInput,
                                             parameter.PhotoMaker.InputIdImageDirectory);
 
-                    Marshal.FreeHGlobal((nint)controlNetImage.data);
+                    Marshal.FreeHGlobal((nint)nativeControlNetImage.data);
                 }
                 else
                 {
-                    Native.sd_image_t controlNetImage = new()
+                    Native.sd_image_t nativeControlNetImage = new()
                     {
                         width = (uint)parameter.ControlNet.Image.Width,
                         height = (uint)parameter.ControlNet.Image.Height,
@@ -277,6 +265,7 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                             parameter.NegativePrompt,
                                             parameter.ClipSkip,
                                             parameter.CfgScale,
+                                            parameter.Guidance,
                                             parameter.Width,
                                             parameter.Height,
                                             parameter.SampleMethod,
@@ -284,7 +273,7 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                             parameter.Strength,
                                             parameter.Seed,
                                             1,
-                                            &controlNetImage,
+                                            &nativeControlNetImage,
                                             parameter.ControlNet.Strength,
                                             parameter.PhotoMaker.StyleRatio,
                                             parameter.PhotoMaker.NormalizeInput,
@@ -300,6 +289,7 @@ public sealed unsafe class StableDiffusionModel : IDisposable
                                     parameter.NegativePrompt,
                                     parameter.ClipSkip,
                                     parameter.CfgScale,
+                                    parameter.Guidance,
                                     parameter.Width,
                                     parameter.Height,
                                     parameter.SampleMethod,
@@ -317,73 +307,15 @@ public sealed unsafe class StableDiffusionModel : IDisposable
         return ImageHelper.ToImage(result);
     }
 
-    public IImage<ColorRGB> Upscale(IImage<ColorRGB> image, int upscaleFactor)
-    {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(upscaleFactor, 0, nameof(upscaleFactor));
-
-        if (_upscalerCtx == null) throw new NullReferenceException("The upscaler is not initialized.");
-
-        fixed (byte* imagePtr = image.ConvertTo<ColorRGB>().AsRefImage())
-        {
-            Native.sd_image_t result = Native.upscale(_upscalerCtx, image.ToSdImage(imagePtr), upscaleFactor);
-            return ImageHelper.ToImage(&result);
-        }
-    }
-
-    private IImage<ColorRGB> Upscale(Native.sd_image_t image, int upscaleFactor)
-    {
-        Native.sd_image_t result = Native.upscale(_upscalerCtx, image, upscaleFactor);
-        return ImageHelper.ToImage(&result);
-    }
-
     public void Dispose()
     {
         if (_disposed) return;
 
-        Native.free_sd_ctx(_ctx);
-
-        if (_upscalerCtx != null)
-            Native.free_upscaler_ctx(_upscalerCtx);
+        if (_ctx != null)
+            Native.free_sd_ctx(_ctx);
 
         GC.SuppressFinalize(this);
         _disposed = true;
-    }
-
-    public static void Convert(string modelPath, string vaePath, Quantization quantization, string outputPath)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(nameof(modelPath));
-        ArgumentException.ThrowIfNullOrWhiteSpace(nameof(outputPath));
-        ArgumentNullException.ThrowIfNull(vaePath);
-        if (!Enum.IsDefined(quantization)) throw new ArgumentOutOfRangeException(nameof(quantization));
-
-        Native.convert(modelPath, vaePath, outputPath, quantization);
-    }
-
-    public static string GetSystemInfo()
-    {
-        void* s = Native.sd_get_system_info();
-        return Marshal.PtrToStringUTF8((nint)s) ?? "";
-    }
-
-    public static int GetNumPhysicalCores() => Native.get_num_physical_cores();
-
-    private static void OnNativeLog(LogLevel level, string text, void* data)
-    {
-        try
-        {
-            Log?.Invoke(null, new StableDiffusionLogEventArgs(level, text));
-        }
-        catch { /**/ }
-    }
-
-    private static void OnNativeProgress(int step, int steps, float time, void* data)
-    {
-        try
-        {
-            Progress?.Invoke(null, new StableDiffusionProgressEventArgs(step, steps, time));
-        }
-        catch { /**/ }
     }
 
     #endregion
