@@ -13,11 +13,42 @@ If GPU-support is available it will prefer this over CPU.
 If you want to add your own native-libraries or need more control over which backend to load, check the static `Backends` class.   
 
 ### Example
+#### 1. Create a model
+
+stable diffusion:
 ```csharp
-using StableDiffusionModel sd = new(@"<path_to_model>", new ModelParameter());
-IImage<ColorRGB> image = sd.TextToImage("<prompt>", new StableDiffusionParameter());
+using DiffusionModel model = ModelBuilder.StableDiffusion(@"<path to model")
+                                         .WithVae(@"<optional path to vae>")
+                                         .WithMultithreading()
+                                         .Build();
 ```
 
+flux:
+```csharp
+using DiffusionModel model = ModelBuilder.Flux(@"<path to flux-model.gguf>",
+                                               @"<path to clip_l.safetensors>",
+                                               @"<path to t5xxl_fp16.safetensors>",
+                                               @"<path to ae.safetensors>")
+                                         .WithMultithreading()
+                                         .Build();
+```
+
+#### 2. create image
+
+with default parameters:
+```csharp
+IImage<ColorRGB> image = model.TextToImage("<prompt>");
+```
+
+with custom parameters:
+```csharp
+IImage<ColorRGB> image = model.TextToImage("<prompt>", model.GetDefaultParameter().WithSeed(1234).WithSize(1344, 768));
+```
+
+#### 3. (optional) save the image (requires System.Dawing or SkiaSharp extension)
+```csharp
+File.WriteAllBytes("output.png", image.ToPng());
+```
 
 To process the resulting image further you can write your own extensions or install one of the [HPPH](https://github.com/DarthAffe/HPPH)-extension sets:   
 [HPPH.System.Drawing](https://www.nuget.org/packages/HPPH.System.Drawing)   
