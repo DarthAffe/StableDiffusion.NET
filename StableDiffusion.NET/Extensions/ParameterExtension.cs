@@ -6,65 +6,87 @@ namespace StableDiffusion.NET;
 
 public static class ParameterExtension
 {
-    public static void Validate(this StableDiffusionParameter parameter)
+    public static void Validate(this UpscaleModelParameter parameter)
     {
         ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
-        ArgumentNullException.ThrowIfNull(parameter.ControlNet, nameof(StableDiffusionParameter.ControlNet));
-        ArgumentNullException.ThrowIfNull(parameter.PhotoMaker, nameof(StableDiffusionParameter.PhotoMaker));
-        ArgumentNullException.ThrowIfNull(parameter.NegativePrompt, nameof(StableDiffusionParameter.NegativePrompt));
+        ArgumentNullException.ThrowIfNull(parameter.ModelPath, nameof(UpscaleModelParameter.ModelPath));
 
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.Width, nameof(StableDiffusionParameter.Width));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.Height, nameof(StableDiffusionParameter.Height));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.SampleSteps, nameof(StableDiffusionParameter.SampleSteps));
+        if (!Enum.IsDefined(parameter.Quantization)) throw new ArgumentOutOfRangeException(nameof(UpscaleModelParameter.Quantization));
+    }
 
-        ArgumentOutOfRangeException.ThrowIfNegative(parameter.CfgScale, nameof(StableDiffusionParameter.CfgScale));
-        ArgumentOutOfRangeException.ThrowIfNegative(parameter.Strength, nameof(StableDiffusionParameter.Strength));
+    public static void Validate(this DiffusionModelParameter parameter)
+    {
+        ((IQuantizedModelParameter)parameter).Validate();
+        ((IDiffusionModelParameter)parameter).Validate();
+        ((IPhotomakerModelParameter)parameter).Validate();
+    }
 
-        if (!Enum.IsDefined(parameter.SampleMethod)) throw new ArgumentOutOfRangeException(nameof(StableDiffusionParameter.SampleMethod));
+    public static void Validate(this IQuantizedModelParameter parameter)
+    {
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.ThreadCount, nameof(IQuantizedModelParameter.ThreadCount));
+
+        if (!Enum.IsDefined(parameter.Quantization)) throw new ArgumentOutOfRangeException(nameof(IQuantizedModelParameter.Quantization));
+    }
+
+    public static void Validate(this IPhotomakerModelParameter parameter)
+    {
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentNullException.ThrowIfNull(parameter.StackedIdEmbeddingsDirectory, nameof(IPhotomakerModelParameter.StackedIdEmbeddingsDirectory));
+    }
+
+    public static void Validate(this IDiffusionModelParameter parameter)
+    {
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentNullException.ThrowIfNull(parameter.VaePath, nameof(IDiffusionModelParameter.VaePath));
+        ArgumentNullException.ThrowIfNull(parameter.TaesdPath, nameof(IDiffusionModelParameter.TaesdPath));
+        ArgumentNullException.ThrowIfNull(parameter.LoraModelDirectory, nameof(IDiffusionModelParameter.LoraModelDirectory));
+        ArgumentNullException.ThrowIfNull(parameter.ControlNetPath, nameof(IDiffusionModelParameter.ControlNetPath));
+        ArgumentNullException.ThrowIfNull(parameter.EmbeddingsDirectory, nameof(IDiffusionModelParameter.EmbeddingsDirectory));
+
+        if (!string.IsNullOrWhiteSpace(parameter.VaePath) && !string.IsNullOrWhiteSpace(parameter.TaesdPath)) throw new ArgumentException("VAE and TAESD are mutually exclusive.");
+
+        if (!Enum.IsDefined(parameter.RngType)) throw new ArgumentOutOfRangeException(nameof(IDiffusionModelParameter.RngType));
+        if (!Enum.IsDefined(parameter.Schedule)) throw new ArgumentOutOfRangeException(nameof(IDiffusionModelParameter.Schedule));
+    }
+
+    public static void Validate(this DiffusionParameter parameter)
+    {
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentNullException.ThrowIfNull(parameter.ControlNet, nameof(DiffusionParameter.ControlNet));
+        ArgumentNullException.ThrowIfNull(parameter.PhotoMaker, nameof(DiffusionParameter.PhotoMaker));
+        ArgumentNullException.ThrowIfNull(parameter.NegativePrompt, nameof(DiffusionParameter.NegativePrompt));
+
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.Width, nameof(DiffusionParameter.Width));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.Height, nameof(DiffusionParameter.Height));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.SampleSteps, nameof(DiffusionParameter.SampleSteps));
+
+        ArgumentOutOfRangeException.ThrowIfNegative(parameter.CfgScale, nameof(DiffusionParameter.CfgScale));
+        ArgumentOutOfRangeException.ThrowIfNegative(parameter.Guidance, nameof(DiffusionParameter.Guidance));
+        ArgumentOutOfRangeException.ThrowIfNegative(parameter.Strength, nameof(DiffusionParameter.Strength));
+
+        if (!Enum.IsDefined(parameter.SampleMethod)) throw new ArgumentOutOfRangeException(nameof(DiffusionParameter.SampleMethod));
 
         parameter.ControlNet.Validate();
         parameter.PhotoMaker.Validate();
     }
 
-    public static void Validate(this StableDiffusionControlNetParameter parameter)
+    public static void Validate(this ControlNetParameter parameter)
     {
-        ArgumentNullException.ThrowIfNull(parameter, nameof(StableDiffusionParameter.ControlNet));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(DiffusionParameter.ControlNet));
 
-        ArgumentOutOfRangeException.ThrowIfNegative(parameter.Strength, nameof(StableDiffusionControlNetParameter.Strength));
-        ArgumentOutOfRangeException.ThrowIfNegative(parameter.CannyHighThreshold, nameof(StableDiffusionControlNetParameter.CannyHighThreshold));
-        ArgumentOutOfRangeException.ThrowIfNegative(parameter.CannyLowThreshold, nameof(StableDiffusionControlNetParameter.CannyLowThreshold));
-        ArgumentOutOfRangeException.ThrowIfNegative(parameter.CannyWeak, nameof(StableDiffusionControlNetParameter.CannyWeak));
-        ArgumentOutOfRangeException.ThrowIfNegative(parameter.CannyStrong, nameof(StableDiffusionControlNetParameter.CannyStrong));
+        ArgumentOutOfRangeException.ThrowIfNegative(parameter.Strength, nameof(ControlNetParameter.Strength));
+        ArgumentOutOfRangeException.ThrowIfNegative(parameter.CannyHighThreshold, nameof(ControlNetParameter.CannyHighThreshold));
+        ArgumentOutOfRangeException.ThrowIfNegative(parameter.CannyLowThreshold, nameof(ControlNetParameter.CannyLowThreshold));
+        ArgumentOutOfRangeException.ThrowIfNegative(parameter.CannyWeak, nameof(ControlNetParameter.CannyWeak));
+        ArgumentOutOfRangeException.ThrowIfNegative(parameter.CannyStrong, nameof(ControlNetParameter.CannyStrong));
     }
 
     public static void Validate(this PhotoMakerParameter parameter)
     {
-        ArgumentNullException.ThrowIfNull(parameter, nameof(StableDiffusionParameter.PhotoMaker));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(DiffusionParameter.PhotoMaker));
         ArgumentNullException.ThrowIfNull(parameter.InputIdImageDirectory, nameof(PhotoMakerParameter.InputIdImageDirectory));
 
         ArgumentOutOfRangeException.ThrowIfNegative(parameter.StyleRatio, nameof(PhotoMakerParameter.StyleRatio));
-    }
-
-    public static void Validate(this ModelParameter parameter)
-    {
-        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
-        ArgumentNullException.ThrowIfNull(parameter.TaesdPath, nameof(ModelParameter.TaesdPath));
-        ArgumentNullException.ThrowIfNull(parameter.LoraModelDir, nameof(ModelParameter.LoraModelDir));
-        ArgumentNullException.ThrowIfNull(parameter.VaePath, nameof(ModelParameter.VaePath));
-        ArgumentNullException.ThrowIfNull(parameter.ControlNetPath, nameof(ModelParameter.ControlNetPath));
-        ArgumentNullException.ThrowIfNull(parameter.EmbeddingsDirectory, nameof(ModelParameter.EmbeddingsDirectory));
-        ArgumentNullException.ThrowIfNull(parameter.StackedIdEmbeddingsDirectory, nameof(ModelParameter.StackedIdEmbeddingsDirectory));
-
-        if (!Enum.IsDefined(parameter.RngType)) throw new ArgumentOutOfRangeException(nameof(ModelParameter.RngType));
-        if (!Enum.IsDefined(parameter.Quantization)) throw new ArgumentOutOfRangeException(nameof(ModelParameter.Quantization));
-        if (!Enum.IsDefined(parameter.Schedule)) throw new ArgumentOutOfRangeException(nameof(ModelParameter.Schedule));
-    }
-
-    public static void Validate(this UpscalerModelParameter parameter)
-    {
-        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
-        ArgumentNullException.ThrowIfNull(parameter.ESRGANPath, nameof(UpscalerModelParameter.ESRGANPath));
-
-        if (!Enum.IsDefined(parameter.Quantization)) throw new ArgumentOutOfRangeException(nameof(ModelParameter.Quantization));
     }
 }

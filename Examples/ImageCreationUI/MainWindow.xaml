@@ -8,7 +8,7 @@
         xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         xmlns:sd="clr-namespace:StableDiffusion.NET;assembly=StableDiffusion.NET"
         mc:Ignorable="d"
-        Title="StableDiffusion.NET" Width="1280" Height="800">
+        Title="StableDiffusion.NET" Width="1706" Height="960">
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
@@ -42,81 +42,112 @@
             <ColumnDefinition Width="400" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Margin="4,0" Orientation="Vertical">
-            <TextBlock Margin="8" Text="This is just an example - inputs are not validated!&#10;Make sure everything is correct before pressing 'Create Image'." />
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="4,0" Orientation="Vertical">
+                <TextBlock Margin="8" Text="This is just an example - inputs are not validated!&#10;Make sure everything is correct before pressing 'Create Image'." />
 
-            <Separator />
+                <Separator />
 
-            <Label Content="Model-Path" />
-            <DockPanel>
-                <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectModelCommand}" IsEnabled="{Binding IsReady}" />
-                <TextBox Text="{Binding ModelPath}" />
-            </DockPanel>
-
-            <Label Content="Vae-Path (Optional)" />
-            <DockPanel>
-                <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectVaeCommand}" IsEnabled="{Binding IsReady}" />
-                <TextBox Text="{Binding VaePath}" />
-            </DockPanel>
-
-            <Label Content="Schedule" />
-            <ComboBox ItemsSource="{Binding Source={StaticResource ScheduleDataSource}}" SelectedItem="{Binding Schedule}" />
-
-            <Button Margin="0,8"  Content="Load Model" Command="{Binding LoadModelCommand}" IsEnabled="{Binding IsReady}" />
-
-            <Separator />
-
-            <Label Margin="0,8,0,0" Content="Prompt" />
-            <TextBox Height="80" TextWrapping="Wrap" Text="{Binding Prompt}" />
-
-            <Label Content="AntiPrompt" />
-            <TextBox Height="80" TextWrapping="Wrap" Text="{Binding AntiPrompt}" />
-
-            <DockPanel LastChildFill="True">
-                <StackPanel DockPanel.Dock="Left">
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
-                        <Label Width="50" Content="Width" />
-                        <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Width}" />
-                    </StackPanel>
-
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
-                        <Label Width="50" Content="Height" />
-                        <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Height}" />
-                    </StackPanel>
-
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
-                        <Label Width="50" Content="Cfg" />
-                        <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Cfg}" />
-                    </StackPanel>
-
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
-                        <Label Width="50" Content="Steps" />
-                        <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Steps}" />
-                    </StackPanel>
-
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
-                        <Label Width="50" Content="Seed" />
-                        <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Seed}" />
-                    </StackPanel>
+                <Label Content="Model-Type" />
+                <StackPanel Orientation="Horizontal" Margin="4,0,0,0">
+                    <RadioButton Content="Stable Diffusion" IsChecked="{Binding IsStableDiffusionSelected}" GroupName="ModelType" />
+                    <RadioButton Margin="16,0,0,0" Content="Flux" IsChecked="{Binding IsFluxSelected}" GroupName="ModelType" />
                 </StackPanel>
 
-                <DockPanel Margin="16,0,0,0" LastChildFill="True">
-                    <Label DockPanel.Dock="Top" Content="Image2Image Source" />
-                    <DockPanel DockPanel.Dock="Top" >
-                        <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectImage2ImageSourceCommand}" IsEnabled="{Binding IsReady}" />
-                        <TextBox Text="{Binding Image2ImageSourcePath}" />
+                <StackPanel Orientation="Vertical" IsEnabled="{Binding IsStableDiffusionSelected}">
+                    <Label Content="Model-Path" />
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectModelCommand}" IsEnabled="{Binding IsReady}" />
+                        <TextBox Text="{Binding ModelPath}" />
+                    </DockPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" IsEnabled="{Binding IsFluxSelected}">
+                    <Label Content="DiffusionModel-Path" />
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectDiffusionModelCommand}" IsEnabled="{Binding IsReady}" />
+                        <TextBox Text="{Binding DiffusionModelPath}" />
                     </DockPanel>
 
-                    <Image Source="{Binding Image2ImageSource, Converter={StaticResource ImageToImageSourceConverter}}" />
+                    <Label Content="ClipL-Path" />
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectClipLCommand}" IsEnabled="{Binding IsReady}" />
+                        <TextBox Text="{Binding ClipLPath}" />
+                    </DockPanel>
+
+                    <Label Content="T5xxl-Path" />
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectT5xxlCommand}" IsEnabled="{Binding IsReady}" />
+                        <TextBox Text="{Binding T5xxlPath}" />
+                    </DockPanel>
+                </StackPanel>
+
+                <Label Content="Vae-Path (Optional)" />
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectVaeCommand}" IsEnabled="{Binding IsReady}" />
+                    <TextBox Text="{Binding VaePath}" />
                 </DockPanel>
-            </DockPanel>
 
-            <Label Content="Sample-Method" />
-            <ComboBox ItemsSource="{Binding Source={StaticResource SamplerDataSource}}" SelectedItem="{Binding SampleMethod}" />
+                <Label Content="Schedule" />
+                <ComboBox ItemsSource="{Binding Source={StaticResource ScheduleDataSource}}" SelectedItem="{Binding Schedule}" />
 
-            <Button Margin="0,16,0,0" Content="Create Image" Command="{Binding CreateImageCommand}" IsEnabled="{Binding IsReady}" />
-            <Button Margin="0,16,0,0" Content="Save Image" Command="{Binding SaveImageCommand}" IsEnabled="{Binding IsReady}" />
-        </StackPanel>
+                <Button Margin="0,8"  Content="Load Model" Command="{Binding LoadModelCommand}" IsEnabled="{Binding IsReady}" />
+
+                <Separator />
+
+                <Label Margin="0,8,0,0" Content="Prompt" />
+                <TextBox Height="80" TextWrapping="Wrap" Text="{Binding Prompt}" />
+
+                <Label Content="AntiPrompt" />
+                <TextBox Height="60" TextWrapping="Wrap" Text="{Binding AntiPrompt}" />
+
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Left">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Label Width="50" Content="Width" />
+                            <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Width}" />
+                        </StackPanel>
+
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Label Width="50" Content="Height" />
+                            <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Height}" />
+                        </StackPanel>
+
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Label Width="50" Content="Cfg" />
+                            <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Cfg}" />
+                        </StackPanel>
+
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Label Width="50" Content="Steps" />
+                            <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Steps}" />
+                        </StackPanel>
+
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Label Width="50" Content="Seed" />
+                            <TextBox HorizontalAlignment="Left" Width="60" Text="{Binding Seed}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <DockPanel Margin="16,0,0,0" LastChildFill="True">
+                        <Label DockPanel.Dock="Top" Content="Image2Image Source" />
+                        <DockPanel DockPanel.Dock="Top" >
+                            <Button DockPanel.Dock="Right" Width="24" Margin="2,0,0,0" Content="..." Command="{Binding SelectImage2ImageSourceCommand}" IsEnabled="{Binding IsReady}" />
+                            <TextBox Text="{Binding Image2ImageSourcePath}" />
+                        </DockPanel>
+
+                        <Image Source="{Binding Image2ImageSource, Converter={StaticResource ImageToImageSourceConverter}}" />
+                    </DockPanel>
+                </DockPanel>
+
+                <Label Content="Sample-Method" />
+                <ComboBox ItemsSource="{Binding Source={StaticResource SamplerDataSource}}" SelectedItem="{Binding SampleMethod}" />
+
+                <Button Margin="0,16,0,0" Content="Create Image" Command="{Binding CreateImageCommand}" IsEnabled="{Binding IsReady}" />
+                <Button Margin="0,16,0,0" Content="Save Image" Command="{Binding SaveImageCommand}" IsEnabled="{Binding IsReady}" />
+            </StackPanel>
+
+        </ScrollViewer>
 
         <GridSplitter Grid.Column="1" Margin="2,0" Width="2" Background="DimGray" VerticalAlignment="Stretch" HorizontalAlignment="Center" />
 

@@ -13,13 +13,48 @@ public class MainWindowViewModel : INotifyPropertyChanged
 {
     #region Properties & Fields
 
-    private StableDiffusionModel? _model;
+    private DiffusionModel? _model;
+
+    private bool _isStableDiffusionSelected = true;
+    public bool IsStableDiffusionSelected
+    {
+        get => _isStableDiffusionSelected;
+        set => SetProperty(ref _isStableDiffusionSelected, value);
+    }
+
+    private bool _isFluxSelected;
+    public bool IsFluxSelected
+    {
+        get => _isFluxSelected;
+        set => SetProperty(ref _isFluxSelected, value);
+    }
 
     private string _modelPath = string.Empty;
     public string ModelPath
     {
         get => _modelPath;
         set => SetProperty(ref _modelPath, value);
+    }
+
+    private string _clipLPath;
+    public string ClipLPath
+    {
+        get => _clipLPath;
+        set => SetProperty(ref _clipLPath, value);
+    }
+
+    private string _t5xxlPath;
+    public string T5xxlPath
+    {
+        get => _t5xxlPath;
+        set => SetProperty(ref _t5xxlPath, value);
+    }
+
+    private string _diffusionModelPath;
+    public string DiffusionModelPath
+    {
+        get => _diffusionModelPath;
+        set => SetProperty(ref _diffusionModelPath, value);
     }
 
     private string _vaePath = string.Empty;
@@ -78,8 +113,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
         set => SetProperty(ref _steps, value);
     }
 
-    private int _seed = -1;
-    public int Seed
+    private long _seed = -1;
+    public long Seed
     {
         get => _seed;
         set => SetProperty(ref _seed, value);
@@ -156,6 +191,15 @@ public class MainWindowViewModel : INotifyPropertyChanged
     private ActionCommand? _selectModelCommand;
     public ActionCommand SelectModelCommand => _selectModelCommand ??= new ActionCommand(SelectModel);
 
+    private ActionCommand? _selectDiffusionModelCommand;
+    public ActionCommand SelectDiffusionModelCommand => _selectDiffusionModelCommand ??= new ActionCommand(SelectDiffusionModel);
+
+    private ActionCommand? _selectClipLCommand;
+    public ActionCommand SelectClipLCommand => _selectClipLCommand ??= new ActionCommand(SelectClipL);
+
+    private ActionCommand? _selectT5xxlCommand;
+    public ActionCommand SelectT5xxlCommand => _selectT5xxlCommand ??= new ActionCommand(SelectT5xxl);
+
     private ActionCommand? _selectVaeCommand;
     public ActionCommand SelectVaeCommand => _selectVaeCommand ??= new ActionCommand(SelectVae);
 
@@ -170,8 +214,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
     {
         try
         {
-            StableDiffusionModel.Log += (_, args) => LogLine($"LOG [{args.Level}]: {args.Text}", false);
-            StableDiffusionModel.Progress += (_, args) => LogLine($"PROGRESS {args.Step} / {args.Steps} ({(args.Progress * 100):N2} %) {args.IterationsPerSecond:N2} it/s ({args.Time})");
+            StableDiffusionCpp.Log += (_, args) => LogLine($"LOG [{args.Level}]: {args.Text}", false);
+            StableDiffusionCpp.Progress += (_, args) => LogLine($"PROGRESS {args.Step} / {args.Steps} ({(args.Progress * 100):N2} %) {args.IterationsPerSecond:N2} it/s ({args.Time})");
         }
         catch (Exception ex)
         {
@@ -191,8 +235,38 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
             _model?.Dispose();
 
-            LogLine($"Loading model '{ModelPath}'");
-            _model = await Task.Run(() => new StableDiffusionModel(ModelPath, new ModelParameter { VaePath = VaePath, Schedule = Schedule }));
+            bool restoreDefaultParameters = false;
+
+            if (IsStableDiffusionSelected)
+            {
+                restoreDefaultParameters = _model?.ModelParameter.DiffusionModelType != DiffusionModelType.StableDiffusion;
+
+                LogLine($"Loading stable diffusion-model '{ModelPath}'");
+                _model = await Task.Run(() => ModelBuilder.StableDiffusion(ModelPath).WithMultithreading().WithVae(VaePath).WithSchedule(Schedule).Build());
+            }
+            else if (IsFluxSelected)
+            {
+                restoreDefaultParameters = _model?.ModelParameter.DiffusionModelType != DiffusionModelType.Flux;
+
+                LogLine($"Loading flux-model '{DiffusionModelPath}'");
+                _model = await Task.Run(() => ModelBuilder.Flux(DiffusionModelPath, ClipLPath, T5xxlPath, VaePath).WithMultithreading().WithSchedule(Schedule).Build());
+            }
+            else
+            {
+                LogLine("No model-type selected :(");
+            }
+
+            if (restoreDefaultParameters && (_model != null))
+            {
+                DiffusionParameter parameter = _model.GetDefaultParameter();
+                AntiPrompt = parameter.NegativePrompt;
+                Width = parameter.Width;
+                Height = parameter.Height;
+                Steps = parameter.SampleSteps;
+                Seed = parameter.Seed;
+                SampleMethod = parameter.SampleMethod;
+                Cfg = _model.ModelParameter.DiffusionModelType == DiffusionModelType.Flux ? parameter.Guidance : parameter.CfgScale;
+            }
         }
         catch (Exception ex)
         {
@@ -206,37 +280,32 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     private async void CreateImage()
     {
+        if (_model == null) return;
+
         try
         {
             IsReady = false;
 
+            DiffusionParameter parameter = _model.GetDefaultParameter()
+                                                 .WithNegativePrompt(AntiPrompt)
+                                                 .WithSize(Width, Height)
+                                                 .WithSteps(Steps)
+                                                 .WithSeed(Seed)
+                                                 .WithSampler(SampleMethod);
+            if (_model.ModelParameter.DiffusionModelType == DiffusionModelType.StableDiffusion)
+                parameter = parameter.WithCfg(Cfg);
+            else if (_model.ModelParameter.DiffusionModelType == DiffusionModelType.Flux)
+                parameter = parameter.WithGuidance(Cfg);
+
             if (Image2ImageSource == null)
             {
                 LogLine("Creating image ...");
-                Image = await Task.Run(() => _model?.TextToImage(Prompt, new StableDiffusionParameter
-                {
-                    NegativePrompt = AntiPrompt,
-                    Width = Width,
-                    Height = Height,
-                    CfgScale = Cfg,
-                    SampleSteps = Steps,
-                    Seed = Seed,
-                    SampleMethod = SampleMethod
-                }));
+                Image = await Task.Run(() => _model?.TextToImage(Prompt, parameter));
             }
             else
             {
                 LogLine("Manipulating image ...");
-                Image = await Task.Run(() => _model?.ImageToImage(Prompt, Image2ImageSource, new StableDiffusionParameter
-                {
-                    NegativePrompt = AntiPrompt,
-                    Width = Width,
-                    Height = Height,
-                    CfgScale = Cfg,
-                    SampleSteps = Steps,
-                    Seed = Seed,
-                    SampleMethod = SampleMethod
-                }));
+                Image = await Task.Run(() => _model?.ImageToImage(Prompt, Image2ImageSource, parameter));
             }
 
             LogLine("done!");
@@ -277,9 +346,30 @@ public class MainWindowViewModel : INotifyPropertyChanged
             ModelPath = openFileDialog.FileName;
     }
 
+    private void SelectDiffusionModel()
+    {
+        OpenFileDialog openFileDialog = new() { Filter = "Diffusion Model|*.*" };
+        if (openFileDialog.ShowDialog() == true)
+            DiffusionModelPath = openFileDialog.FileName;
+    }
+
+    private void SelectClipL()
+    {
+        OpenFileDialog openFileDialog = new() { Filter = "ClipL|*.*" };
+        if (openFileDialog.ShowDialog() == true)
+            ClipLPath = openFileDialog.FileName;
+    }
+
+    private void SelectT5xxl()
+    {
+        OpenFileDialog openFileDialog = new() { Filter = "T5xxl|*.*" };
+        if (openFileDialog.ShowDialog() == true)
+            T5xxlPath = openFileDialog.FileName;
+    }
+
     private void SelectVae()
     {
-        OpenFileDialog openFileDialog = new() { Filter = "Stable Diffusion VAE|*.*" };
+        OpenFileDialog openFileDialog = new() { Filter = "VAE|*.*" };
         if (openFileDialog.ShowDialog() == true)
             VaePath = openFileDialog.FileName;
     }

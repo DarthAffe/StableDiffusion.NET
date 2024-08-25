@@ -11,10 +11,13 @@
 
   <ItemGroup>
     <PackageReference Include="HPPH.System.Drawing" Version="1.0.0" />
-    <PackageReference Include="StableDiffusion.NET" Version="2.0.0" />
-    <PackageReference Include="StableDiffusion.NET.Backend.Cpu" Version="2.0.0" />
-    <PackageReference Include="StableDiffusion.NET.Backend.Cuda" Version="2.0.0" />
-    <PackageReference Include="StableDiffusion.NET.Backend.Rocm" Version="2.0.0" />
+    <PackageReference Include="StableDiffusion.NET.Backend.Cpu" Version="3.0.0" />
+    <PackageReference Include="StableDiffusion.NET.Backend.Cuda" Version="3.0.0" />
+    <PackageReference Include="StableDiffusion.NET.Backend.Rocm" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\StableDiffusion.NET\StableDiffusion.NET.csproj" />
   </ItemGroup>
 
 </Project>
