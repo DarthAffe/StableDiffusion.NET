@@ -9,6 +9,7 @@ public enum Sampler
     DPMPP2SA,
     DPMPP2M,
     DPMPP2Mv2,
-    LCM,
-    N_Sample_Methods
+    IPNDM,
+    IPNDM_V,
+    LCM
 }
