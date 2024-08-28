@@ -5,6 +5,7 @@ public enum Schedule
     Default,
     Discrete,
     Karras,
+    Exponential,
     AYS,
-    N_Schedules
+    GITS
 }
