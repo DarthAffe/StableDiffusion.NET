@@ -13,7 +13,7 @@ public class CpuBackend : IBackend
 
     public bool IsEnabled { get; set; } = true;
 
-    public int Priority => 0;
+    public int Priority { get; set; } = 0;
 
     public bool IsAvailable => (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                              || RuntimeInformation.IsOSPlatform(OSPlatform.Linux)

@@ -6,7 +6,7 @@ namespace StableDiffusion.NET;
 public interface IBackend
 {
     bool IsEnabled { get; set; }
-    public int Priority { get; }
+    public int Priority { get; set; }
     bool IsAvailable { get; }
     string PathPart { get; }
 }

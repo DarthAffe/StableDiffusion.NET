@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>StableDiffusion.NET.Backend.Vulkan</id>
+    <version>$version$</version>
+    <title>StableDiffusion.NET.Backend.Vulkan</title>
+    <authors>Darth Affe &amp; stable-diffusion.cpp Authors</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <icon>sd_net_vulkan.png</icon>
+    <projectUrl>https://github.com/DarthAffe/StableDiffusion.NET</projectUrl>
+    <description>Vulkan-Backend for StableDiffusion.NET.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright © Darth Affe 2024</copyright>
+    <readme>readme.md</readme>
+  </metadata>
+
+  <files>
+    <file src="StableDiffusion.NET.Backend.props" target="build/net8.0/StableDiffusion.NET.Backend.Vulkan.props" />
+
+    <file src="windows-vulkan/stable-diffusion.dll" target="runtimes\win-x64\native\vulkan\stable-diffusion.dll" />
+    
+    <file src="sd_net_vulkan.png" target="sd_net_vulkan.png" />
+    <file src="readme.md" target="readme.md" />
+    <file src="ggml.txt" target="ggml.txt" />
+    <file src="stable-diffusion.cpp.txt" target="stable-diffusion.cpp.txt" />
+  </files>
+</package>
