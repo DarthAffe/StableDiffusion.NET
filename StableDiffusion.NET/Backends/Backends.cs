@@ -15,11 +15,12 @@ public static class Backends
     public static CudaBackend CudaBackend { get; } = new();
     public static RocmBackend RocmBackend { get; } = new();
     public static SyclBackend SyclBackend { get; } = new();
+    public static VulkanBackend VulkanBackend { get; } = new();
 
     private static readonly List<IBackend> CUSTOM_BACKENDS = [];
     public static IReadOnlyList<IBackend> CustomBackends => CUSTOM_BACKENDS.AsReadOnly();
 
-    public static IEnumerable<IBackend> RegisteredBackends => [CpuBackend, CudaBackend, RocmBackend, SyclBackend, .. CUSTOM_BACKENDS];
+    public static IEnumerable<IBackend> RegisteredBackends => [CpuBackend, CudaBackend, RocmBackend, SyclBackend, VulkanBackend, .. CUSTOM_BACKENDS];
     public static IEnumerable<IBackend> AvailableBackends => RegisteredBackends.Where(x => x.IsAvailable);
     public static IEnumerable<IBackend> ActiveBackends => AvailableBackends.Where(x => x.IsEnabled);
 
@@ -37,7 +38,7 @@ public static class Backends
 
     public static bool RegisterBackend(IBackend backend)
     {
-        if (backend is NET.CpuBackend or NET.CudaBackend or NET.RocmBackend or NET.SyclBackend)
+        if (backend is NET.CpuBackend or NET.CudaBackend or NET.RocmBackend or NET.SyclBackend or NET.VulkanBackend)
             throw new ArgumentException("Default backends can't be registered again.");
 
         if (CUSTOM_BACKENDS.Contains(backend))
