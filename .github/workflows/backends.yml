@@ -363,6 +363,7 @@ jobs:
           nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda.nuspec -version ${{ github.event.inputs.version }}
           nuget pack ./Backends/StableDiffusion.NET.Backend.Rocm.nuspec -version ${{ github.event.inputs.version }}
           nuget pack ./Backends/StableDiffusion.NET.Backend.Sycl.nuspec -version ${{ github.event.inputs.version }}
+          nuget pack ./Backends/StableDiffusion.NET.Backend.Vulkan.nuspec -version ${{ github.event.inputs.version }}
           
       - name: Upload artifacts
         id: upload_artifacts
