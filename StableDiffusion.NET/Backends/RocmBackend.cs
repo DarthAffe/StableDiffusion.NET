@@ -12,7 +12,7 @@ public partial class RocmBackend : IBackend
 
     public bool IsEnabled { get; set; } = true;
 
-    public int Priority => 10;
+    public int Priority { get; set; } = 10;
 
     public bool IsAvailable => ((RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                               && RocmVersion is 5)
