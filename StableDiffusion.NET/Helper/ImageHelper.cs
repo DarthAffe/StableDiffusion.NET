@@ -8,21 +8,29 @@ internal static class ImageHelper
 {
     public static unsafe Image<ColorRGB> ToImage(Native.sd_image_t* sdImage)
     {
-        int width = (int)sdImage->width;
-        int height = (int)sdImage->height;
-        int bpp = (int)sdImage->channel;
+        Image<ColorRGB> image = ToImage(*sdImage);
 
-        Image<ColorRGB> image = Image<ColorRGB>.Create(new ReadOnlySpan<byte>(sdImage->data, width * height * bpp), width, height, width * bpp);
+        Marshal.FreeHGlobal((nint)sdImage);
+
+        return image;
+    }
+
+    public static unsafe Image<ColorRGB> ToImage(Native.sd_image_t sdImage)
+    {
+        int width = (int)sdImage.width;
+        int height = (int)sdImage.height;
+        int bpp = (int)sdImage.channel;
+
+        Image<ColorRGB> image = Image<ColorRGB>.Create(new ReadOnlySpan<byte>(sdImage.data, width * height * bpp), width, height, width * bpp);
 
         Dispose(sdImage);
 
         return image;
     }
 
-    public static unsafe void Dispose(Native.sd_image_t* image)
+    public static unsafe void Dispose(Native.sd_image_t image)
     {
-        Marshal.FreeHGlobal((nint)image->data);
-        Marshal.FreeHGlobal((nint)image);
+        Marshal.FreeHGlobal((nint)image.data);
     }
 
     public static unsafe Native.sd_image_t ToSdImage(this IImage<ColorRGB> image, byte* pinnedReference)

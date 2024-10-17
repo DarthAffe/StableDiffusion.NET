@@ -58,14 +58,14 @@ public sealed unsafe class UpscaleModel : IDisposable
         fixed (byte* imagePtr = sourceImage.AsRefImage())
         {
             Native.sd_image_t result = Native.upscale(_ctx, sourceImage.ToSdImage(imagePtr), upscaleFactor);
-            return ImageHelper.ToImage(&result);
+            return ImageHelper.ToImage(result);
         }
     }
 
     private IImage<ColorRGB> Upscale(Native.sd_image_t image, int upscaleFactor)
     {
         Native.sd_image_t result = Native.upscale(_ctx, image, upscaleFactor);
-        return ImageHelper.ToImage(&result);
+        return ImageHelper.ToImage(result);
     }
 
     public void Dispose()
