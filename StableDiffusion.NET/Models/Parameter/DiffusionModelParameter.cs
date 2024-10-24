@@ -24,12 +24,16 @@ public sealed class DiffusionModelParameter : IDiffusionModelParameter, IQuantiz
 
     public Quantization Quantization { get; set; } = Quantization.Unspecified;
 
-    // Stable Diffusion only
+    // SD <= 3 only
     public string ModelPath { get; set; } = string.Empty;
     public string StackedIdEmbeddingsDirectory { get; set; } = string.Empty;
 
-    // Flux only
+    // Flux & SD3.5 only
     public string DiffusionModelPath { get; set; } = string.Empty;
     public string ClipLPath { get; set; } = string.Empty;
     public string T5xxlPath { get; set; } = string.Empty;
+
+
+    // SD3.5 only
+    public string ClipGPath { get; set; } = string.Empty;
 }
