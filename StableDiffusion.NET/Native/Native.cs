@@ -51,6 +51,7 @@ internal unsafe partial class Native
     [LibraryImport(LIB_NAME, EntryPoint = "new_sd_ctx")]
     internal static partial sd_ctx_t* new_sd_ctx([MarshalAs(UnmanagedType.LPStr)] string model_path,
                                                  [MarshalAs(UnmanagedType.LPStr)] string clip_l_path,
+                                                 [MarshalAs(UnmanagedType.LPStr)] string clip_g_path,
                                                  [MarshalAs(UnmanagedType.LPStr)] string t5xxl_path,
                                                  [MarshalAs(UnmanagedType.LPStr)] string diffusion_model_path,
                                                  [MarshalAs(UnmanagedType.LPStr)] string vae_path,

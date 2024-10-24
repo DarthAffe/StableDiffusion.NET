@@ -41,6 +41,7 @@ public sealed unsafe class DiffusionModel : IDisposable
     {
         _ctx = Native.new_sd_ctx(ModelParameter.ModelPath,
                                  ModelParameter.ClipLPath,
+                                 ModelParameter.ClipGPath,
                                  ModelParameter.T5xxlPath,
                                  ModelParameter.DiffusionModelPath,
                                  ModelParameter.VaePath,
