@@ -171,10 +171,6 @@ jobs:
   windows-hip:
     runs-on: windows-latest
 
-    strategy:
-      matrix:
-        gpu_target: [gfx1100, gfx1101, gfx1030]
-
     steps:
       - name: Install
         id: depends
@@ -205,7 +201,7 @@ jobs:
           $env:CMAKE_PREFIX_PATH="${env:HIP_PATH}"
           mkdir build
           cd build
-          cmake -G "Unix Makefiles" --build .. -DCMAKE_C_COMPILER="${env:HIP_PATH}\bin\clang.exe" -DCMAKE_CXX_COMPILER="${env:HIP_PATH}\bin\clang++.exe" -DGGML_HIP=ON -DCMAKE_BUILD_TYPE=Release -DAMDGPU_TARGETS=${{ matrix.gpu_target }} -DGGML_RPC=ON -DSD_BUILD_SHARED_LIBS=ON
+          cmake -G "Unix Makefiles" .. -DCMAKE_C_COMPILER="${env:HIP_PATH}\bin\clang.exe" -DCMAKE_CXX_COMPILER="${env:HIP_PATH}\bin\clang++.exe" -DGGML_HIP=ON -DCMAKE_BUILD_TYPE=Release -DAMDGPU_TARGETS="gfx1100;gfx1101;gfx1030" -DGGML_RPC=ON -DSD_BUILD_SHARED_LIBS=ON
           cmake --build . --config Release
               
       - name: Upload artifact
