@@ -31,7 +31,7 @@ jobs:
           - build: 'avx512'
             defines: '-DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'cuda12'
-            defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'rocm5'
             defines: '-G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DSD_HIPBLAS=ON -DCMAKE_BUILD_TYPE=Release -DAMDGPU_TARGETS="gfx1100;gfx1102;gfx1030" -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'vulkan'
@@ -49,13 +49,11 @@ jobs:
       - name: Install cuda-toolkit
         id: cuda-toolkit-12
         if: ${{ matrix.build == 'cuda12' }}
-        uses: Jimver/cuda-toolkit@v0.2.16
+        uses: Jimver/cuda-toolkit@v0.2.19
         with:
-          cuda: '12.5.0'
+          cuda: '12.6.2'
           method: network
           sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust", "visual_studio_integration"]'
-          use-github-cache: false
-          use-local-cache: false
 
       - name: Install rocm-toolkit
         id: rocm-toolkit
@@ -111,7 +109,7 @@ jobs:
       matrix:
         include:
           - build: 'cuda11'
-            defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"'
+            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"'
 
     steps:
       - name: Checkout
@@ -208,9 +206,9 @@ jobs:
           - build: 'avx512'
             defines: '-DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'cuda11'
-            defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'cuda12'
-            defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON'            
+            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON'            
           - build: 'sycl'
             defines: '-DSD_SYCL=ON -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DSD_BUILD_SHARED_LIBS=ON'
             
@@ -404,6 +402,6 @@ jobs:
           name: StableDiffusion.NET.Backend-Nugets
           path: ./*.nupkg
           
-      - name: Nuget Push
-        id: nuget_push
-        run: dotnet nuget push **\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+     # - name: Nuget Push
+     #   id: nuget_push
+     #   run: dotnet nuget push **\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
