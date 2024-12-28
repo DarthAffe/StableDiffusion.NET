@@ -167,7 +167,7 @@ jobs:
         with:
           name: windows-sycl
           path: .\build\bin\stable-diffusion.dll
-	
+
   windows-hip:
     runs-on: windows-latest
 
