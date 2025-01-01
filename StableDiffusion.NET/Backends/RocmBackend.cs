@@ -14,11 +14,7 @@ public partial class RocmBackend : IBackend
 
     public int Priority { get; set; } = 10;
 
-    public bool IsAvailable => ((RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                              && RocmVersion is 5)
-                             || (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-                              && RocmVersion is 6))
-                            && (RuntimeInformation.OSArchitecture == Architecture.X64);
+    public bool IsAvailable => (RocmVersion == 6) && (RuntimeInformation.OSArchitecture == Architecture.X64);
 
     public string PathPart => RocmVersion switch
     {
