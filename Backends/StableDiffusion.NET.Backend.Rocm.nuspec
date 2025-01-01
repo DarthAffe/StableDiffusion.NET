@@ -18,7 +18,7 @@
   <files>
     <file src="StableDiffusion.NET.Backend.props" target="build/net8.0/StableDiffusion.NET.Backend.Rocm.props" />
 
-    <file src="windows-rocm5/stable-diffusion.dll" target="runtimes\win-x64\native\rocm5\stable-diffusion.dll" />
+    <file src="windows-rocm6/stable-diffusion.dll" target="runtimes\win-x64\native\rocm6\stable-diffusion.dll" />
     
     <file src="linux-rocm6/libstable-diffusion.so" target="runtimes\linux-x64\native\rocm6\libstable-diffusion.so" />
     

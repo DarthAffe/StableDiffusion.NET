@@ -23,17 +23,15 @@ jobs:
       matrix:
         include:
           - build: 'noavx'
-            defines: '-DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON'
+            defines: 'DGGML_NATIVE=OFF -DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx'
-            defines: '-DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON'
+            defines: 'DGGML_NATIVE=OFF -DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx2'
-            defines: '-DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: 'DGGML_NATIVE=OFF -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx512'
-            defines: '-DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: 'DGGML_NATIVE=OFF -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'cuda12'
-            defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON'
-          - build: 'rocm5'
-            defines: '-G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DSD_HIPBLAS=ON -DCMAKE_BUILD_TYPE=Release -DAMDGPU_TARGETS="gfx1100;gfx1102;gfx1030" -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'vulkan'
             defines: "-DSD_VULKAN=ON -DSD_BUILD_SHARED_LIBS=ON"
 
@@ -49,27 +47,11 @@ jobs:
       - name: Install cuda-toolkit
         id: cuda-toolkit-12
         if: ${{ matrix.build == 'cuda12' }}
-        uses: Jimver/cuda-toolkit@v0.2.16
+        uses: Jimver/cuda-toolkit@v0.2.19
         with:
-          cuda: '12.5.0'
+          cuda: '12.6.2'
           method: network
           sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust", "visual_studio_integration"]'
-          use-github-cache: false
-          use-local-cache: false
-
-      - name: Install rocm-toolkit
-        id: rocm-toolkit
-        if: ${{ matrix.build == 'rocm5' }}
-        uses: Cyberhan123/rocm-toolkit@v0.1.0
-        with:
-          rocm: '5.5.0'
-
-      - name: Install Ninja
-        id: install-ninja
-        if: ${{ matrix.build == 'rocm5' }}
-        uses: urkle/action-get-ninja@v1
-        with:
-          version: 1.11.1
 
       - name: Install Vulkan SDK
         id: get_vulkan
@@ -90,19 +72,10 @@ jobs:
       
       - name: Upload artifact
         id: upload_artifact
-        if: ${{ matrix.build != 'rocm5' }}
         uses: actions/upload-artifact@v4.3.1
         with:
           name: windows-${{ matrix.build }}
           path: .\build\bin\Release\stable-diffusion.dll
-
-      - name: Upload artifact Rocm
-        id: upload_artifact_rocm
-        if: ${{ matrix.build == 'rocm5' }}
-        uses: actions/upload-artifact@v4.3.1
-        with:
-          name: windows-${{ matrix.build }}
-          path: .\build\bin\stable-diffusion.dll  
 
   windows-2019:
     runs-on: windows-2019
@@ -111,7 +84,7 @@ jobs:
       matrix:
         include:
           - build: 'cuda11'
-            defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"'
+            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"'
 
     steps:
       - name: Checkout
@@ -157,8 +130,9 @@ jobs:
         shell: bash
 
     env:
-      WINDOWS_BASEKIT_URL: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/7dff44ba-e3af-4448-841c-0d616c8da6e7/w_BaseKit_p_2024.1.0.595_offline.exe
-      WINDOWS_DPCPP_MKL: intel.oneapi.win.cpp-dpcpp-common:intel.oneapi.win.mkl.devel
+      WINDOWS_BASEKIT_URL: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/b380d914-366b-4b77-a74a-05e3c38b3514/intel-oneapi-base-toolkit-2025.0.0.882_offline.exe
+      WINDOWS_DPCPP_MKL: intel.oneapi.win.cpp-dpcpp-common:intel.oneapi.win.mkl.devel:intel.oneapi.win.dnnl:intel.oneapi.win.tbb.devel
+      ONEAPI_ROOT: "C:/Program Files (x86)/Intel/oneAPI"
 
     steps:
       - name: Checkout
@@ -194,6 +168,49 @@ jobs:
           name: windows-sycl
           path: .\build\bin\stable-diffusion.dll
 
+  windows-hip:
+    runs-on: windows-latest
+
+    steps:
+      - name: Install
+        id: depends
+        run: |
+          $ErrorActionPreference = "Stop"
+          write-host "Downloading AMD HIP SDK Installer"
+          Invoke-WebRequest -Uri "https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-24.Q4-WinSvr2022-For-HIP.exe" -OutFile "${env:RUNNER_TEMP}\rocm-install.exe"
+          write-host "Installing AMD HIP SDK"
+          Start-Process "${env:RUNNER_TEMP}\rocm-install.exe" -ArgumentList '-install' -NoNewWindow -Wait
+          write-host "Completed AMD HIP SDK installation"
+      - name: Verify ROCm
+        id: verify
+        run: |
+          & 'C:\Program Files\AMD\ROCm\*\bin\clang.exe' --version
+          
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          repository: 'leejet/stable-diffusion.cpp'
+          ref: '${{ github.event.inputs.commit }}'
+          submodules: recursive  
+
+      - name: Build
+        id: cmake_build
+        run: |
+          $env:HIP_PATH=$(Resolve-Path 'C:\Program Files\AMD\ROCm\*\bin\clang.exe' | split-path | split-path)
+          $env:CMAKE_PREFIX_PATH="${env:HIP_PATH}"
+          mkdir build
+          cd build
+          cmake -G "Unix Makefiles" .. -DCMAKE_C_COMPILER="${env:HIP_PATH}\bin\clang.exe" -DCMAKE_CXX_COMPILER="${env:HIP_PATH}\bin\clang++.exe" -DGGML_HIP=ON -DCMAKE_BUILD_TYPE=Release -DAMDGPU_TARGETS="gfx1100;gfx1101;gfx1030" -DGGML_RPC=ON -DSD_BUILD_SHARED_LIBS=ON
+          cmake --build . --config Release
+              
+      - name: Upload artifact
+        id: upload_artifact
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: windows-rocm6
+          path: .\build\bin\stable-diffusion.dll
+
   linux:
     runs-on: ubuntu-latest
     strategy:
@@ -208,9 +225,9 @@ jobs:
           - build: 'avx512'
             defines: '-DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'cuda11'
-            defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'cuda12'
-            defines: '-DSD_CUBLAS=ON -DSD_BUILD_SHARED_LIBS=ON'            
+            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON'            
           - build: 'sycl'
             defines: '-DSD_SYCL=ON -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DSD_BUILD_SHARED_LIBS=ON'
             
@@ -307,7 +324,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DCMAKE_C_COMPILER=hipcc -DCMAKE_CXX_COMPILER=hipcc -DSD_HIPBLAS=ON -DCMAKE_BUILD_TYPE=Release -DAMDGPU_TARGETS="gfx1100;gfx1102;gfx1030" -DSD_BUILD_SHARED_LIBS=ON
+          cmake .. -DCMAKE_HIP_COMPILER="$(hipconfig -l)/clang" -DGGML_HIP=ON -DSD_BUILD_SHARED_LIBS=ON
           cmake --build . --config Release
                
       - name: Upload artifact Rocm
@@ -361,6 +378,7 @@ jobs:
 
     needs:
       - windows
+      - windows-hip
       - windows-sycl
       - linux
       - linux-hip
