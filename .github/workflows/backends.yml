@@ -23,15 +23,15 @@ jobs:
       matrix:
         include:
           - build: 'noavx'
-            defines: 'DGGML_NATIVE=OFF -DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx'
-            defines: 'DGGML_NATIVE=OFF -DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx2'
-            defines: 'DGGML_NATIVE=OFF -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx512'
-            defines: 'DGGML_NATIVE=OFF -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'cuda12'
-            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;89" -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'vulkan'
             defines: "-DSD_VULKAN=ON -DSD_BUILD_SHARED_LIBS=ON"
 
@@ -84,7 +84,7 @@ jobs:
       matrix:
         include:
           - build: 'cuda11'
-            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"'
+            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_ARCHITECTURES="61" -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"'
 
     steps:
       - name: Checkout
@@ -217,17 +217,17 @@ jobs:
       matrix:
         include:
           - build: 'noavx'
-            defines: '-DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx'
-            defines: '-DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx2'
-            defines: '-DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx512'
-            defines: '-DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'cuda11'
-            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61" -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'cuda12'
-            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON'            
+            defines: '-DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;89" -DSD_BUILD_SHARED_LIBS=ON'            
           - build: 'sycl'
             defines: '-DSD_SYCL=ON -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DSD_BUILD_SHARED_LIBS=ON'
             
@@ -341,13 +341,13 @@ jobs:
       matrix:
         include:
           - build: 'noavx'
-            defines: '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx'
-            defines: '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX2=OFF -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx2'
-            defines: '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx512'
-            defines: '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
+            defines: '-DGGML_NATIVE=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
    
     steps:          
       - name: Checkout
