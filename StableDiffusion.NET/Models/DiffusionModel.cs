@@ -59,7 +59,8 @@ public sealed unsafe class DiffusionModel : IDisposable
                                  ModelParameter.Schedule,
                                  ModelParameter.KeepClipOnCPU,
                                  ModelParameter.KeepControlNetOnCPU,
-                                 ModelParameter.KeepVaeOnCPU);
+                                 ModelParameter.KeepVaeOnCPU,
+                                 ModelParameter.FlashAttention);
 
         if (_ctx == null) throw new NullReferenceException("Failed to initialize diffusion-model.");
     }
@@ -122,7 +123,12 @@ public sealed unsafe class DiffusionModel : IDisposable
                                             parameter.ControlNet.Strength,
                                             parameter.PhotoMaker.StyleRatio,
                                             parameter.PhotoMaker.NormalizeInput,
-                                            parameter.PhotoMaker.InputIdImageDirectory);
+                                            parameter.PhotoMaker.InputIdImageDirectory,
+                                            parameter.SkipLayers,
+                                            parameter.SkipLayers.Length,
+                                            parameter.SlgScale,
+                                            parameter.SkipLayerStart,
+                                            parameter.SkipLayerEnd);
 
                     Marshal.FreeHGlobal((nint)nativeControlNetImage.data);
                 }
@@ -152,7 +158,12 @@ public sealed unsafe class DiffusionModel : IDisposable
                                             parameter.ControlNet.Strength,
                                             parameter.PhotoMaker.StyleRatio,
                                             parameter.PhotoMaker.NormalizeInput,
-                                            parameter.PhotoMaker.InputIdImageDirectory);
+                                            parameter.PhotoMaker.InputIdImageDirectory,
+                                            parameter.SkipLayers,
+                                            parameter.SkipLayers.Length,
+                                            parameter.SlgScale,
+                                            parameter.SkipLayerStart,
+                                            parameter.SkipLayerEnd);
                 }
             }
         }
@@ -174,7 +185,12 @@ public sealed unsafe class DiffusionModel : IDisposable
                                     0,
                                     parameter.PhotoMaker.StyleRatio,
                                     parameter.PhotoMaker.NormalizeInput,
-                                    parameter.PhotoMaker.InputIdImageDirectory);
+                                    parameter.PhotoMaker.InputIdImageDirectory,
+                                    parameter.SkipLayers,
+                                    parameter.SkipLayers.Length,
+                                    parameter.SlgScale,
+                                    parameter.SkipLayerStart,
+                                    parameter.SkipLayerEnd);
         }
 
         return ImageHelper.ToImage(result);
@@ -246,7 +262,12 @@ public sealed unsafe class DiffusionModel : IDisposable
                                             parameter.ControlNet.Strength,
                                             parameter.PhotoMaker.StyleRatio,
                                             parameter.PhotoMaker.NormalizeInput,
-                                            parameter.PhotoMaker.InputIdImageDirectory);
+                                            parameter.PhotoMaker.InputIdImageDirectory,
+                                            parameter.SkipLayers,
+                                            parameter.SkipLayers.Length,
+                                            parameter.SlgScale,
+                                            parameter.SkipLayerStart,
+                                            parameter.SkipLayerEnd);
 
                     Marshal.FreeHGlobal((nint)nativeControlNetImage.data);
                 }
@@ -278,7 +299,12 @@ public sealed unsafe class DiffusionModel : IDisposable
                                             parameter.ControlNet.Strength,
                                             parameter.PhotoMaker.StyleRatio,
                                             parameter.PhotoMaker.NormalizeInput,
-                                            parameter.PhotoMaker.InputIdImageDirectory);
+                                            parameter.PhotoMaker.InputIdImageDirectory,
+                                            parameter.SkipLayers,
+                                            parameter.SkipLayers.Length,
+                                            parameter.SlgScale,
+                                            parameter.SkipLayerStart,
+                                            parameter.SkipLayerEnd);
                 }
             }
         }
@@ -302,7 +328,12 @@ public sealed unsafe class DiffusionModel : IDisposable
                                     0,
                                     parameter.PhotoMaker.StyleRatio,
                                     parameter.PhotoMaker.NormalizeInput,
-                                    parameter.PhotoMaker.InputIdImageDirectory);
+                                    parameter.PhotoMaker.InputIdImageDirectory,
+                                    parameter.SkipLayers,
+                                    parameter.SkipLayers.Length,
+                                    parameter.SlgScale,
+                                    parameter.SkipLayerStart,
+                                    parameter.SkipLayerEnd);
         }
 
         return ImageHelper.ToImage(result);

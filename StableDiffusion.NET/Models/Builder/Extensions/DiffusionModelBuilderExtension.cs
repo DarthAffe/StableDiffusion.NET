@@ -119,4 +119,12 @@ public static class DiffusionModelBuilderExtension
 
         return builder;
     }
+
+    public static T WithFlashAttention<T>(this T builder, bool flashAttention = true)
+        where T : IDiffusionModelBuilder
+    {
+        builder.Parameter.FlashAttention = flashAttention;
+
+        return builder;
+    }
 }

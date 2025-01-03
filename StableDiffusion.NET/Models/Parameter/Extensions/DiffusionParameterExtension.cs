@@ -64,6 +64,34 @@ public static class DiffusionParameterExtension
         return parameter;
     }
 
+    public static DiffusionParameter WithSlgScale(this DiffusionParameter parameter, float slgScale)
+    {
+        parameter.SlgScale = slgScale;
+
+        return parameter;
+    }
+
+    public static DiffusionParameter WithSkipLayers(this DiffusionParameter parameter, int[] layers)
+    {
+        parameter.SkipLayers = layers;
+
+        return parameter;
+    }
+
+    public static DiffusionParameter WithSkipLayerStart(this DiffusionParameter parameter, float skipLayerStart)
+    {
+        parameter.SkipLayerStart = skipLayerStart;
+
+        return parameter;
+    }
+
+    public static DiffusionParameter WithSkipLayerEnd(this DiffusionParameter parameter, float skipLayerEnd)
+    {
+        parameter.SkipLayerEnd = skipLayerEnd;
+
+        return parameter;
+    }
+
     public static DiffusionParameter WithControlNet(this DiffusionParameter parameter, IImage image, float? strength = null)
     {
         parameter.ControlNet.Image = image;
