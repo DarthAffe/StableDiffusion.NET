@@ -37,6 +37,8 @@ public enum Quantization
     Q4_0_4_4 = 31,
     Q4_0_4_8 = 32,
     Q4_0_8_8 = 33,
+    TQ1_0 = 34,
+    TQ2_0 = 35,
 
     Unspecified
 }

@@ -71,6 +71,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
         set => SetProperty(ref _schedule, value);
     }
 
+    private bool _flashAttention = true;
+    public bool FlashAttention
+    {
+        get => _flashAttention;
+        set => SetProperty(ref _flashAttention, value);
+    }
+
     private string _prompt = string.Empty;
     public string Prompt
     {
@@ -242,14 +249,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 restoreDefaultParameters = _model?.ModelParameter.DiffusionModelType != DiffusionModelType.StableDiffusion;
 
                 LogLine($"Loading stable diffusion-model '{ModelPath}'");
-                _model = await Task.Run(() => ModelBuilder.StableDiffusion(ModelPath).WithMultithreading().WithVae(VaePath).WithSchedule(Schedule).Build());
+                _model = await Task.Run(() => ModelBuilder.StableDiffusion(ModelPath).WithMultithreading().WithVae(VaePath).WithSchedule(Schedule).WithFlashAttention(FlashAttention).Build());
             }
             else if (IsFluxSelected)
             {
                 restoreDefaultParameters = _model?.ModelParameter.DiffusionModelType != DiffusionModelType.Flux;
 
                 LogLine($"Loading flux-model '{DiffusionModelPath}'");
-                _model = await Task.Run(() => ModelBuilder.Flux(DiffusionModelPath, ClipLPath, T5xxlPath, VaePath).WithMultithreading().WithSchedule(Schedule).Build());
+                _model = await Task.Run(() => ModelBuilder.Flux(DiffusionModelPath, ClipLPath, T5xxlPath, VaePath).WithMultithreading().WithSchedule(Schedule).WithFlashAttention(FlashAttention).Build());
             }
             else
             {

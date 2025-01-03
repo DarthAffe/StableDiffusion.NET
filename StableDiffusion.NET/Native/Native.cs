@@ -69,7 +69,8 @@ internal unsafe partial class Native
                                                  schedule_t s,
                                                  [MarshalAs(UnmanagedType.I1)] bool keep_clip_on_cpu,
                                                  [MarshalAs(UnmanagedType.I1)] bool keep_control_net_cpu,
-                                                 [MarshalAs(UnmanagedType.I1)] bool keep_vae_on_cpu);
+                                                 [MarshalAs(UnmanagedType.I1)] bool keep_vae_on_cpu,
+                                                 [MarshalAs(UnmanagedType.I1)] bool diffusion_flash_attn);
 
     [LibraryImport(LIB_NAME, EntryPoint = "free_sd_ctx")]
     internal static partial void free_sd_ctx(sd_ctx_t* sd_ctx);
@@ -91,7 +92,12 @@ internal unsafe partial class Native
                                                 float control_strength,
                                                 float style_strength,
                                                 [MarshalAs(UnmanagedType.I1)] bool normalize_input,
-                                                [MarshalAs(UnmanagedType.LPStr)] string input_id_images_path);
+                                                [MarshalAs(UnmanagedType.LPStr)] string input_id_images_path,
+                                                int[] skip_layers,
+                                                int skip_layers_count,
+                                                float slg_scale,
+                                                float skip_layer_start,
+                                                float skip_layer_end);
 
     [LibraryImport(LIB_NAME, EntryPoint = "img2img")]
     internal static partial sd_image_t* img2img(sd_ctx_t* sd_ctx,
@@ -112,7 +118,12 @@ internal unsafe partial class Native
                                                 float control_strength,
                                                 float style_strength,
                                                 [MarshalAs(UnmanagedType.I1)] bool normalize_input,
-                                                [MarshalAs(UnmanagedType.LPStr)] string input_id_images_path);
+                                                [MarshalAs(UnmanagedType.LPStr)] string input_id_images_path,
+                                                int[] skip_layers,
+                                                int skip_layers_count,
+                                                float slg_scale,
+                                                float skip_layer_start,
+                                                float skip_layer_end);
 
     [LibraryImport(LIB_NAME, EntryPoint = "img2vid")]
     internal static partial sd_image_t* img2vid(sd_ctx_t* sd_ctx,

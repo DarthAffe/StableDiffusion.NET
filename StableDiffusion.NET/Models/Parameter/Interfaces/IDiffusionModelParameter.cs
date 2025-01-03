@@ -16,6 +16,7 @@ public interface IDiffusionModelParameter
     bool KeepControlNetOnCPU { get; set; }
     bool KeepClipOnCPU { get; set; }
     bool KeepVaeOnCPU { get; set; }
+    bool FlashAttention { get; set; }
 
     RngType RngType { get; set; }
     Schedule Schedule { get; set; }

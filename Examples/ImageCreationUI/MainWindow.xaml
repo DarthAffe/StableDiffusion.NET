@@ -91,6 +91,11 @@
                 <Label Content="Schedule" />
                 <ComboBox ItemsSource="{Binding Source={StaticResource ScheduleDataSource}}" SelectedItem="{Binding Schedule}" />
 
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <Label Content="Flash Attention" />
+                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding FlashAttention}" />
+                </StackPanel>
+
                 <Button Margin="0,8"  Content="Load Model" Command="{Binding LoadModelCommand}" IsEnabled="{Binding IsReady}" />
 
                 <Separator />
