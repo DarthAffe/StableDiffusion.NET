@@ -202,17 +202,75 @@ public sealed unsafe class DiffusionModel : IDisposable
 
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(prompt);
+        ArgumentNullException.ThrowIfNull(image);
 
         parameter.Validate();
 
         if (image is not IImage<ColorRGB> refImage)
             refImage = image.ConvertTo<ColorRGB>();
 
-        fixed (byte* imagePtr = refImage.AsRefImage())
-            return ImageToImage(prompt, refImage.ToSdImage(imagePtr), parameter);
+        // DarthAffe 10.08.2024: Mask needs to be a 1 channel all max value image when it's not used - I really don't like this concept as it adds unnecessary allocations, but that's how it is :(
+        Span<byte> maskBuffer = new byte[image.Width * image.Height];
+        maskBuffer.Fill(byte.MaxValue);
+
+        fixed (byte* maskPtr = maskBuffer)
+        {
+            Native.sd_image_t maskImage = new()
+            {
+                width = (uint)image.Width,
+                height = (uint)image.Height,
+                channel = 1,
+                data = maskPtr
+            };
+
+            fixed (byte* imagePtr = refImage.AsRefImage())
+                return ImageToImage(prompt, refImage.ToSdImage(imagePtr), maskImage, parameter);
+        }
     }
 
-    private IImage<ColorRGB> ImageToImage(string prompt, Native.sd_image_t image, DiffusionParameter parameter)
+    public IImage<ColorRGB> Inpaint(string prompt, IImage image, IImage mask, DiffusionParameter? parameter = null)
+    {
+        parameter ??= GetDefaultParameter();
+
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentNullException.ThrowIfNull(prompt);
+        ArgumentNullException.ThrowIfNull(image);
+        ArgumentNullException.ThrowIfNull(mask);
+
+        if (image.Width != mask.Width) throw new ArgumentException("The mask needs to have the same with as the image.", nameof(mask));
+        if (image.Height != mask.Height) throw new ArgumentException("The mask needs to have the same height as the image.", nameof(mask));
+
+        parameter.Validate();
+
+        if (image is not IImage<ColorRGB> refImage)
+            refImage = image.ConvertTo<ColorRGB>();
+
+        // DarthAffe 10.08.2024: HPPH does currently not support monochrome images, that's why we need to convert it here. We're going for the simple conversion as the source image is supposed to be monochrome anyway.
+        Span<byte> maskBuffer = new byte[image.Width * image.Height];
+        for (int y = 0; y < image.Height; y++)
+            for (int x = 0; x < image.Width; x++)
+            {
+                IColor color = mask[x, y];
+                maskBuffer[(image.Width * y) + x] = (byte)Math.Round((color.R + color.G + color.B) / 3.0);
+            }
+
+        fixed (byte* maskPtr = maskBuffer)
+        {
+            Native.sd_image_t maskImage = new()
+            {
+                width = (uint)image.Width,
+                height = (uint)image.Height,
+                channel = 1,
+                data = maskPtr
+            };
+
+            fixed (byte* imagePtr = refImage.AsRefImage())
+                return ImageToImage(prompt, refImage.ToSdImage(imagePtr), maskImage, parameter);
+        }
+
+    }
+
+    private IImage<ColorRGB> ImageToImage(string prompt, Native.sd_image_t image, Native.sd_image_t mask, DiffusionParameter parameter)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(prompt);
@@ -246,6 +304,7 @@ public sealed unsafe class DiffusionModel : IDisposable
 
                     result = Native.img2img(_ctx,
                                             image,
+                                            mask,
                                             prompt,
                                             parameter.NegativePrompt,
                                             parameter.ClipSkip,
@@ -283,6 +342,7 @@ public sealed unsafe class DiffusionModel : IDisposable
 
                     result = Native.img2img(_ctx,
                                             image,
+                                            mask,
                                             prompt,
                                             parameter.NegativePrompt,
                                             parameter.ClipSkip,
@@ -312,6 +372,7 @@ public sealed unsafe class DiffusionModel : IDisposable
         {
             result = Native.img2img(_ctx,
                                     image,
+                                    mask,
                                     prompt,
                                     parameter.NegativePrompt,
                                     parameter.ClipSkip,

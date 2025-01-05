@@ -102,6 +102,7 @@ internal unsafe partial class Native
     [LibraryImport(LIB_NAME, EntryPoint = "img2img")]
     internal static partial sd_image_t* img2img(sd_ctx_t* sd_ctx,
                                                 sd_image_t init_image,
+                                                sd_image_t mask_image,
                                                 [MarshalAs(UnmanagedType.LPStr)] string prompt,
                                                 [MarshalAs(UnmanagedType.LPStr)] string negative_prompt,
                                                 int clip_skip,

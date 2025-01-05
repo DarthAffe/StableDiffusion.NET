@@ -64,6 +64,13 @@ public static class DiffusionParameterExtension
         return parameter;
     }
 
+    public static DiffusionParameter WithStrength(this DiffusionParameter parameter, float strength)
+    {
+        parameter.Strength = strength;
+
+        return parameter;
+    }
+
     public static DiffusionParameter WithSlgScale(this DiffusionParameter parameter, float slgScale)
     {
         parameter.SlgScale = slgScale;
