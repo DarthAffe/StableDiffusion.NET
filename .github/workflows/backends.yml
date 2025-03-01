@@ -245,7 +245,7 @@ jobs:
         if: ${{ matrix.build == 'cuda11' }}
         uses: Jimver/cuda-toolkit@v0.2.21
         with:
-          cuda: '11.8.0'
+          cuda: '11.7.1'
           method: network
           use-github-cache: false
           use-local-cache: false
