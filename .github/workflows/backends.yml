@@ -47,9 +47,9 @@ jobs:
       - name: Install cuda-toolkit
         id: cuda-toolkit-12
         if: ${{ matrix.build == 'cuda12' }}
-        uses: Jimver/cuda-toolkit@v0.2.19
+        uses: Jimver/cuda-toolkit@v0.2.21
         with:
-          cuda: '12.6.2'
+          cuda: '12.8.0'
           method: network
           sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust", "visual_studio_integration"]'
 
@@ -98,7 +98,7 @@ jobs:
       - name: Install cuda-toolkit
         id: cuda-toolkit-11
         if: ${{ matrix.build == 'cuda11' }}
-        uses: Jimver/cuda-toolkit@v0.2.16
+        uses: Jimver/cuda-toolkit@v0.2.21
         with:
           cuda: '11.8.0'
           method: network
@@ -243,9 +243,9 @@ jobs:
       - name: Install cuda-toolkit
         id: cuda-toolkit-11
         if: ${{ matrix.build == 'cuda11' }}
-        uses: Jimver/cuda-toolkit@v0.2.14
+        uses: Jimver/cuda-toolkit@v0.2.21
         with:
-          cuda: '11.7.1'
+          cuda: '11.8.0'
           method: network
           use-github-cache: false
           use-local-cache: false
@@ -253,9 +253,9 @@ jobs:
       - name: Install cuda-toolkit
         id: cuda-toolkit-12
         if: ${{ matrix.build == 'cuda12' }}
-        uses: Jimver/cuda-toolkit@v0.2.14
+        uses: Jimver/cuda-toolkit@v0.2.21
         with:
-          cuda: '12.2.0'
+          cuda: '12.8.0'
           method: network
           use-github-cache: false
           use-local-cache: false
