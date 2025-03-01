@@ -11,7 +11,7 @@ on:
         description: 'sd.cpp commit'
         required: true
         type: string
-		
+
 jobs:
   windows-cpu:
     runs-on: windows-latest
