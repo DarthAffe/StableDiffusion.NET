@@ -98,6 +98,7 @@ jobs:
         run: |
           mkdir build
           cd build
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;80;89;90" -DSD_BUILD_SHARED_LIBS=ON
           cmake --build . --config Release
       
@@ -154,6 +155,7 @@ jobs:
         run: |
           mkdir build
           cd build
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;80;89;90" -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"
           cmake --build . --config Release
       
