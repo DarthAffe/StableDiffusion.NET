@@ -95,6 +95,7 @@ jobs:
 
       - name: Build
         id: cmake_build
+        shell: cmd
         run: |
           mkdir build
           cd build
@@ -152,6 +153,7 @@ jobs:
 
       - name: Build
         id: cmake_build
+        shell: cmd
         run: |
           mkdir build
           cd build
