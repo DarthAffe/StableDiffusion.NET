@@ -101,7 +101,7 @@ jobs:
           mkdir build
           cd build
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;80;89;90;120" -DSD_BUILD_SHARED_LIBS=ON
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89;100" -DSD_BUILD_SHARED_LIBS=ON
           cmake --build . --config Release
       
       - name: Upload artifact
@@ -160,7 +160,7 @@ jobs:
           mkdir build
           cd build
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;80;89;90" -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89;100" -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"
           cmake --build . --config Release
       
       - name: Upload artifact
@@ -361,14 +361,14 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;80;89;90" -DSD_BUILD_SHARED_LIBS=ON
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89;100" -DSD_BUILD_SHARED_LIBS=ON
           cmake --build . --config Release
      
       - name: Upload artifact
         id: upload_artifact
         uses: actions/upload-artifact@v4.6.1
         with:
-          name: linux-$cuda12
+          name: linux-cuda12
           path: ./build/bin/libstable-diffusion.so
           
   linux-cuda11:
@@ -396,7 +396,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;80;89;90" -DSD_BUILD_SHARED_LIBS=ON
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89;100" -DSD_BUILD_SHARED_LIBS=ON
           cmake --build . --config Release
      
       - name: Upload artifact
@@ -551,22 +551,18 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
 
-      - name: Setup nuget
-        id: setup_nuget
-        uses: NuGet/setup-nuget@v2.0.1
-
       - name: Pack
         id: pack
         run: |
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cpu.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda11.Windows.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Windows.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda11.Linux.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Linux.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Rocm.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Sycl.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Vulkan.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cpu.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cuda11.Windows.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Windows.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cuda11.Linux.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Linux.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cuda.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Rocm.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Sycl.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Vulkan.nuspec -version ${{ github.event.inputs.version }}
           
       - name: Upload artifacts
         id: upload_artifacts
