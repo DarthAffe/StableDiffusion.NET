@@ -11,5 +11,7 @@ public enum Sampler
     DPMPP2Mv2,
     IPNDM,
     IPNDM_V,
-    LCM
+    LCM,
+    DDIM_Trailing,
+    TCD
 }

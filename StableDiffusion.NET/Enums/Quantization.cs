@@ -34,11 +34,14 @@ public enum Quantization
     F64 = 28,
     IQ1_M = 29,
     BF16 = 30,
-    Q4_0_4_4 = 31,
-    Q4_0_4_8 = 32,
-    Q4_0_8_8 = 33,
+    //Q4_0_4_4 = 31, support has been removed from gguf files
+    //Q4_0_4_8 = 32,
+    //Q4_0_8_8 = 33,
     TQ1_0 = 34,
     TQ2_0 = 35,
+    // SD_TYPE_IQ4_NL_4_4 = 36,
+    // SD_TYPE_IQ4_NL_4_8 = 37,
+    // SD_TYPE_IQ4_NL_8_8 = 38,
 
-    Unspecified
+    Unspecified = 39
 }

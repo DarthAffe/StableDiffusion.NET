@@ -90,5 +90,10 @@ public sealed class DiffusionParameter
     /// </summary>
     public float Guidance { get; set; } = 3.5f;
 
+    /// <summary>
+    /// eta in DDIM, only for DDIM and TCD (default: 0)
+    /// </summary>
+    public float Eta { get; set; } = 0f;
+
     #endregion
 }

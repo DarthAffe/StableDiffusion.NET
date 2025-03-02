@@ -82,6 +82,7 @@ internal unsafe partial class Native
                                                 int clip_skip,
                                                 float cfg_scale,
                                                 float guidance,
+                                                float eta,
                                                 int width,
                                                 int height,
                                                 sample_method_t sample_method,
