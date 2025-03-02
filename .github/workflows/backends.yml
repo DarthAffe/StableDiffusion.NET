@@ -551,22 +551,18 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
 
-      - name: Setup nuget
-        id: setup_nuget
-        uses: NuGet/setup-nuget@v2.0.1
-
       - name: Pack
         id: pack
         run: |
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cpu.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda11.Windows.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Windows.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda11.Linux.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Linux.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Cuda.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Rocm.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Sycl.nuspec -version ${{ github.event.inputs.version }}
-          nuget pack ./Backends/StableDiffusion.NET.Backend.Vulkan.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cpu.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cuda11.Windows.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Windows.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cuda11.Linux.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cuda12.Linux.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Cuda.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Rocm.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Sycl.nuspec -version ${{ github.event.inputs.version }}
+          dotnet pack ./Backends/StableDiffusion.NET.Backend.Vulkan.nuspec -version ${{ github.event.inputs.version }}
           
       - name: Upload artifacts
         id: upload_artifacts
