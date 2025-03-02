@@ -13,11 +13,8 @@ on:
         type: string
 
 jobs:
-  windows:
+  windows-cpu:
     runs-on: windows-latest
-    
-    env:
-      VULKAN_VERSION: 1.3.261.1
     
     strategy:
       matrix:
@@ -30,37 +27,15 @@ jobs:
             defines: '-DGGML_NATIVE=OFF -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx512'
             defines: '-DGGML_NATIVE=OFF -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
-          - build: 'cuda12'
-            defines: '-DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;89" -DSD_BUILD_SHARED_LIBS=ON'
-          - build: 'vulkan'
-            defines: "-DSD_VULKAN=ON -DSD_BUILD_SHARED_LIBS=ON"
 
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.2.2
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
           submodules: recursive
-
-      - name: Install cuda-toolkit
-        id: cuda-toolkit-12
-        if: ${{ matrix.build == 'cuda12' }}
-        uses: Jimver/cuda-toolkit@v0.2.21
-        with:
-          cuda: '12.8.0'
-          method: network
-          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust", "visual_studio_integration"]'
-
-      - name: Install Vulkan SDK
-        id: get_vulkan
-        if: ${{ matrix.build == 'vulkan' }}
-        run: |
-          curl.exe -o $env:RUNNER_TEMP/VulkanSDK-Installer.exe -L "https://sdk.lunarg.com/sdk/download/${env:VULKAN_VERSION}/windows/VulkanSDK-${env:VULKAN_VERSION}-Installer.exe"
-          & "$env:RUNNER_TEMP\VulkanSDK-Installer.exe" --accept-licenses --default-answer --confirm-command install
-          Add-Content $env:GITHUB_ENV "VULKAN_SDK=C:\VulkanSDK\${env:VULKAN_VERSION}"
-          Add-Content $env:GITHUB_PATH "C:\VulkanSDK\${env:VULKAN_VERSION}\bin"
 
       - name: Build
         id: cmake_build
@@ -72,56 +47,129 @@ jobs:
       
       - name: Upload artifact
         id: upload_artifact
-        uses: actions/upload-artifact@v4.3.1
+        uses: actions/upload-artifact@v4.6.1
         with:
           name: windows-${{ matrix.build }}
           path: .\build\bin\Release\stable-diffusion.dll
 
-  windows-2019:
+  windows-cuda12:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          repository: 'leejet/stable-diffusion.cpp'
+          ref: '${{ github.event.inputs.commit }}'
+          submodules: recursive
+
+      - name:  Install Cuda Toolkit 12.8
+        id: cuda-12
+        run: |
+          mkdir -p "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8"
+          choco install unzip -y
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cudart/windows-x86_64/cuda_cudart-windows-x86_64-12.8.57-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvcc/windows-x86_64/cuda_nvcc-windows-x86_64-12.8.61-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvrtc/windows-x86_64/cuda_nvrtc-windows-x86_64-12.8.61-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/libcublas/windows-x86_64/libcublas-windows-x86_64-12.8.3.14-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvtx/windows-x86_64/cuda_nvtx-windows-x86_64-12.8.55-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_profiler_api/windows-x86_64/cuda_profiler_api-windows-x86_64-12.8.55-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/visual_studio_integration/windows-x86_64/visual_studio_integration-windows-x86_64-12.8.55-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvprof/windows-x86_64/cuda_nvprof-windows-x86_64-12.8.57-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cccl/windows-x86_64/cuda_cccl-windows-x86_64-12.8.55-archive.zip"
+          unzip '*.zip' -d "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8"
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\cuda_cudart-windows-x86_64-12.8.57-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\cuda_nvcc-windows-x86_64-12.8.61-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\cuda_nvrtc-windows-x86_64-12.8.61-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\libcublas-windows-x86_64-12.8.3.14-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\cuda_nvtx-windows-x86_64-12.8.55-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\cuda_profiler_api-windows-x86_64-12.8.55-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\visual_studio_integration-windows-x86_64-12.8.55-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\cuda_nvprof-windows-x86_64-12.8.57-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\cuda_cccl-windows-x86_64-12.8.55-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\visual_studio_integration\MSBuildExtensions\*" "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations" /E /I /H /Y
+          echo "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\libnvvp" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          echo "CUDA_PATH_V12_8=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Build
+        id: cmake_build
+        shell: cmd
+        run: |
+          mkdir build
+          cd build
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89;100" -DSD_BUILD_SHARED_LIBS=ON
+          cmake --build . --config Release
+      
+      - name: Upload artifact
+        id: upload_artifact
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: windows-cuda12
+          path: .\build\bin\Release\stable-diffusion.dll
+
+  windows-cuda11:
     runs-on: windows-2019
-        
-    strategy:
-      matrix:
-        include:
-          - build: 'cuda11'
-            defines: '-DSD_CUDA=ON -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_ARCHITECTURES="61" -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"'
 
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.2.2
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
           submodules: recursive
 
-      - name: Install cuda-toolkit
-        id: cuda-toolkit-11
-        if: ${{ matrix.build == 'cuda11' }}
-        uses: Jimver/cuda-toolkit@v0.2.21
-        with:
-          cuda: '11.8.0'
-          method: network
-          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust", "visual_studio_integration"]'
-          use-github-cache: false
-          use-local-cache: false
+      - name:  Install Cuda Toolkit 11.8
+        id: cuda-11
+        run: |
+          mkdir -p "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8"
+          choco install unzip -y
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cudart/windows-x86_64/cuda_cudart-windows-x86_64-11.8.89-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvcc/windows-x86_64/cuda_nvcc-windows-x86_64-11.8.89-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvrtc/windows-x86_64/cuda_nvrtc-windows-x86_64-11.8.89-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/libcublas/windows-x86_64/libcublas-windows-x86_64-11.8.1.74-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvtx/windows-x86_64/cuda_nvtx-windows-x86_64-11.8.86-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_profiler_api/windows-x86_64/cuda_profiler_api-windows-x86_64-11.8.86-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/visual_studio_integration/windows-x86_64/visual_studio_integration-windows-x86_64-11.8.86-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvprof/windows-x86_64/cuda_nvprof-windows-x86_64-11.8.87-archive.zip"
+          curl -O "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cccl/windows-x86_64/cuda_cccl-windows-x86_64-11.8.89-archive.zip"
+          unzip '*.zip' -d "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8"
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\cuda_cudart-windows-x86_64-11.8.89-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\cuda_nvcc-windows-x86_64-11.8.89-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\cuda_nvrtc-windows-x86_64-11.8.89-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\libcublas-windows-x86_64-11.8.1.74-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\cuda_nvtx-windows-x86_64-11.8.86-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\cuda_profiler_api-windows-x86_64-11.8.86-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\visual_studio_integration-windows-x86_64-11.8.86-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\cuda_nvprof-windows-x86_64-11.8.87-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\cuda_cccl-windows-x86_64-11.8.89-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\visual_studio_integration\MSBuildExtensions\*" "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Microsoft\VC\v160\BuildCustomizations" /E /I /H /Y
+          echo "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\libnvvp" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          echo "CUDA_PATH_V11_8=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Build
         id: cmake_build
+        shell: cmd
         run: |
           mkdir build
           cd build
-          cmake .. ${{ matrix.defines }}
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89" -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"
           cmake --build . --config Release
       
       - name: Upload artifact
         id: upload_artifact
-        if: ${{ matrix.build != 'rocm5' }}
-        uses: actions/upload-artifact@v4.3.1
+        uses: actions/upload-artifact@v4.6.1
         with:
-          name: windows-${{ matrix.build }}
+          name: windows-cuda11
           path: .\build\bin\Release\stable-diffusion.dll
-          
+
   windows-sycl:
     runs-on: windows-latest
     
@@ -137,7 +185,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.2.2
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -145,7 +193,7 @@ jobs:
           
       - name: Checkout Install Script
         id: checkoutInstallScript
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.2.2
         with:
           path: scripts
           sparse-checkout: |
@@ -163,7 +211,7 @@ jobs:
               
       - name: Upload artifact
         id: upload_artifact
-        uses: actions/upload-artifact@v4.3.1
+        uses: actions/upload-artifact@v4.6.1
         with:
           name: windows-sycl
           path: .\build\bin\stable-diffusion.dll
@@ -188,7 +236,7 @@ jobs:
           
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.2.2
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -206,13 +254,52 @@ jobs:
               
       - name: Upload artifact
         id: upload_artifact
-        uses: actions/upload-artifact@v4.3.1
+        uses: actions/upload-artifact@v4.6.1
         with:
           name: windows-rocm6
           path: .\build\bin\stable-diffusion.dll
 
-  linux:
+  windows-vulkan:
+    runs-on: windows-latest
+    
+    env:
+      VULKAN_VERSION: 1.3.261.1
+    
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          repository: 'leejet/stable-diffusion.cpp'
+          ref: '${{ github.event.inputs.commit }}'
+          submodules: recursive
+
+      - name: Install Vulkan SDK
+        id: get_vulkan
+        run: |
+          curl.exe -o $env:RUNNER_TEMP/VulkanSDK-Installer.exe -L "https://sdk.lunarg.com/sdk/download/${env:VULKAN_VERSION}/windows/VulkanSDK-${env:VULKAN_VERSION}-Installer.exe"
+          & "$env:RUNNER_TEMP\VulkanSDK-Installer.exe" --accept-licenses --default-answer --confirm-command install
+          Add-Content $env:GITHUB_ENV "VULKAN_SDK=C:\VulkanSDK\${env:VULKAN_VERSION}"
+          Add-Content $env:GITHUB_PATH "C:\VulkanSDK\${env:VULKAN_VERSION}\bin"
+
+      - name: Build
+        id: cmake_build
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DSD_VULKAN=ON -DSD_BUILD_SHARED_LIBS=ON
+          cmake --build . --config Release
+      
+      - name: Upload artifact
+        id: upload_artifact
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: windows-vulkan
+          path: .\build\bin\Release\stable-diffusion.dll
+          
+  linux-cpu:
     runs-on: ubuntu-latest
+    
     strategy:
       matrix:
         include:
@@ -224,45 +311,115 @@ jobs:
             defines: '-DGGML_NATIVE=OFF -DGGML_AVX2=ON -DSD_BUILD_SHARED_LIBS=ON'
           - build: 'avx512'
             defines: '-DGGML_NATIVE=OFF -DGGML_AVX512=ON -DSD_BUILD_SHARED_LIBS=ON'
-          - build: 'cuda11'
-            defines: '-DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61" -DSD_BUILD_SHARED_LIBS=ON'
-          - build: 'cuda12'
-            defines: '-DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;89" -DSD_BUILD_SHARED_LIBS=ON'            
-          - build: 'sycl'
-            defines: '-DSD_SYCL=ON -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DSD_BUILD_SHARED_LIBS=ON'
             
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.2.2
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
           submodules: recursive
-   
-      - name: Install cuda-toolkit
-        id: cuda-toolkit-11
-        if: ${{ matrix.build == 'cuda11' }}
-        uses: Jimver/cuda-toolkit@v0.2.21
+
+      - name: Build
+        id: cmake_build
+        run: |
+          mkdir build
+          cd build
+          cmake .. ${{ matrix.defines }}
+          cmake --build . --config Release
+                  
+      - name: Upload artifact
+        id: upload_artifact
+        uses: actions/upload-artifact@v4.6.1
         with:
-          cuda: '11.7.1'
-          method: network
-          use-github-cache: false
-          use-local-cache: false
-   
-      - name: Install cuda-toolkit
-        id: cuda-toolkit-12
-        if: ${{ matrix.build == 'cuda12' }}
-        uses: Jimver/cuda-toolkit@v0.2.21
+          name: linux-${{ matrix.build }}
+          path: ./build/bin/libstable-diffusion.so
+          
+  linux-cuda12:
+    runs-on: ubuntu-latest
+    container: nvidia/cuda:12.8.0-devel-ubuntu24.04
+    
+    steps:
+      - name: Install dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt update
+          apt install -y cmake build-essential ninja-build libgomp1 git
+    
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4.2.2
         with:
-          cuda: '12.8.0'
-          method: network
-          use-github-cache: false
-          use-local-cache: false
-   
+          repository: 'leejet/stable-diffusion.cpp'
+          ref: '${{ github.event.inputs.commit }}'
+          submodules: recursive
+
+      - name: Build
+        id: cmake_build
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89;100" -DSD_BUILD_SHARED_LIBS=ON
+          cmake --build . --config Release
+     
+      - name: Upload artifact
+        id: upload_artifact
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: linux-cuda12
+          path: ./build/bin/libstable-diffusion.so
+          
+  linux-cuda11:
+    runs-on: ubuntu-latest
+    container: nvidia/cuda:11.8.0-devel-ubuntu22.04
+    
+    steps:
+      - name: Install dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt update
+          apt install -y cmake build-essential ninja-build libgomp1 git
+    
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          repository: 'leejet/stable-diffusion.cpp'
+          ref: '${{ github.event.inputs.commit }}'
+          submodules: recursive
+
+      - name: Build
+        id: cmake_build
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89" -DSD_BUILD_SHARED_LIBS=ON
+          cmake --build . --config Release
+     
+      - name: Upload artifact
+        id: upload_artifact
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: linux-cuda11
+          path: ./build/bin/libstable-diffusion.so
+          
+  linux-sycl:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          repository: 'leejet/stable-diffusion.cpp'
+          ref: '${{ github.event.inputs.commit }}'
+          submodules: recursive
+
       - name: Install Sycl tools
         id: installSyclCompiler
-        if: ${{ matrix.build == 'sycl' }}
         shell: bash
         run: |        
           cd /tmp
@@ -274,31 +431,21 @@ jobs:
           sudo apt install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-mkl-devel
    
       - name: Build
-        id: cmake_build_sycl
-        if: ${{ matrix.build == 'sycl' }}
+        id: cmake_build
         run: |
           source /opt/intel/oneapi/setvars.sh
           mkdir build
           cd build
-          cmake .. ${{ matrix.defines }}
+          cmake .. -DSD_SYCL=ON -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DSD_BUILD_SHARED_LIBS=ON
           cmake --build . --config Release
-   
-      - name: Build
-        id: cmake_build
-        if: ${{ matrix.build != 'sycl' }}
-        run: |
-          mkdir build
-          cd build
-          cmake .. ${{ matrix.defines }}
-          cmake --build . --config Release
-                  
+     
       - name: Upload artifact
         id: upload_artifact
-        uses: actions/upload-artifact@v4.3.1
+        uses: actions/upload-artifact@v4.6.1
         with:
-          name: linux-${{ matrix.build }}
+          name: linux-sycl
           path: ./build/bin/libstable-diffusion.so
-
+          
   linux-hip:
     runs-on: ubuntu-22.04
     container: rocm/dev-ubuntu-22.04:6.0.2
@@ -313,7 +460,7 @@ jobs:
           
       - name: Clone
         id: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.2.2
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -329,12 +476,12 @@ jobs:
                
       - name: Upload artifact Rocm
         id: upload_artifact_rocm
-        uses: actions/upload-artifact@v4.3.1
+        uses: actions/upload-artifact@v4.6.1
         with:
           name: linux-rocm6
           path: ./build/bin/libstable-diffusion.so
-          
-  osx:
+
+  osx-cpu:
     runs-on: macos-latest
           
     strategy:
@@ -352,7 +499,7 @@ jobs:
     steps:          
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.2.2
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -368,30 +515,36 @@ jobs:
                   
       - name: Upload artifact
         id: upload_artifact
-        uses: actions/upload-artifact@v4.3.1
+        uses: actions/upload-artifact@v4.6.1
         with:
           name: osx-${{ matrix.build }}
           path: ./build/bin/libstable-diffusion.dylib
-
+          
   release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     needs:
-      - windows
-      - windows-hip
+      - windows-cpu
+      - windows-cuda12
+      - windows-cuda11
       - windows-sycl
-      - linux
+      - windows-hip
+      - windows-vulkan
+      - linux-cpu
+      - linux-cuda12
+      - linux-cuda11
+      - linux-sycl
       - linux-hip
-      - osx
+      - osx-cpu
 
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.2.2
       
       - name: Download artifacts
         id: download_artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.1.9
         with:
             path: Backends
       
@@ -400,7 +553,7 @@ jobs:
 
       - name: Setup nuget
         id: setup_nuget
-        uses: NuGet/setup-nuget@v2.0.0
+        uses: NuGet/setup-nuget@v2.0.1
 
       - name: Pack
         id: pack
@@ -417,7 +570,7 @@ jobs:
           
       - name: Upload artifacts
         id: upload_artifacts
-        uses: actions/upload-artifact@v4.3.1
+        uses: actions/upload-artifact@v4.6.1
         with:
           name: StableDiffusion.NET.Backend-Nugets
           path: ./*.nupkg
