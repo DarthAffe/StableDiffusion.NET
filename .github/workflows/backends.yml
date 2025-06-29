@@ -527,7 +527,7 @@ jobs:
       - windows-cpu
       - windows-cuda12
       - windows-cuda11
-      - windows-sycl
+#     - windows-sycl
       - windows-hip
       - windows-vulkan
       - linux-cpu
