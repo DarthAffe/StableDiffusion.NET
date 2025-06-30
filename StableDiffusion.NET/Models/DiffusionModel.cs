@@ -61,7 +61,10 @@ public sealed unsafe class DiffusionModel : IDisposable
                                  ModelParameter.KeepClipOnCPU,
                                  ModelParameter.KeepControlNetOnCPU,
                                  ModelParameter.KeepVaeOnCPU,
-                                 ModelParameter.FlashAttention);
+                                 ModelParameter.FlashAttention,
+                                 ModelParameter.ChromaUseDitMap,
+                                 ModelParameter.ChromaEnableT5Map,
+                                 ModelParameter.ChromaT5MaskPad);
 
         if (_ctx == null) throw new NullReferenceException("Failed to initialize diffusion-model.");
     }

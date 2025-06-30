@@ -70,7 +70,10 @@ internal unsafe partial class Native
                                                  [MarshalAs(UnmanagedType.I1)] bool keep_clip_on_cpu,
                                                  [MarshalAs(UnmanagedType.I1)] bool keep_control_net_cpu,
                                                  [MarshalAs(UnmanagedType.I1)] bool keep_vae_on_cpu,
-                                                 [MarshalAs(UnmanagedType.I1)] bool diffusion_flash_attn);
+                                                 [MarshalAs(UnmanagedType.I1)] bool diffusion_flash_attn,
+                                                 [MarshalAs(UnmanagedType.I1)] bool chroma_use_dit_mask,
+                                                 [MarshalAs(UnmanagedType.I1)] bool chroma_use_t5_mask,
+                                                 int chroma_t5_mask_pad);
 
     [LibraryImport(LIB_NAME, EntryPoint = "free_sd_ctx")]
     internal static partial void free_sd_ctx(sd_ctx_t* sd_ctx);

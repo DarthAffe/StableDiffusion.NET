@@ -109,6 +109,11 @@ public sealed class DiffusionModelParameter : IDiffusionModelParameter, IQuantiz
     /// </summary>
     public string T5xxlPath { get; set; } = string.Empty;
 
+    // Flux Chroma specific
+    public bool ChromaUseDitMap { get; set; } = true;
+    public bool ChromaEnableT5Map { get; set; } = false;
+    public int ChromaT5MaskPad { get; set; } = 1;
+
     // SD3.5 only
     /// <summary>
     /// path to the clip-g text encoder
