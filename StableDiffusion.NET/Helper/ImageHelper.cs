@@ -28,12 +28,19 @@ internal static class ImageHelper
         return image;
     }
 
-    public static unsafe void Dispose(Native.sd_image_t image)
+    public static unsafe void Dispose(Native.sd_image_t image) => Marshal.FreeHGlobal((nint)image.data);
+
+    public static unsafe Native.sd_image_t ToSdImage(this IImage image, out nint dataPtr)
     {
-        Marshal.FreeHGlobal((nint)image.data);
+        int sizeInBytes = image.SizeInBytes;
+
+        dataPtr = Marshal.AllocHGlobal(sizeInBytes);
+        image.CopyTo(new Span<byte>((void*)dataPtr, sizeInBytes));
+
+        return image.ToSdImage((byte*)dataPtr);
     }
 
-    public static unsafe Native.sd_image_t ToSdImage(this IImage<ColorRGB> image, byte* pinnedReference)
+    public static unsafe Native.sd_image_t ToSdImage(this IImage image, byte* pinnedReference)
         => new()
         {
             width = (uint)image.Width,
@@ -41,4 +48,26 @@ internal static class ImageHelper
             channel = (uint)image.ColorFormat.BytesPerPixel,
             data = pinnedReference
         };
+
+    public static unsafe Native.sd_image_t* ToSdImagePtr(this IImage image, out nint dataPtr)
+    {
+        int sizeInBytes = image.SizeInBytes;
+
+        dataPtr = Marshal.AllocHGlobal(sizeInBytes);
+        image.CopyTo(new Span<byte>((void*)dataPtr, sizeInBytes));
+
+        return image.ToSdImagePtr((byte*)dataPtr);
+    }
+
+    public static unsafe Native.sd_image_t* ToSdImagePtr(this IImage image, byte* pinnedReference)
+    {
+        Native.sd_image_t* nativeImage = (Native.sd_image_t*)Marshal.AllocHGlobal(sizeof(Native.sd_image_t));
+
+        nativeImage->width = (uint)image.Width;
+        nativeImage->height = (uint)image.Height;
+        nativeImage->channel = (uint)image.ColorFormat.BytesPerPixel;
+        nativeImage->data = pinnedReference;
+
+        return nativeImage;
+    }
 }
