@@ -147,7 +147,7 @@ jobs:
           xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\visual_studio_integration-windows-x86_64-11.8.86-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
           xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\cuda_nvprof-windows-x86_64-11.8.87-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
           xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\cuda_cccl-windows-x86_64-11.8.89-archive\*" "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" /E /I /H /Y
-          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\visual_studio_integration\MSBuildExtensions\*" "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Microsoft\VC\v160\BuildCustomizations" /E /I /H /Y
+          xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\visual_studio_integration\MSBuildExtensions\*" "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations" /E /I /H /Y
           echo "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\libnvvp" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
@@ -159,7 +159,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89" -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"
           cmake --build . --config Release
       
