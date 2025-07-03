@@ -112,7 +112,7 @@ jobs:
           path: .\build\bin\Release\stable-diffusion.dll
 
   windows-cuda11:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
