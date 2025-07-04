@@ -526,7 +526,7 @@ jobs:
     needs:
       - windows-cpu
       - windows-cuda12
-      - windows-cuda11
+#     - windows-cuda11
 #     - windows-sycl
       - windows-hip
       - windows-vulkan
