@@ -101,7 +101,7 @@ jobs:
           mkdir build
           cd build
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89;100" -DSD_BUILD_SHARED_LIBS=ON
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;80;86;89;90;100" -DSD_BUILD_SHARED_LIBS=ON
           cmake --build . --config Release
       
       - name: Upload artifact
@@ -160,7 +160,7 @@ jobs:
           mkdir build
           cd build
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89" -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;80;86;89" -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"
           cmake --build . --config Release
       
       - name: Upload artifact
@@ -526,8 +526,8 @@ jobs:
     needs:
       - windows-cpu
       - windows-cuda12
-#     - windows-cuda11
-#     - windows-sycl
+      - windows-cuda11
+      - windows-sycl
       - windows-hip
       - windows-vulkan
       - linux-cpu
@@ -575,6 +575,6 @@ jobs:
           name: StableDiffusion.NET.Backend-Nugets
           path: ./*.nupkg
           
-      - name: Nuget Push
-        id: nuget_push
-        run: dotnet nuget push **\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+#      - name: Nuget Push
+#        id: nuget_push
+#        run: dotnet nuget push **\*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
