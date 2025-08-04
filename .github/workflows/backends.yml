@@ -160,7 +160,7 @@ jobs:
           mkdir build
           cd build
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;80;86;89" -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler"
+          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;80;86;89" -DSD_BUILD_SHARED_LIBS=ON -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler -D_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH"
           cmake --build . --config Release
       
       - name: Upload artifact
