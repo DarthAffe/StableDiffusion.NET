@@ -204,7 +204,7 @@ jobs:
     runs-on: windows-latest
     
     env:
-      VULKAN_VERSION: 1.4.313.2
+      VULKAN_VERSION: 1.4.321.1
     
     steps:
       - name: Checkout
@@ -311,42 +311,7 @@ jobs:
         with:
           name: linux-cuda12
           path: ./build/bin/libstable-diffusion.so
-          
-  linux-cuda11:
-    runs-on: ubuntu-latest
-    container: nvidia/cuda:11.8.0-devel-ubuntu22.04
-    
-    steps:
-      - name: Install dependencies
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          apt update
-          apt install -y cmake build-essential ninja-build libgomp1 git
-    
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4.2.2
-        with:
-          repository: 'leejet/stable-diffusion.cpp'
-          ref: '${{ github.event.inputs.commit }}'
-          submodules: recursive
-
-      - name: Build
-        id: cmake_build
-        run: |
-          mkdir build
-          cd build
-          cmake .. -DSD_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="61;75;86;89" -DSD_BUILD_SHARED_LIBS=ON
-          cmake --build . --config Release
-     
-      - name: Upload artifact
-        id: upload_artifact
-        uses: actions/upload-artifact@v4.6.1
-        with:
-          name: linux-cuda11
-          path: ./build/bin/libstable-diffusion.so
-          
+                    
   linux-sycl:
     runs-on: ubuntu-latest
     
