@@ -112,7 +112,7 @@ jobs:
           path: .\build\bin\Release\stable-diffusion.dll
 
   windows-sycl:
-    runs-on: windows-latest
+    runs-on: windows-2022
     
     defaults:
       run:
