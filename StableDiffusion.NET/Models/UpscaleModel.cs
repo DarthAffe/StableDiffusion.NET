@@ -13,7 +13,7 @@ public sealed unsafe class UpscaleModel : IDisposable
 
     public UpscaleModelParameter ModelParameter { get; }
 
-    private Native.upscaler_ctx_t* _ctx;
+    private Native.Types.upscaler_ctx_t* _ctx;
 
     #endregion
 
@@ -40,32 +40,19 @@ public sealed unsafe class UpscaleModel : IDisposable
     {
         _ctx = Native.new_upscaler_ctx(ModelParameter.ModelPath,
                                        ModelParameter.ThreadCount,
-                                       ModelParameter.Quantization);
+                                       ModelParameter.ConvDirect);
 
         if (_ctx == null) throw new NullReferenceException("Failed to initialize upscale-model.");
     }
 
-    public IImage<ColorRGB> Upscale(IImage image, int upscaleFactor)
+    public Image<ColorRGB> Upscale(IImage image, int upscaleFactor)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(upscaleFactor, 0, nameof(upscaleFactor));
 
         if (_ctx == null) throw new NullReferenceException("The model is not initialized.");
 
-        if (image is not IImage<ColorRGB> sourceImage)
-            sourceImage = image.ConvertTo<ColorRGB>();
-
-        fixed (byte* imagePtr = sourceImage.AsRefImage())
-        {
-            Native.sd_image_t result = Native.upscale(_ctx, sourceImage.ToSdImage(imagePtr), upscaleFactor);
-            return ImageHelper.ToImage(result);
-        }
-    }
-
-    private IImage<ColorRGB> Upscale(Native.sd_image_t image, int upscaleFactor)
-    {
-        Native.sd_image_t result = Native.upscale(_ctx, image, upscaleFactor);
-        return ImageHelper.ToImage(result);
+        return Native.upscale(_ctx, image, (uint)upscaleFactor);
     }
 
     public void Dispose()

@@ -1,9 +1,10 @@
-﻿namespace StableDiffusion.NET;
+﻿using JetBrains.Annotations;
 
-public sealed class DiffusionModelParameter : IDiffusionModelParameter, IQuantizedModelParameter, IPhotomakerModelParameter
+namespace StableDiffusion.NET;
+
+[PublicAPI]
+public sealed class DiffusionModelParameter : IDiffusionModelParameter
 {
-    public DiffusionModelType DiffusionModelType { get; set; } = DiffusionModelType.None;
-
     /// <summary>
     /// path to vae
     /// </summary>
@@ -68,6 +69,18 @@ public sealed class DiffusionModelParameter : IDiffusionModelParameter, IQuantiz
     public bool FlashAttention { get; set; } = false;
 
     /// <summary>
+    /// use Conv2d direct in the diffusion model
+    /// This might crash if it is not supported by the backend.
+    /// </summary>
+    public bool DiffusionConvDirect { get; set; } = false;
+
+    /// <summary>
+    /// use Conv2d direct in the vae model (should improve the performance)
+    /// This might crash if it is not supported by the backend.
+    /// </summary>
+    public bool VaeConfDirect { get; set; } = false;
+
+    /// <summary>
     /// RNG (default: Standard)
     /// </summary>
     public RngType RngType { get; set; } = RngType.Standard;
@@ -78,7 +91,8 @@ public sealed class DiffusionModelParameter : IDiffusionModelParameter, IQuantiz
     public Schedule Schedule { get; set; } = Schedule.Default;
 
     /// <summary>
-    /// 
+    /// quantizes on load
+    /// not really useful in most cases
     /// </summary>
     public Quantization Quantization { get; set; } = Quantization.Unspecified;
 
@@ -119,4 +133,6 @@ public sealed class DiffusionModelParameter : IDiffusionModelParameter, IQuantiz
     /// path to the clip-g text encoder
     /// </summary>
     public string ClipGPath { get; set; } = string.Empty;
+
+    public static DiffusionModelParameter Create() => new();
 }

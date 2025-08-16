@@ -38,7 +38,7 @@ internal static partial class Native
         return false;
     }
 
-    private static nint ResolveDllImport(string libraryname, Assembly assembly, DllImportSearchPath? searchpath)
+    private static nint ResolveDllImport(string libraryname, Assembly _, DllImportSearchPath? __)
     {
         if (libraryname != LIB_NAME) return nint.Zero;
         if (_loadedLibraryHandle != nint.Zero) return _loadedLibraryHandle;

@@ -3,12 +3,13 @@
 namespace StableDiffusion.NET;
 
 [PublicAPI]
-public sealed class ESRGANModelBuilder : IQuantizedModelBuilder
+public sealed class ESRGANModelBuilder : IUpscaleModelBuilder
 {
     #region Properties & Fields
 
     public UpscaleModelParameter Parameter { get; }
-    IQuantizedModelParameter IQuantizedModelBuilder.Parameter => Parameter;
+    IUpscaleModelParameter IUpscaleModelBuilder.Parameter => Parameter;
+    IModelParameter IModelBuilder.Parameter => Parameter;
 
     #endregion
 

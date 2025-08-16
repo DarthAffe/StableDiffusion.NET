@@ -3,14 +3,14 @@
 namespace StableDiffusion.NET;
 
 [PublicAPI]
-public sealed class StableDiffusionModelBuilder : IDiffusionModelBuilder, IQuantizedModelBuilder, IPhotomakerModelBuilder
+public sealed class StableDiffusionModelBuilder : IDiffusionModelBuilder
 {
     #region Properties & Fields
 
     public DiffusionModelParameter Parameter { get; }
     IDiffusionModelParameter IDiffusionModelBuilder.Parameter => Parameter;
-    IQuantizedModelParameter IQuantizedModelBuilder.Parameter => Parameter;
-    IPhotomakerModelParameter IPhotomakerModelBuilder.Parameter => Parameter;
+    IModelParameter IModelBuilder.Parameter => Parameter;
+
 
     #endregion
 
@@ -18,7 +18,7 @@ public sealed class StableDiffusionModelBuilder : IDiffusionModelBuilder, IQuant
 
     public StableDiffusionModelBuilder(string modelPath)
     {
-        Parameter = new DiffusionModelParameter { DiffusionModelType = DiffusionModelType.StableDiffusion, ModelPath = modelPath };
+        Parameter = new DiffusionModelParameter { ModelPath = modelPath };
     }
 
     #endregion

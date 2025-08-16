@@ -1,8 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿namespace StableDiffusion.NET;
 
-namespace StableDiffusion.NET;
-
-[PublicAPI]
 public sealed class PhotoMakerParameter
 {
     /// <summary>
@@ -13,10 +10,12 @@ public sealed class PhotoMakerParameter
     /// <summary>
     /// strength for keeping input identity (default: 20)
     /// </summary>
-    public float StyleRatio { get; set; } = 20f;
+    public float StyleStrength { get; set; } = 20f;
 
     /// <summary>
     /// normalize PHOTOMAKER input id images
     /// </summary>
     public bool NormalizeInput { get; set; } = false;
+
+    internal PhotoMakerParameter() { }
 }

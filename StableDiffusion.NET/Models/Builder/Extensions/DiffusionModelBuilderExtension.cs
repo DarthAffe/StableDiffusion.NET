@@ -76,10 +76,10 @@ public static class DiffusionModelBuilderExtension
         return builder;
     }
 
-    public static T KeepVaeOnCpu<T>(this T builder, bool keepVaeOnCpu = true)
+    public static T KeepControlNetOnCpu<T>(this T builder, bool keepControlNetOnCpu = true)
         where T : IDiffusionModelBuilder
     {
-        builder.Parameter.KeepVaeOnCPU = keepVaeOnCpu;
+        builder.Parameter.KeepControlNetOnCPU = keepControlNetOnCpu;
 
         return builder;
     }
@@ -92,10 +92,34 @@ public static class DiffusionModelBuilderExtension
         return builder;
     }
 
-    public static T KeepControlNetOnCpu<T>(this T builder, bool keepControlNetOnCpu = true)
+    public static T KeepVaeOnCpu<T>(this T builder, bool keepVaeOnCpu = true)
         where T : IDiffusionModelBuilder
     {
-        builder.Parameter.KeepControlNetOnCPU = keepControlNetOnCpu;
+        builder.Parameter.KeepVaeOnCPU = keepVaeOnCpu;
+
+        return builder;
+    }
+
+    public static T WithFlashAttention<T>(this T builder, bool flashAttention = true)
+        where T : IDiffusionModelBuilder
+    {
+        builder.Parameter.FlashAttention = flashAttention;
+
+        return builder;
+    }
+
+    public static T WithDiffusionConvDirect<T>(this T builder, bool diffusionConfDirect = true)
+        where T : IDiffusionModelBuilder
+    {
+        builder.Parameter.DiffusionConvDirect = diffusionConfDirect;
+
+        return builder;
+    }
+
+    public static T WithVaeConvDirect<T>(this T builder, bool vaeConfDirect = true)
+        where T : IDiffusionModelBuilder
+    {
+        builder.Parameter.VaeConfDirect = vaeConfDirect;
 
         return builder;
     }
@@ -120,10 +144,96 @@ public static class DiffusionModelBuilderExtension
         return builder;
     }
 
-    public static T WithFlashAttention<T>(this T builder, bool flashAttention = true)
+    public static T WithQuantization<T>(this T builder, Quantization quantization)
         where T : IDiffusionModelBuilder
     {
-        builder.Parameter.FlashAttention = flashAttention;
+        if (!Enum.IsDefined(quantization)) throw new ArgumentOutOfRangeException(nameof(quantization));
+
+        builder.Parameter.Quantization = quantization;
+
+        return builder;
+    }
+
+    public static T WithPhotomaker<T>(this T builder, string stackedIdEmbeddingsDirectory)
+        where T : IDiffusionModelBuilder
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(stackedIdEmbeddingsDirectory, nameof(stackedIdEmbeddingsDirectory));
+
+        builder.Parameter.StackedIdEmbeddingsDirectory = stackedIdEmbeddingsDirectory;
+
+        return builder;
+    }
+
+    public static T WithModelPath<T>(this T builder, string modelPath)
+        where T : IDiffusionModelBuilder
+    {
+        ArgumentNullException.ThrowIfNull(modelPath);
+
+        builder.Parameter.ModelPath = modelPath;
+
+        return builder;
+    }
+
+    public static T WithDiffusionModelPath<T>(this T builder, string diffusionModelPath)
+        where T : IDiffusionModelBuilder
+    {
+        ArgumentNullException.ThrowIfNull(diffusionModelPath);
+
+        builder.Parameter.DiffusionModelPath = diffusionModelPath;
+
+        return builder;
+    }
+
+    public static T WithClipLPath<T>(this T builder, string clipLPath)
+        where T : IDiffusionModelBuilder
+    {
+        ArgumentNullException.ThrowIfNull(clipLPath);
+
+        builder.Parameter.ClipLPath = clipLPath;
+
+        return builder;
+    }
+
+    public static T WithT5xxlPath<T>(this T builder, string t5xxlPath)
+        where T : IDiffusionModelBuilder
+    {
+        ArgumentNullException.ThrowIfNull(t5xxlPath);
+
+        builder.Parameter.T5xxlPath = t5xxlPath;
+
+        return builder;
+    }
+
+    public static T UseChromaDitMap<T>(this T builder, bool useChromaDitMap = true)
+        where T : IDiffusionModelBuilder
+    {
+        builder.Parameter.ChromaUseDitMap = useChromaDitMap;
+
+        return builder;
+    }
+
+    public static T EnableChromaT5Map<T>(this T builder, bool enableChromaT5Map = true)
+        where T : IDiffusionModelBuilder
+    {
+        builder.Parameter.ChromaEnableT5Map = enableChromaT5Map;
+
+        return builder;
+    }
+
+    public static T WithChromaT5MaskPad<T>(this T builder, int chromaT5MaskPad)
+        where T : IDiffusionModelBuilder
+    {
+        builder.Parameter.ChromaT5MaskPad = chromaT5MaskPad;
+
+        return builder;
+    }
+
+    public static T WithClipGPath<T>(this T builder, string clipGPath)
+        where T : IDiffusionModelBuilder
+    {
+        ArgumentNullException.ThrowIfNull(clipGPath);
+
+        builder.Parameter.ClipGPath = clipGPath;
 
         return builder;
     }

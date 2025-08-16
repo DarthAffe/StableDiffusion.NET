@@ -3,13 +3,14 @@
 namespace StableDiffusion.NET;
 
 [PublicAPI]
-public sealed class StableDiffusion3_5ModelBuilder : IDiffusionModelBuilder, IQuantizedModelBuilder
+public sealed class StableDiffusion3_5ModelBuilder : IDiffusionModelBuilder
 {
     #region Properties & Fields
 
     public DiffusionModelParameter Parameter { get; }
     IDiffusionModelParameter IDiffusionModelBuilder.Parameter => Parameter;
-    IQuantizedModelParameter IQuantizedModelBuilder.Parameter => Parameter;
+    IModelParameter IModelBuilder.Parameter => Parameter;
+
 
     #endregion
 
@@ -19,7 +20,6 @@ public sealed class StableDiffusion3_5ModelBuilder : IDiffusionModelBuilder, IQu
     {
         Parameter = new DiffusionModelParameter
         {
-            DiffusionModelType = DiffusionModelType.StableDiffusion,
             ModelPath = modelPath,
             ClipLPath = clipLPath,
             ClipGPath = clipGPath,
