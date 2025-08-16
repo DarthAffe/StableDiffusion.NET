@@ -112,6 +112,8 @@ jobs:
           path: .\build\bin\Release\stable-diffusion.dll
 
   windows-sycl:
+    if: ${{ false }}
+    
     runs-on: windows-2022
     
     defaults:
@@ -442,6 +444,9 @@ jobs:
       - osx-cpu
 
     steps:
+      - name: Print header version
+        run: echo "${{ github.event.inputs.commit }}"
+    
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4.2.2
