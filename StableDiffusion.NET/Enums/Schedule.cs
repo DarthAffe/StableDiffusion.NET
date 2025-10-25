@@ -1,11 +1,14 @@
 ﻿namespace StableDiffusion.NET;
 
-public enum Schedule
+public enum Scheduler
 {
     Default,
     Discrete,
     Karras,
     Exponential,
     AYS,
-    GITS
+    GITS,
+    SGM_Uniform,
+    Simple,
+    Smoothstep
 }

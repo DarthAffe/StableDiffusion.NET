@@ -3,12 +3,14 @@
 namespace StableDiffusion.NET;
 
 [PublicAPI]
-public sealed class UpscaleModelParameter : IUpscaleModelParameter
+public sealed class UpscaleModelParameter
 {
     /// <summary>
     /// path to esrgan model. Upscale images after generate, just RealESRGAN_x4plus_anime_6B supported by now
     /// </summary>
     public string ModelPath { get; set; } = string.Empty;
+
+    public bool OffloadParamsToCPU { get; set; } = false;
 
     /// <summary>
     /// number of threads to use during computation (default: -1)

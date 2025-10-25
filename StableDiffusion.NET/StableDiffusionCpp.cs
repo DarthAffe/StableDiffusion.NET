@@ -11,8 +11,8 @@ public static unsafe class StableDiffusionCpp
     #region Properties & Fields
 
     // ReSharper disable NotAccessedField.Local - They are important, the delegate can be collected if it's not stored!
-    private static Native.sd_log_cb_t LOG_CALLBACK;
-    private static Native.sd_progress_cb_t PROGRESS_CALLBACK;
+    private static Native.sd_log_cb_t? _logCallback;
+    private static Native.sd_progress_cb_t? _progressCallback;
     // ReSharper restore NotAccessedField.Local
 
     #endregion
@@ -30,8 +30,8 @@ public static unsafe class StableDiffusionCpp
 
     public static void InitializeEvents()
     {
-        Native.sd_set_log_callback(LOG_CALLBACK = OnNativeLog, null);
-        Native.sd_set_progress_callback(PROGRESS_CALLBACK = OnNativeProgress, null);
+        Native.sd_set_log_callback(_logCallback = OnNativeLog, null);
+        Native.sd_set_progress_callback(_progressCallback = OnNativeProgress, null);
     }
 
     public static void Convert(string modelPath, string vaePath, Quantization quantization, string outputPath, string tensorTypeRules = "")
@@ -54,27 +54,21 @@ public static unsafe class StableDiffusionCpp
 
         IImage<ColorRGB> controlImage = parameter.Image as IImage<ColorRGB> ?? parameter.Image!.ConvertTo<ColorRGB>();
 
-        byte[] controlImageData = controlImage.ToRawArray();
-        fixed (byte* controlImagePtr = controlImageData)
+        Native.Types.sd_image_t sdImage = controlImage.ToSdImage();
+        try
         {
-            byte* result = Native.preprocess_canny(controlImagePtr,
-                                                   controlImage.Width,
-                                                   controlImage.Height,
-                                                   parameter.HighThreshold,
-                                                   parameter.LowThreshold,
-                                                   parameter.Weak,
-                                                   parameter.Strong,
-                                                   parameter.Inverse);
+            bool result = Native.preprocess_canny(sdImage,
+                                                  parameter.HighThreshold,
+                                                  parameter.LowThreshold,
+                                                  parameter.Weak,
+                                                  parameter.Strong,
+                                                  parameter.Inverse);
 
-            try
-            {
-                return Image<ColorRGB>.Create(new ReadOnlySpan<ColorRGB>(result, controlImageData.Length),
-                    controlImage.Width, controlImage.Height);
-            }
-            finally
-            {
-                NativeMemory.Free(result);
-            }
+            return sdImage.ToImage();
+        }
+        finally
+        {
+            sdImage.Free();
         }
     }
 

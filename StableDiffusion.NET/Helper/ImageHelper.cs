@@ -111,6 +111,8 @@ internal static class ImageHelper
 
     internal static unsafe IImage[] ToImageArrayIFace(Native.Types.sd_image_t* sdImage, int count)
     {
+        if (sdImage == null) return [];
+
         IImage[] images = new IImage[count];
 
         for (int i = 0; i < images.Length; i++)

@@ -64,25 +64,24 @@ public sealed unsafe class DiffusionModel : IDisposable
         }
     }
 
-    // TODO DarthAffe 09.08.2025: Implement when no longer marked as broken
-    //public Image<ColorRGB>[] GenerateVideo()
-    //{
-    //    ObjectDisposedException.ThrowIf(_disposed, this);
+    public Image<ColorRGB>[] GenerateVideo(VideoGenerationParameter parameter)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
 
-    //    //parameter.Validate();
+        parameter.Validate();
 
-    //    int imageCount = 0; // TODO DarthAffe 09.08.2025: Set correct count
+        Native.Types.sd_image_t* result = Native.generate_video(_ctx, parameter, out int frameCount);
+        if (result == null) return [];
 
-    //    Native.Types.sd_image_t* result = Native.generate_video(_ctx, new Native.Types.sd_vid_gen_params_t()); // TODO DarthAffe 09.08.2025: Add Parameter
-    //    try
-    //    {
-    //        return ImageHelper.ToImageArray(result, imageCount);
-    //    }
-    //    finally
-    //    {
-    //        ImageHelper.Free(result, imageCount);
-    //    }
-    //}
+        try
+        {
+            return ImageHelper.ToImageArray(result, frameCount);
+        }
+        finally
+        {
+            ImageHelper.Free(result, frameCount);
+        }
+    }
 
     public void Dispose()
     {

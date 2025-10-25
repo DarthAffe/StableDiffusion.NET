@@ -28,7 +28,6 @@ public static class ParameterExtension
         if (!string.IsNullOrWhiteSpace(parameter.VaePath) && !string.IsNullOrWhiteSpace(parameter.TaesdPath)) throw new ArgumentException("VAE and TAESD are mutually exclusive.");
 
         if (!Enum.IsDefined(parameter.RngType)) throw new ArgumentOutOfRangeException(nameof(DiffusionModelParameter.RngType));
-        if (!Enum.IsDefined(parameter.Schedule)) throw new ArgumentOutOfRangeException(nameof(DiffusionModelParameter.Schedule));
     }
 
     public static void Validate(this ImageGenerationParameter parameter)
@@ -36,17 +35,29 @@ public static class ParameterExtension
         ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
         ArgumentNullException.ThrowIfNull(parameter.ControlNet, nameof(ImageGenerationParameter.ControlNet));
         ArgumentNullException.ThrowIfNull(parameter.PhotoMaker, nameof(ImageGenerationParameter.PhotoMaker));
+        ArgumentNullException.ThrowIfNull(parameter.Prompt, nameof(ImageGenerationParameter.Prompt));
         ArgumentNullException.ThrowIfNull(parameter.NegativePrompt, nameof(ImageGenerationParameter.NegativePrompt));
 
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.Width, nameof(ImageGenerationParameter.Width));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.Height, nameof(ImageGenerationParameter.Height));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.SampleSteps, nameof(ImageGenerationParameter.SampleSteps));
 
-        if (!Enum.IsDefined(parameter.SampleMethod)) throw new ArgumentOutOfRangeException(nameof(ImageGenerationParameter.SampleMethod));
-
-        parameter.Guidance.Validate();
+        parameter.SampleParameter.Validate();
         parameter.ControlNet.Validate();
         parameter.PhotoMaker.Validate();
+    }
+
+    public static void Validate(this VideoGenerationParameter parameter)
+    {
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentNullException.ThrowIfNull(parameter.Prompt, nameof(VideoGenerationParameter.Prompt));
+        ArgumentNullException.ThrowIfNull(parameter.NegativePrompt, nameof(VideoGenerationParameter.NegativePrompt));
+
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.Width, nameof(VideoGenerationParameter.Width));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.Height, nameof(VideoGenerationParameter.Height));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.FrameCount, nameof(VideoGenerationParameter.FrameCount));
+
+        parameter.SampleParameter.Validate();
+        parameter.HighNoiseSampleParameter.Validate();
     }
 
     public static void Validate(this ControlNetParameter parameter)
@@ -59,9 +70,21 @@ public static class ParameterExtension
     public static void Validate(this PhotoMakerParameter parameter)
     {
         ArgumentNullException.ThrowIfNull(parameter, nameof(ImageGenerationParameter.PhotoMaker));
-        ArgumentNullException.ThrowIfNull(parameter.InputIdImageDirectory, nameof(PhotoMakerParameter.InputIdImageDirectory));
+        ArgumentNullException.ThrowIfNull(parameter.IdEmbedPath, nameof(PhotoMakerParameter.IdEmbedPath));
 
         ArgumentOutOfRangeException.ThrowIfNegative(parameter.StyleStrength, nameof(PhotoMakerParameter.StyleStrength));
+    }
+
+    public static void Validate(this SampleParameter parameter)
+    {
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.SampleSteps, nameof(ImageGenerationParameter.SampleParameter.SampleSteps));
+
+        if (!Enum.IsDefined(parameter.Scheduler)) throw new ArgumentOutOfRangeException(nameof(ImageGenerationParameter.SampleParameter.Scheduler));
+        if (!Enum.IsDefined(parameter.SampleMethod)) throw new ArgumentOutOfRangeException(nameof(ImageGenerationParameter.SampleParameter.SampleMethod));
+
+        parameter.Guidance.Validate();
     }
 
     public static void Validate(this GuidanceParameter parameter)
@@ -85,7 +108,7 @@ public static class ParameterExtension
         ArgumentOutOfRangeException.ThrowIfNegative(parameter.SkipLayerStart);
         ArgumentOutOfRangeException.ThrowIfNegative(parameter.SkipLayerEnd);
     }
-    
+
     public static void Validate(this CannyParameter parameter)
     {
         ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
