@@ -82,14 +82,6 @@ internal static class ImageHelper
         }
     }
 
-    public static unsafe Native.Types.sd_image_t* ToSdImagePtr(this IImage image, bool monochrome = false)
-    {
-        Native.Types.sd_image_t* imagePtr = (Native.Types.sd_image_t*)NativeMemory.Alloc((nuint)Marshal.SizeOf<Native.Types.sd_image_t>());
-        imagePtr[0] = image.ToSdImage(monochrome);
-
-        return imagePtr;
-    }
-
     public static unsafe void Free(this Native.Types.sd_image_t sdImage)
     {
         if (sdImage.data == null) return;
@@ -127,7 +119,7 @@ internal static class ImageHelper
     {
         int count = images.Length;
 
-        Native.Types.sd_image_t* imagePtr = (Native.Types.sd_image_t*)NativeMemory.Alloc((nuint)(count * Marshal.SizeOf<Native.Types.sd_image_t>()));
+        Native.Types.sd_image_t* imagePtr = (Native.Types.sd_image_t*)NativeMemory.Alloc((nuint)count, (nuint)Marshal.SizeOf<Native.Types.sd_image_t>());
 
         for (int i = 0; i < count; i++)
             imagePtr[i] = images[i].ToSdImage(monochrome);
