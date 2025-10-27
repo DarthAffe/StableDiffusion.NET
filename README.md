@@ -27,11 +27,11 @@ StableDiffusionCpp.Progress += (_, args) => Console.WriteLine($"PROGRESS {args.S
 
 Image<ColorRGB>? treeWithTiger;
 // Load a StableDiffusion model in a using block to unload it again after the two images are created
-using (DiffusionModel sd = ModelBuilder.StableDiffusion(@"<path to model") 
-                                    // .WithVae(@"<optional path to vae>")
-                                       .WithMultithreading()
-                                       .WithFlashAttention()
-                                       .Build())
+using (DiffusionModel sd = new(DiffusionModelParameter.Create()
+                                                       .WithModelPath(@"N:\StableDiffusion\stable-diffusion-webui\models\Stable-diffusion\animagineXLV3_v30.safetensors")
+											        // .WithVae(@"<optional path to vae>")
+                                                       .WithMultithreading()
+                                                       .WithFlashAttention()))
 {
     // Create a image from a prompt
     Image<ColorRGB>? tree = sd.GenerateImage(ImageGenerationParameter.TextToImage("A beautiful tree standing on a small hill").WithSDXLDefaults());
@@ -43,17 +43,24 @@ using (DiffusionModel sd = ModelBuilder.StableDiffusion(@"<path to model")
     File.WriteAllBytes("image2.png", treeWithTiger.ToPng());
 }
 
-// Load a flux kontext model
-using DiffusionModel flux = ModelBuilder.Flux(@"<path to flux-model.gguf>",
-                                              @"<path to clip_l.safetensors>",
-                                              @"<path to t5xxl_fp16.safetensors>",
-                                              @"<path to ae.safetensors>")
-                                        .WithMultithreading()
-                                        .WithFlashAttention()
-                                        .Build();
+// Load the qwen image edit model
+using DiffusionModel qwenContext = new(DiffusionModelParameter.Create()
+                                                              .WithDiffusionModelPath(@"<Qwen-Image-Edit-2509-path>")
+                                                              .WithQwen2VLPath(@"<Qwen2.5-VL-7B-Instruct-path>")
+                                                              .WithQwen2VLVisionPath(@"<Qwen2.5-VL-7B-Instruct.mmproj-path>")
+                                                              .WithVae(@"<qwen_image_vae-path>")
+                                                              .WithMultithreading()
+                                                              .WithFlashAttention()
+                                                              .WithFlowShift(3)
+                                                              .WithOffloadedParamsToCPU()
+                                                              .WithImmediatelyFreedParams());
 
-// Perform an edit on the previosly created image
-Image<ColorRGB>? tigerOnMoon = flux.GenerateImage(ImageGenerationParameter.TextToImage("Remove the hill with the grass and place the tree with the tiger on the moon").WithFluxDefaults().WithRefImages(treeWithTiger));
+// Perform an edit on the previously created image
+Image<ColorRGB>? tigerOnMoon = qwenContext.GenerateImage(ImageGenerationParameter.TextToImage("Remove the background and place the tree and the tiger on the moon.")
+                                                                                 .WithSize(1024, 1024)
+                                                                                 .WithCfg(2.5f)
+                                                                                 .WithSampler(Sampler.Euler)
+                                                                                 .WithRefImages(treeWithTiger));
 File.WriteAllBytes("image3.png", tigerOnMoon.ToPng());
 ```
 
