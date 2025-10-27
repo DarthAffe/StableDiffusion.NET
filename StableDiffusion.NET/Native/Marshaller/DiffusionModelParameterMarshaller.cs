@@ -25,7 +25,7 @@ internal static unsafe class DiffusionModelParameterMarshaller
             embedding_dir = AnsiStringMarshaller.ConvertToUnmanaged(managed.EmbeddingsDirectory),
             photo_maker_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.StackedIdEmbeddingsDirectory),
             vae_decode_only = (sbyte)(managed.VaeDecodeOnly ? 1 : 0),
-            free_params_immediately = 0, // DarthAffe 06.08.2025: Static value
+            free_params_immediately = (sbyte)(managed.FreeParamsImmediately ? 1 : 0),
             n_threads = managed.ThreadCount,
             wtype = managed.Quantization,
             rng_type = managed.RngType,
@@ -63,6 +63,7 @@ internal static unsafe class DiffusionModelParameterMarshaller
             EmbeddingsDirectory = AnsiStringMarshaller.ConvertToManaged(unmanaged.embedding_dir) ?? string.Empty,
             StackedIdEmbeddingsDirectory = AnsiStringMarshaller.ConvertToManaged(unmanaged.photo_maker_path) ?? string.Empty,
             VaeDecodeOnly = unmanaged.vae_decode_only == 1,
+            FreeParamsImmediately = unmanaged.free_params_immediately == 1,
             ThreadCount = unmanaged.n_threads,
             Quantization = unmanaged.wtype,
             RngType = unmanaged.rng_type,

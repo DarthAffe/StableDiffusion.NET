@@ -41,6 +41,8 @@ public sealed class DiffusionModelParameter
     /// </summary>
     public bool VaeDecodeOnly { get; set; } = false;
 
+    public bool FreeParamsImmediately { get; set; } = false;
+
     /// <summary>
     /// process vae in tiles to reduce memory usage
     /// </summary>
@@ -103,7 +105,7 @@ public sealed class DiffusionModelParameter
     /// path to PHOTOMAKER stacked id embeddings
     /// </summary>
     public string StackedIdEmbeddingsDirectory { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// path to full model
     /// </summary>
