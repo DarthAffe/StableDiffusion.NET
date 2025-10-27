@@ -80,6 +80,13 @@ public static class DiffusionModelBuilderExtension
         return parameter;
     }
 
+    public static DiffusionModelParameter WithImmediatelyFreedParams(this DiffusionModelParameter parameter, bool immediatelyFreedParams = true)
+    {
+        parameter.FreeParamsImmediately = immediatelyFreedParams;
+
+        return parameter;
+    }
+
     public static DiffusionModelParameter WithVaeTiling(this DiffusionModelParameter parameter, bool vaeTiling = true)
     {
         parameter.VaeTiling = vaeTiling;
