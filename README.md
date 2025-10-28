@@ -28,7 +28,7 @@ StableDiffusionCpp.Progress += (_, args) => Console.WriteLine($"PROGRESS {args.S
 Image<ColorRGB>? treeWithTiger;
 // Load a StableDiffusion model in a using block to unload it again after the two images are created
 using (DiffusionModel sd = new(DiffusionModelParameter.Create()
-                                                       .WithModelPath(@"N:\StableDiffusion\stable-diffusion-webui\models\Stable-diffusion\animagineXLV3_v30.safetensors")
+                                                       .WithModelPath(@"<path to model>")
 											        // .WithVae(@"<optional path to vae>")
                                                        .WithMultithreading()
                                                        .WithFlashAttention()))
