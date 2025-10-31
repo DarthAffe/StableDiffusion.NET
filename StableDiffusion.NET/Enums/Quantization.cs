@@ -42,6 +42,7 @@ public enum Quantization
     // SD_TYPE_IQ4_NL_4_4 = 36,
     // SD_TYPE_IQ4_NL_4_8 = 37,
     // SD_TYPE_IQ4_NL_8_8 = 38,
+    SD_TYPE_MXFP4 = 39,
 
-    Unspecified = 39
+    Unspecified = 40
 }

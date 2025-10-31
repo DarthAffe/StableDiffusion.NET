@@ -9,15 +9,13 @@
     <license type="expression">MIT</license>
     <icon>sd_net_cuda.png</icon>
     <projectUrl>https://github.com/DarthAffe/StableDiffusion.NET</projectUrl>
-    <description>CUDA-Backend (11 and 12) for StableDiffusion.NET.</description>
+    <description>CUDA-Backend (12) for StableDiffusion.NET.</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright © Darth Affe 2024</copyright>
     <readme>readme.md</readme>
   
     <dependencies>
-      <dependency id="StableDiffusion.NET.Backend.Cuda11.Windows" version="$version$" />
       <dependency id="StableDiffusion.NET.Backend.Cuda12.Windows" version="$version$" />
-      <dependency id="StableDiffusion.NET.Backend.Cuda11.Linux" version="$version$" />
       <dependency id="StableDiffusion.NET.Backend.Cuda12.Linux" version="$version$" />
     </dependencies>
   </metadata>

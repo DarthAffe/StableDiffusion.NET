@@ -27,7 +27,7 @@ public partial class CudaBackend : IBackend
     public bool IsAvailable => (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                              || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                             && (RuntimeInformation.OSArchitecture == Architecture.X64)
-                            && CudaVersion is 11 or 12;
+                            && CudaVersion is 12;
 
     public string PathPart => CudaVersion switch
     {

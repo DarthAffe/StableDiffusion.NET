@@ -1,9 +1,10 @@
-﻿namespace StableDiffusion.NET;
+﻿using JetBrains.Annotations;
 
-public sealed class DiffusionModelParameter : IDiffusionModelParameter, IQuantizedModelParameter, IPhotomakerModelParameter
+namespace StableDiffusion.NET;
+
+[PublicAPI]
+public sealed class DiffusionModelParameter
 {
-    public DiffusionModelType DiffusionModelType { get; set; } = DiffusionModelType.None;
-
     /// <summary>
     /// path to vae
     /// </summary>
@@ -40,20 +41,24 @@ public sealed class DiffusionModelParameter : IDiffusionModelParameter, IQuantiz
     /// </summary>
     public bool VaeDecodeOnly { get; set; } = false;
 
+    public bool FreeParamsImmediately { get; set; } = false;
+
     /// <summary>
     /// process vae in tiles to reduce memory usage
     /// </summary>
     public bool VaeTiling { get; set; } = false;
 
-    /// <summary>
-    /// keep controlnet in cpu
-    /// </summary>
-    public bool KeepControlNetOnCPU { get; set; } = false;
+    public bool OffloadParamsToCPU { get; set; } = false;
 
     /// <summary>
     /// keep clip in cpu (for low vram)
     /// </summary>
     public bool KeepClipOnCPU { get; set; } = false;
+
+    /// <summary>
+    /// keep controlnet in cpu
+    /// </summary>
+    public bool KeepControlNetOnCPU { get; set; } = false;
 
     /// <summary>
     /// keep vae in cpu (for low vram)
@@ -68,32 +73,44 @@ public sealed class DiffusionModelParameter : IDiffusionModelParameter, IQuantiz
     public bool FlashAttention { get; set; } = false;
 
     /// <summary>
+    /// use Conv2d direct in the diffusion model
+    /// This might crash if it is not supported by the backend.
+    /// </summary>
+    public bool DiffusionConvDirect { get; set; } = false;
+
+    /// <summary>
+    /// use Conv2d direct in the vae model (should improve the performance)
+    /// This might crash if it is not supported by the backend.
+    /// </summary>
+    public bool VaeConvDirect { get; set; } = false;
+
+    /// <summary>
     /// RNG (default: Standard)
     /// </summary>
     public RngType RngType { get; set; } = RngType.Standard;
 
-    /// <summary>
-    /// Denoiser sigma schedule (default: Default)
-    /// </summary>
-    public Schedule Schedule { get; set; } = Schedule.Default;
+    public Prediction Prediction { get; set; } = Prediction.Default;
 
     /// <summary>
-    /// 
+    /// quantizes on load
+    /// not really useful in most cases
     /// </summary>
     public Quantization Quantization { get; set; } = Quantization.Unspecified;
 
-    // SD <= 3 only
-    /// <summary>
-    /// path to full model
-    /// </summary>
-    public string ModelPath { get; set; } = string.Empty;
+    public float FlowShift { get; set; } = 0;
+
+    public bool ForceSdxlVaeConvScale { get; set; } = false;
 
     /// <summary>
     /// path to PHOTOMAKER stacked id embeddings
     /// </summary>
     public string StackedIdEmbeddingsDirectory { get; set; } = string.Empty;
 
-    // Flux & SD3.5 only
+    /// <summary>
+    /// path to full model
+    /// </summary>
+    public string ModelPath { get; set; } = string.Empty;
+
     /// <summary>
     /// path to the standalone diffusion model
     /// </summary>
@@ -105,18 +122,25 @@ public sealed class DiffusionModelParameter : IDiffusionModelParameter, IQuantiz
     public string ClipLPath { get; set; } = string.Empty;
 
     /// <summary>
+    /// path to the clip-g text encoder
+    /// </summary>
+    public string ClipGPath { get; set; } = string.Empty;
+
+    /// <summary>
     /// path to the the t5xxl text encoder
     /// </summary>
     public string T5xxlPath { get; set; } = string.Empty;
 
-    // Flux Chroma specific
+    public string Qwen2VLPath { get; set; } = string.Empty;
+
+    public string Qwen2VLVisionPath { get; set; } = string.Empty;
+
+    public string ClipVisionPath { get; set; } = string.Empty;
+    public string HighNoiseDiffusionModelPath { get; set; } = string.Empty;
+
     public bool ChromaUseDitMap { get; set; } = true;
     public bool ChromaEnableT5Map { get; set; } = false;
     public int ChromaT5MaskPad { get; set; } = 1;
 
-    // SD3.5 only
-    /// <summary>
-    /// path to the clip-g text encoder
-    /// </summary>
-    public string ClipGPath { get; set; } = string.Empty;
+    public static DiffusionModelParameter Create() => new();
 }

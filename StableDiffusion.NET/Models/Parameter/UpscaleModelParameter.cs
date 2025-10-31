@@ -3,12 +3,14 @@
 namespace StableDiffusion.NET;
 
 [PublicAPI]
-public sealed class UpscaleModelParameter : IQuantizedModelParameter
+public sealed class UpscaleModelParameter
 {
     /// <summary>
     /// path to esrgan model. Upscale images after generate, just RealESRGAN_x4plus_anime_6B supported by now
     /// </summary>
     public string ModelPath { get; set; } = string.Empty;
+
+    public bool OffloadParamsToCPU { get; set; } = false;
 
     /// <summary>
     /// number of threads to use during computation (default: -1)
@@ -17,7 +19,10 @@ public sealed class UpscaleModelParameter : IQuantizedModelParameter
     public int ThreadCount { get; set; } = 1;
 
     /// <summary>
-    /// 
+    /// use Conv2d direct in the diffusion model
+    /// This might crash if it is not supported by the backend.
     /// </summary>
-    public Quantization Quantization { get; set; } = Quantization.F16;
+    public bool ConvDirect { get; set; } = false;
+
+    public static UpscaleModelParameter Create() => new();
 }

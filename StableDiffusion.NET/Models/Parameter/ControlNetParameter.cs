@@ -1,13 +1,9 @@
 ﻿using HPPH;
-using JetBrains.Annotations;
 
 namespace StableDiffusion.NET;
 
-[PublicAPI]
 public sealed class ControlNetParameter
 {
-    public bool IsEnabled => Image != null;
-
     /// <summary>
     /// image condition, control net
     /// </summary>
@@ -19,33 +15,5 @@ public sealed class ControlNetParameter
     /// </summary>
     public float Strength { get; set; } = 0.9f;
 
-    /// <summary>
-    /// apply canny preprocessor (edge detection)
-    /// </summary>
-    public bool CannyPreprocess { get; set; } = false;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public float CannyHighThreshold { get; set; } = 0.08f;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public float CannyLowThreshold { get; set; } = 0.08f;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public float CannyWeak { get; set; } = 0.8f;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public float CannyStrong { get; set; } = 1.0f;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public bool CannyInverse { get; set; } = false;
+    internal ControlNetParameter() { }
 }
