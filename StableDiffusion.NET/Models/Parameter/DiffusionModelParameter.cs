@@ -72,6 +72,8 @@ public sealed class DiffusionModelParameter
     /// </summary>
     public bool FlashAttention { get; set; } = false;
 
+    public bool TaePreviewOnly { get; set; } = false;
+
     /// <summary>
     /// use Conv2d direct in the diffusion model
     /// This might crash if it is not supported by the backend.
@@ -90,6 +92,8 @@ public sealed class DiffusionModelParameter
     public RngType RngType { get; set; } = RngType.Standard;
 
     public Prediction Prediction { get; set; } = Prediction.Default;
+
+    public LoraApplyMode LoraApplyMode { get; set; } = LoraApplyMode.Auto;
 
     /// <summary>
     /// quantizes on load
