@@ -23,6 +23,8 @@ using sd_img_gen_params_t = ImageGenerationParameter;
 using sd_log_level_t = LogLevel;
 using sd_type_t = Quantization;
 using sd_vid_gen_params_t = VideoGenerationParameter;
+using lora_apply_mode_t = LoraApplyMode;
+using preview_t = Preview;
 using size_t = nuint;
 using uint32_t = uint;
 using uint8_t = byte;
@@ -73,11 +75,13 @@ internal unsafe partial class Native
             public sd_type_t wtype;
             public rng_type_t rng_type;
             public prediction_t prediction;
+            public lora_apply_mode_t lora_apply_mode;
             public sbyte offload_params_to_cpu;
             public sbyte keep_clip_on_cpu;
             public sbyte keep_control_net_on_cpu;
             public sbyte keep_vae_on_cpu;
             public sbyte diffusion_flash_attn;
+            public sbyte tae_preview_only;
             public sbyte diffusion_conv_direct;
             public sbyte vae_conv_direct;
             public sbyte force_sdxl_vae_conv_scale;
@@ -188,6 +192,7 @@ internal unsafe partial class Native
 
     internal delegate void sd_log_cb_t(sd_log_level_t level, [MarshalAs(UnmanagedType.LPStr)] string text, void* data);
     internal delegate void sd_progress_cb_t(int step, int steps, float time, void* data);
+    internal delegate void sd_preview_cb_t(int step, int frame_count, sd_image_t* frames, bool is_noisy);
 
     #endregion
 
@@ -198,6 +203,9 @@ internal unsafe partial class Native
 
     [LibraryImport(LIB_NAME, EntryPoint = "sd_set_progress_callback")]
     internal static partial void sd_set_progress_callback(sd_progress_cb_t cb, void* data);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_set_preview_callback")]
+    internal static partial void sd_set_preview_callback(sd_preview_cb_t? cb, preview_t mode, int interval, [MarshalAs(UnmanagedType.I1)] bool denoised, [MarshalAs(UnmanagedType.I1)] bool noisy);
 
     [LibraryImport(LIB_NAME, EntryPoint = "get_num_physical_cores")]
     internal static partial int32_t get_num_physical_cores();
@@ -242,6 +250,20 @@ internal unsafe partial class Native
 
     [LibraryImport(LIB_NAME, EntryPoint = "str_to_prediction")]
     internal static partial prediction_t str_to_prediction([MarshalAs(UnmanagedType.LPStr)] string str);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_preview_name")]
+    [return: MarshalAs(UnmanagedType.LPStr)]
+    internal static partial string sd_preview_name(preview_t preview);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "str_to_preview")]
+    internal static partial preview_t str_to_preview([MarshalAs(UnmanagedType.LPStr)] string str);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_lora_apply_mode_name")]
+    [return: MarshalAs(UnmanagedType.LPStr)]
+    internal static partial string sd_lora_apply_mode_name(lora_apply_mode_t mode);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "str_to_lora_apply_mode")]
+    internal static partial lora_apply_mode_t str_to_lora_apply_mode([MarshalAs(UnmanagedType.LPStr)] string str);
 
     //
 
