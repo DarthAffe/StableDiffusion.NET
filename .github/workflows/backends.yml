@@ -111,52 +111,6 @@ jobs:
           name: windows-cuda12
           path: .\build\bin\Release\stable-diffusion.dll
 
-  windows-sycl:
-    runs-on: windows-latest
-    
-    defaults:
-      run:
-        shell: bash
-
-    env:
-      WINDOWS_BASEKIT_URL: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/b380d914-366b-4b77-a74a-05e3c38b3514/intel-oneapi-base-toolkit-2025.0.0.882_offline.exe
-      WINDOWS_DPCPP_MKL: intel.oneapi.win.cpp-dpcpp-common:intel.oneapi.win.mkl.devel:intel.oneapi.win.dnnl:intel.oneapi.win.tbb.devel
-      ONEAPI_ROOT: "C:/Program Files (x86)/Intel/oneAPI"
-
-    steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4.2.2
-        with:
-          repository: 'leejet/stable-diffusion.cpp'
-          ref: '${{ github.event.inputs.commit }}'
-          submodules: recursive            
-          
-      - name: Checkout Install Script
-        id: checkoutInstallScript
-        uses: actions/checkout@v4.2.2
-        with:
-          path: scripts
-          sparse-checkout: |
-            Backends/install-oneapi.bat
-            Backends/win-build-sycl.bat
-          sparse-checkout-cone-mode: false
-        
-      - name: Install Sycl tools
-        id: installSyclCompiler
-        run:  scripts/Backends/install-oneapi.bat $WINDOWS_BASEKIT_URL $WINDOWS_DPCPP_MKL
-          
-      - name: Build
-        id: cmake_build
-        run: scripts/Backends/win-build-sycl.bat
-              
-      - name: Upload artifact
-        id: upload_artifact
-        uses: actions/upload-artifact@v4.6.1
-        with:
-          name: windows-sycl
-          path: .\build\bin\stable-diffusion.dll
-
   windows-hip:
     runs-on: windows-latest
 
@@ -166,14 +120,20 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           write-host "Downloading AMD HIP SDK Installer"
-          Invoke-WebRequest -Uri "https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-24.Q4-WinSvr2022-For-HIP.exe" -OutFile "${env:RUNNER_TEMP}\rocm-install.exe"
+          Invoke-WebRequest -Uri "https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-25.Q3-WinSvr2022-For-HIP.exe" -OutFile "${env:RUNNER_TEMP}\rocm-install.exe"
           write-host "Installing AMD HIP SDK"
           Start-Process "${env:RUNNER_TEMP}\rocm-install.exe" -ArgumentList '-install' -NoNewWindow -Wait
           write-host "Completed AMD HIP SDK installation"
       - name: Verify ROCm
         id: verify
         run: |
-          & 'C:\Program Files\AMD\ROCm\*\bin\clang.exe' --version
+          # Find and test ROCm installation
+          $clangPath = Get-ChildItem 'C:\Program Files\AMD\ROCm\*\bin\clang.exe' | Select-Object -First 1
+          if (-not $clangPath) {
+            Write-Error "ROCm installation not found"
+            exit 1
+          }
+          & $clangPath.FullName --version
           
       - name: Checkout
         id: checkout
@@ -204,7 +164,7 @@ jobs:
     runs-on: windows-latest
     
     env:
-      VULKAN_VERSION: 1.3.261.1
+      VULKAN_VERSION: 1.4.328.1
     
     steps:
       - name: Checkout
@@ -218,7 +178,7 @@ jobs:
       - name: Install Vulkan SDK
         id: get_vulkan
         run: |
-          curl.exe -o $env:RUNNER_TEMP/VulkanSDK-Installer.exe -L "https://sdk.lunarg.com/sdk/download/${env:VULKAN_VERSION}/windows/VulkanSDK-${env:VULKAN_VERSION}-Installer.exe"
+          curl.exe -o $env:RUNNER_TEMP/VulkanSDK-Installer.exe -L "https://sdk.lunarg.com/sdk/download/${env:VULKAN_VERSION}/windows/vulkansdk-windows-X64-${env:VULKAN_VERSION}.exe"
           & "$env:RUNNER_TEMP\VulkanSDK-Installer.exe" --accept-licenses --default-answer --confirm-command install
           Add-Content $env:GITHUB_ENV "VULKAN_SDK=C:\VulkanSDK\${env:VULKAN_VERSION}"
           Add-Content $env:GITHUB_PATH "C:\VulkanSDK\${env:VULKAN_VERSION}\bin"
@@ -354,7 +314,7 @@ jobs:
           
   linux-hip:
     runs-on: ubuntu-22.04
-    container: rocm/dev-ubuntu-22.04:6.0.2
+    container: rocm/dev-ubuntu-22.04:6.4.4
    
     steps:
       - name: Dependencies
