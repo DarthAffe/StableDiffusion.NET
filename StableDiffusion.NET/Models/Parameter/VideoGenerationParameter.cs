@@ -38,6 +38,8 @@ public sealed class VideoGenerationParameter
 
     public float VaceStrength { get; set; }
 
+    public EasyCache EasyCache { get; } = new();
+
     #endregion
 
     public static VideoGenerationParameter Create() => new();

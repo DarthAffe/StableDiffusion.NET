@@ -59,6 +59,8 @@ public sealed class ImageGenerationParameter
 
     public TilingParameter VaeTiling { get; } = new();
 
+    public EasyCache EasyCache { get; } = new();
+
     #endregion
 
     public static ImageGenerationParameter Create() => new();
