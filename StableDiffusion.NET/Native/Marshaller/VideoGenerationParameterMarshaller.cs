@@ -27,7 +27,14 @@ internal static class VideoGenerationParameterMarshaller
             Strength = unmanaged.strength,
             Seed = unmanaged.seed,
             FrameCount = unmanaged.video_frames,
-            VaceStrength = unmanaged.vace_strength
+            VaceStrength = unmanaged.vace_strength,
+            EasyCache =
+            {
+                IsEnabled = unmanaged.easycache.enabled == 1,
+                ReuseThreshold = unmanaged.easycache.reuse_threshold,
+                StartPercent = unmanaged.easycache.start_percent,
+                EndPercent = unmanaged.easycache.end_percent
+            }
         };
 
         return parameter;
@@ -68,6 +75,14 @@ internal static class VideoGenerationParameterMarshaller
             _initImage = managed.InitImage?.ToSdImage() ?? new Native.Types.sd_image_t();
             _endImage = managed.EndImage?.ToSdImage() ?? new Native.Types.sd_image_t();
             _controlFrames = managed.ControlFrames == null ? null : managed.ControlFrames.ToSdImage();
+            
+            Native.Types.sd_easycache_params_t easyCache = new()
+            {
+                enabled = (sbyte)(managed.EasyCache.IsEnabled ? 1 : 0),
+                reuse_threshold = managed.EasyCache.ReuseThreshold,
+                start_percent = managed.EasyCache.StartPercent,
+                end_percent = managed.EasyCache.EndPercent,
+            };
 
             _vidGenParams = new Native.Types.sd_vid_gen_params_t
             {
@@ -87,6 +102,7 @@ internal static class VideoGenerationParameterMarshaller
                 seed = managed.Seed,
                 video_frames = managed.FrameCount,
                 vace_strength = managed.VaceStrength,
+                easycache = easyCache,
             };
         }
 

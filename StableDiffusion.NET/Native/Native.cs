@@ -25,6 +25,7 @@ using sd_type_t = Quantization;
 using sd_vid_gen_params_t = VideoGenerationParameter;
 using lora_apply_mode_t = LoraApplyMode;
 using preview_t = Preview;
+using sd_easycache_params_t = Native.Types.sd_easycache_params_t;
 using size_t = nuint;
 using uint32_t = uint;
 using uint8_t = byte;
@@ -69,11 +70,13 @@ internal unsafe partial class Native
             public byte* lora_model_dir;
             public byte* embedding_dir;
             public byte* photo_maker_path;
+            public byte* tensor_type_rules;
             public sbyte vae_decode_only;
             public sbyte free_params_immediately;
             public int n_threads;
             public sd_type_t wtype;
             public rng_type_t rng_type;
+            public rng_type_t sampler_rng_type;
             public prediction_t prediction;
             public lora_apply_mode_t lora_apply_mode;
             public sbyte offload_params_to_cpu;
@@ -131,12 +134,22 @@ internal unsafe partial class Native
             public int shifted_timestep;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         internal struct sd_pm_params_t
         {
             public sd_image_t* id_images;
             public int id_images_count;
             public byte* id_embed_path;
             public float style_strength;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct sd_easycache_params_t
+        {
+            public sbyte enabled;
+            public float reuse_threshold;
+            public float start_percent;
+            public float end_percent;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -161,6 +174,7 @@ internal unsafe partial class Native
             public float control_strength;
             public sd_pm_params_t pm_params;
             public sd_tiling_params_t vae_tiling_params;
+            public sd_easycache_params_t easycache;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -182,6 +196,7 @@ internal unsafe partial class Native
             public int64_t seed;
             public int video_frames;
             public float vace_strength;
+            public sd_easycache_params_t easycache;
         }
 
         internal struct sd_ctx_t;
@@ -237,12 +252,12 @@ internal unsafe partial class Native
     [LibraryImport(LIB_NAME, EntryPoint = "str_to_sample_method")]
     internal static partial sample_method_t str_to_sample_method([MarshalAs(UnmanagedType.LPStr)] string str);
 
-    [LibraryImport(LIB_NAME, EntryPoint = "sd_schedule_name")]
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_scheduler_name")]
     [return: MarshalAs(UnmanagedType.LPStr)]
-    internal static partial string sd_schedule_name(scheduler_t schedule);
+    internal static partial string sd_scheduler_name(scheduler_t schedule);
 
-    [LibraryImport(LIB_NAME, EntryPoint = "str_to_schedule")]
-    internal static partial scheduler_t str_to_schedule([MarshalAs(UnmanagedType.LPStr)] string str);
+    [LibraryImport(LIB_NAME, EntryPoint = "str_to_scheduler")]
+    internal static partial scheduler_t str_to_scheduler([MarshalAs(UnmanagedType.LPStr)] string str);
 
     [LibraryImport(LIB_NAME, EntryPoint = "sd_prediction_name")]
     [return: MarshalAs(UnmanagedType.LPStr)]
@@ -265,6 +280,9 @@ internal unsafe partial class Native
     [LibraryImport(LIB_NAME, EntryPoint = "str_to_lora_apply_mode")]
     internal static partial lora_apply_mode_t str_to_lora_apply_mode([MarshalAs(UnmanagedType.LPStr)] string str);
 
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_easycache_params_init")]
+    internal static partial void sd_easycache_params_init(ref sd_easycache_params_t easycache_params);
+
     //
 
     [LibraryImport(LIB_NAME, EntryPoint = "sd_ctx_params_init")]
@@ -282,9 +300,6 @@ internal unsafe partial class Native
     [LibraryImport(LIB_NAME, EntryPoint = "free_sd_ctx")]
     internal static partial void free_sd_ctx(sd_ctx_t* sd_ctx);
 
-    [LibraryImport(LIB_NAME, EntryPoint = "sd_get_default_sample_method")]
-    internal static partial sample_method_t sd_get_default_sample_method(sd_ctx_t* sd_ctx);
-
     //
 
     [LibraryImport(LIB_NAME, EntryPoint = "sd_sample_params_init")]
@@ -300,6 +315,12 @@ internal unsafe partial class Native
     [LibraryImport(LIB_NAME, EntryPoint = "sd_img_gen_params_to_str")]
     [return: MarshalAs(UnmanagedType.LPStr)]
     internal static partial string sd_img_gen_params_to_str([MarshalUsing(typeof(ImageGenerationParameterMarshaller))] in sd_img_gen_params_t sd_img_gen_params);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_get_default_sample_method")]
+    internal static partial sample_method_t sd_get_default_sample_method(sd_ctx_t* sd_ctx);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_get_default_scheduler")]
+    internal static partial scheduler_t sd_get_default_scheduler(sd_ctx_t* sd_ctx);
 
     [LibraryImport(LIB_NAME, EntryPoint = "generate_image")]
     internal static partial sd_image_t* generate_image(sd_ctx_t* sd_ctx, [MarshalUsing(typeof(ImageGenerationParameterMarshaller))] in sd_img_gen_params_t sd_img_gen_params);

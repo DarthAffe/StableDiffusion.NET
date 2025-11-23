@@ -3,5 +3,6 @@
 public enum RngType
 {
     Standard,
-    Cuda
+    Cuda,
+    Cpu
 }

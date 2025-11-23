@@ -24,11 +24,13 @@ internal static unsafe class DiffusionModelParameterMarshaller
             lora_model_dir = AnsiStringMarshaller.ConvertToUnmanaged(managed.LoraModelDirectory),
             embedding_dir = AnsiStringMarshaller.ConvertToUnmanaged(managed.EmbeddingsDirectory),
             photo_maker_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.StackedIdEmbeddingsDirectory),
+            tensor_type_rules = AnsiStringMarshaller.ConvertToUnmanaged(managed.TensorTypeRules),
             vae_decode_only = (sbyte)(managed.VaeDecodeOnly ? 1 : 0),
             free_params_immediately = (sbyte)(managed.FreeParamsImmediately ? 1 : 0),
             n_threads = managed.ThreadCount,
             wtype = managed.Quantization,
             rng_type = managed.RngType,
+            sampler_rng_type = managed.SamplerRngType,
             prediction = managed.Prediction,
             lora_apply_mode = managed.LoraApplyMode,
             offload_params_to_cpu = (sbyte)(managed.OffloadParamsToCPU ? 1 : 0),
@@ -64,11 +66,13 @@ internal static unsafe class DiffusionModelParameterMarshaller
             LoraModelDirectory = AnsiStringMarshaller.ConvertToManaged(unmanaged.lora_model_dir) ?? string.Empty,
             EmbeddingsDirectory = AnsiStringMarshaller.ConvertToManaged(unmanaged.embedding_dir) ?? string.Empty,
             StackedIdEmbeddingsDirectory = AnsiStringMarshaller.ConvertToManaged(unmanaged.photo_maker_path) ?? string.Empty,
+            TensorTypeRules = AnsiStringMarshaller.ConvertToManaged(unmanaged.tensor_type_rules) ?? string.Empty,
             VaeDecodeOnly = unmanaged.vae_decode_only == 1,
             FreeParamsImmediately = unmanaged.free_params_immediately == 1,
             ThreadCount = unmanaged.n_threads,
             Quantization = unmanaged.wtype,
             RngType = unmanaged.rng_type,
+            SamplerRngType = unmanaged.sampler_rng_type,
             Prediction = unmanaged.prediction,
             LoraApplyMode = unmanaged.lora_apply_mode,
             OffloadParamsToCPU = unmanaged.offload_params_to_cpu == 1,
@@ -101,5 +105,6 @@ internal static unsafe class DiffusionModelParameterMarshaller
         AnsiStringMarshaller.Free(unmanaged.lora_model_dir);
         AnsiStringMarshaller.Free(unmanaged.embedding_dir);
         AnsiStringMarshaller.Free(unmanaged.photo_maker_path);
+        AnsiStringMarshaller.Free(unmanaged.tensor_type_rules);
     }
 }

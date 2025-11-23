@@ -91,6 +91,8 @@ public sealed class DiffusionModelParameter
     /// </summary>
     public RngType RngType { get; set; } = RngType.Standard;
 
+    public RngType SamplerRngType { get; set; } = RngType.Standard;
+
     public Prediction Prediction { get; set; } = Prediction.Default;
 
     public LoraApplyMode LoraApplyMode { get; set; } = LoraApplyMode.Auto;
@@ -109,6 +111,8 @@ public sealed class DiffusionModelParameter
     /// path to PHOTOMAKER stacked id embeddings
     /// </summary>
     public string StackedIdEmbeddingsDirectory { get; set; } = string.Empty;
+
+    public string TensorTypeRules { get; set; } = string.Empty;
 
     /// <summary>
     /// path to full model

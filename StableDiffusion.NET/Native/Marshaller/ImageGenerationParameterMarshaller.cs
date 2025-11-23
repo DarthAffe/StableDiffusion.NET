@@ -46,6 +46,13 @@ internal static class ImageGenerationParameterMarshaller
                 TargetOverlap = unmanaged.vae_tiling_params.target_overlap,
                 RelSizeX = unmanaged.vae_tiling_params.rel_size_x,
                 RelSizeY = unmanaged.vae_tiling_params.rel_size_y
+            },
+            EasyCache =
+            {
+                IsEnabled = unmanaged.easycache.enabled == 1,
+                ReuseThreshold = unmanaged.easycache.reuse_threshold,
+                StartPercent = unmanaged.easycache.start_percent,
+                EndPercent = unmanaged.easycache.end_percent
             }
         };
 
@@ -126,6 +133,14 @@ internal static class ImageGenerationParameterMarshaller
                 rel_size_y = managed.VaeTiling.RelSizeY
             };
 
+            Native.Types.sd_easycache_params_t easyCache = new()
+            {
+                enabled = (sbyte)(managed.EasyCache.IsEnabled ? 1 : 0),
+                reuse_threshold = managed.EasyCache.ReuseThreshold,
+                start_percent = managed.EasyCache.StartPercent,
+                end_percent = managed.EasyCache.EndPercent,
+            };
+
             _imgGenParams = new Native.Types.sd_img_gen_params_t
             {
                 prompt = AnsiStringMarshaller.ConvertToUnmanaged(managed.Prompt),
@@ -145,7 +160,8 @@ internal static class ImageGenerationParameterMarshaller
                 control_image = _controlNetImage,
                 control_strength = managed.ControlNet.Strength,
                 pm_params = photoMakerParams,
-                vae_tiling_params = tilingParams
+                vae_tiling_params = tilingParams,
+                easycache = easyCache
             };
         }
 

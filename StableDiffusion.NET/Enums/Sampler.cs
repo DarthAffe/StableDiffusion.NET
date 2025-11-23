@@ -2,8 +2,8 @@
 
 public enum Sampler
 {
-    Default,
     Euler,
+    Euler_A,
     Heun,
     DPM2,
     DPMPP2SA,
@@ -14,5 +14,5 @@ public enum Sampler
     LCM,
     DDIM_Trailing,
     TCD,
-    Euler_A,
+    Default
 }
