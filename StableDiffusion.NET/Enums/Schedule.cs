@@ -2,7 +2,6 @@
 
 public enum Scheduler
 {
-    Default,
     Discrete,
     Karras,
     Exponential,
@@ -10,5 +9,7 @@ public enum Scheduler
     GITS,
     SGM_Uniform,
     Simple,
-    Smoothstep
+    Smoothstep,
+    LCM,
+    Default
 }
