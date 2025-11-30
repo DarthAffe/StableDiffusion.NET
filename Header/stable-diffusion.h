@@ -48,12 +48,10 @@ enum sample_method_t {
     LCM_SAMPLE_METHOD,
     DDIM_TRAILING_SAMPLE_METHOD,
     TCD_SAMPLE_METHOD,
-			
     SAMPLE_METHOD_COUNT
 };
 
 enum scheduler_t {
-			
     DISCRETE_SCHEDULER,
     KARRAS_SCHEDULER,
     EXPONENTIAL_SCHEDULER,
@@ -73,6 +71,7 @@ enum prediction_t {
     EDM_V_PRED,
     SD3_FLOW_PRED,
     FLUX_FLOW_PRED,
+    FLUX2_FLOW_PRED,
     PREDICTION_COUNT
 };
 
@@ -158,8 +157,8 @@ typedef struct {
     const char* clip_g_path;
     const char* clip_vision_path;
     const char* t5xxl_path;
-    const char* qwen2vl_path;
-    const char* qwen2vl_vision_path;
+    const char* llm_path;
+    const char* llm_vision_path;
     const char* diffusion_model_path;
     const char* high_noise_diffusion_model_path;
     const char* vae_path;
@@ -284,11 +283,11 @@ typedef struct sd_ctx_t sd_ctx_t;
 
 typedef void (*sd_log_cb_t)(enum sd_log_level_t level, const char* text, void* data);
 typedef void (*sd_progress_cb_t)(int step, int steps, float time, void* data);
-typedef void (*sd_preview_cb_t)(int step, int frame_count, sd_image_t* frames, bool is_noisy);
+typedef void (*sd_preview_cb_t)(int step, int frame_count, sd_image_t* frames, bool is_noisy, void* data);
 
 SD_API void sd_set_log_callback(sd_log_cb_t sd_log_cb, void* data);
 SD_API void sd_set_progress_callback(sd_progress_cb_t cb, void* data);
-SD_API void sd_set_preview_callback(sd_preview_cb_t cb, enum preview_t mode, int interval, bool denoised, bool noisy);
+SD_API void sd_set_preview_callback(sd_preview_cb_t cb, enum preview_t mode, int interval, bool denoised, bool noisy, void* data);
 SD_API int32_t get_num_physical_cores();
 SD_API const char* sd_get_system_info();
 
@@ -314,7 +313,6 @@ SD_API char* sd_ctx_params_to_str(const sd_ctx_params_t* sd_ctx_params);
 
 SD_API sd_ctx_t* new_sd_ctx(const sd_ctx_params_t* sd_ctx_params);
 SD_API void free_sd_ctx(sd_ctx_t* sd_ctx);
-																				 
 
 SD_API void sd_sample_params_init(sd_sample_params_t* sample_params);
 SD_API char* sd_sample_params_to_str(const sd_sample_params_t* sample_params);
