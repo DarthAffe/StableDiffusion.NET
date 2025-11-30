@@ -60,8 +60,8 @@ internal unsafe partial class Native
             public byte* clip_g_path;
             public byte* clip_vision_path;
             public byte* t5xxl_path;
-            public byte* qwen2vl_path;
-            public byte* qwen2vl_vision_path;
+            public byte* llm_path;
+            public byte* llm_vision_path;
             public byte* diffusion_model_path;
             public byte* high_noise_diffusion_model_path;
             public byte* vae_path;
@@ -207,7 +207,7 @@ internal unsafe partial class Native
 
     internal delegate void sd_log_cb_t(sd_log_level_t level, [MarshalAs(UnmanagedType.LPStr)] string text, void* data);
     internal delegate void sd_progress_cb_t(int step, int steps, float time, void* data);
-    internal delegate void sd_preview_cb_t(int step, int frame_count, sd_image_t* frames, bool is_noisy);
+    internal delegate void sd_preview_cb_t(int step, int frame_count, sd_image_t* frames, bool is_noisy, void* data);
 
     #endregion
 
@@ -220,7 +220,7 @@ internal unsafe partial class Native
     internal static partial void sd_set_progress_callback(sd_progress_cb_t cb, void* data);
 
     [LibraryImport(LIB_NAME, EntryPoint = "sd_set_preview_callback")]
-    internal static partial void sd_set_preview_callback(sd_preview_cb_t? cb, preview_t mode, int interval, [MarshalAs(UnmanagedType.I1)] bool denoised, [MarshalAs(UnmanagedType.I1)] bool noisy);
+    internal static partial void sd_set_preview_callback(sd_preview_cb_t? cb, preview_t mode, int interval, [MarshalAs(UnmanagedType.I1)] bool denoised, [MarshalAs(UnmanagedType.I1)] bool noisy, void* data);
 
     [LibraryImport(LIB_NAME, EntryPoint = "get_num_physical_cores")]
     internal static partial int32_t get_num_physical_cores();

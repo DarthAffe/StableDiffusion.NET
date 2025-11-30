@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 
 namespace StableDiffusion.NET;
 
@@ -139,9 +140,13 @@ public sealed class DiffusionModelParameter
     /// </summary>
     public string T5xxlPath { get; set; } = string.Empty;
 
-    public string Qwen2VLPath { get; set; } = string.Empty;
+    [Obsolete("Use LLMPath instead")]
+    public string Qwen2VLPath { get => LLMPath; set => LLMPath = value; }
+    public string LLMPath { get; set; } = string.Empty;
 
-    public string Qwen2VLVisionPath { get; set; } = string.Empty;
+    [Obsolete("Use LLMVisionPath instead")]
+    public string Qwen2VLVisionPath { get => LLMVisionPath; set => LLMVisionPath = value; }
+    public string LLMVisionPath { get; set; } = string.Empty;
 
     public string ClipVisionPath { get; set; } = string.Empty;
     public string HighNoiseDiffusionModelPath { get; set; } = string.Empty;

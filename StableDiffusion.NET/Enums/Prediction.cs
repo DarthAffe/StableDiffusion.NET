@@ -7,5 +7,6 @@ public enum Prediction
     V,
     EDM_V,
     SD3Flow,
-    FluxFlow
+    FluxFlow,
+    Flux2Flow
 }
