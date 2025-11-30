@@ -45,7 +45,7 @@ public static unsafe class StableDiffusionCpp
         else if (_previewCallback == null)
             _previewCallback = OnPreview;
 
-        Native.sd_set_preview_callback(_previewCallback, mode, interval, denoised, noisy);
+        Native.sd_set_preview_callback(_previewCallback, mode, interval, denoised, noisy, null);
     }
 
     public static void Convert(string modelPath, string vaePath, Quantization quantization, string outputPath, string tensorTypeRules = "")
@@ -104,7 +104,7 @@ public static unsafe class StableDiffusionCpp
         catch { /**/ }
     }
 
-    private static void OnPreview(int step, int frameCount, Native.Types.sd_image_t* frames, bool isNoisy)
+    private static void OnPreview(int step, int frameCount, Native.Types.sd_image_t* frames, bool isNoisy, void* data)
     {
         try
         {

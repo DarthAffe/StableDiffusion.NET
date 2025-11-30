@@ -236,16 +236,20 @@ public static class DiffusionModelBuilderExtension
         return parameter;
     }
 
-    public static DiffusionModelParameter WithQwen2VLPath(this DiffusionModelParameter parameter, string qwen2VLPath)
+    [Obsolete("Use WithLLMPath instead")]
+    public static DiffusionModelParameter WithQwen2VLPath(this DiffusionModelParameter parameter, string qwen2VLPath) => parameter.WithLLMPath(qwen2VLPath);
+    public static DiffusionModelParameter WithLLMPath(this DiffusionModelParameter parameter, string llmPath)
     {
-        parameter.Qwen2VLPath = qwen2VLPath;
+        parameter.LLMPath = llmPath;
 
         return parameter;
     }
 
-    public static DiffusionModelParameter WithQwen2VLVisionPath(this DiffusionModelParameter parameter, string qwen2VLVisionPath)
+    [Obsolete("Use WithLLMVisionPath instead")]
+    public static DiffusionModelParameter WithQwen2VLVisionPath(this DiffusionModelParameter parameter, string qwen2VLVisionPath) => parameter.WithLLMVisionPath(qwen2VLVisionPath);
+    public static DiffusionModelParameter WithLLMVisionPath(this DiffusionModelParameter parameter, string llmVisionPath)
     {
-        parameter.Qwen2VLVisionPath = qwen2VLVisionPath;
+        parameter.LLMVisionPath = llmVisionPath;
 
         return parameter;
     }

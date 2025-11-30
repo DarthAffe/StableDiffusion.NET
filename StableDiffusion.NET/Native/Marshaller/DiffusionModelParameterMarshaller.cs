@@ -14,8 +14,8 @@ internal static unsafe class DiffusionModelParameterMarshaller
             clip_g_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.ClipGPath),
             clip_vision_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.ClipVisionPath),
             t5xxl_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.T5xxlPath),
-            qwen2vl_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.Qwen2VLPath),
-            qwen2vl_vision_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.Qwen2VLVisionPath),
+            llm_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.LLMPath),
+            llm_vision_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.LLMVisionPath),
             diffusion_model_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.DiffusionModelPath),
             high_noise_diffusion_model_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.HighNoiseDiffusionModelPath),
             vae_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.VaePath),
@@ -56,8 +56,8 @@ internal static unsafe class DiffusionModelParameterMarshaller
             ClipGPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.clip_g_path) ?? string.Empty,
             ClipVisionPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.clip_vision_path) ?? string.Empty,
             T5xxlPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.t5xxl_path) ?? string.Empty,
-            Qwen2VLPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.qwen2vl_path) ?? string.Empty,
-            Qwen2VLVisionPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.qwen2vl_vision_path) ?? string.Empty,
+            LLMPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.llm_path) ?? string.Empty,
+            LLMVisionPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.llm_vision_path) ?? string.Empty,
             DiffusionModelPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.diffusion_model_path) ?? string.Empty,
             HighNoiseDiffusionModelPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.high_noise_diffusion_model_path) ?? string.Empty,
             VaePath = AnsiStringMarshaller.ConvertToManaged(unmanaged.vae_path) ?? string.Empty,
@@ -96,8 +96,8 @@ internal static unsafe class DiffusionModelParameterMarshaller
         AnsiStringMarshaller.Free(unmanaged.clip_l_path);
         AnsiStringMarshaller.Free(unmanaged.clip_g_path);
         AnsiStringMarshaller.Free(unmanaged.t5xxl_path);
-        AnsiStringMarshaller.Free(unmanaged.qwen2vl_path);
-        AnsiStringMarshaller.Free(unmanaged.qwen2vl_vision_path);
+        AnsiStringMarshaller.Free(unmanaged.llm_path);
+        AnsiStringMarshaller.Free(unmanaged.llm_vision_path);
         AnsiStringMarshaller.Free(unmanaged.diffusion_model_path);
         AnsiStringMarshaller.Free(unmanaged.vae_path);
         AnsiStringMarshaller.Free(unmanaged.taesd_path);
