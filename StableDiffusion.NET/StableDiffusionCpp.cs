@@ -60,7 +60,7 @@ public static unsafe class StableDiffusionCpp
 
     public static string GetSystemInfo() => Native.sd_get_system_info();
 
-    public static int GetNumPhysicalCores() => Native.get_num_physical_cores();
+    public static int GetNumPhysicalCores() => Native.sd_get_num_physical_cores();
 
     public static Image<ColorRGB> PreprocessCanny(CannyParameter parameter)
     {
