@@ -2,11 +2,11 @@
 
 public enum Prediction
 {
-    Default,
     EPS,
     V,
     EDM_V,
-    SD3Flow,
+    Flow,
     FluxFlow,
-    Flux2Flow
+    Flux2Flow,
+    Default
 }

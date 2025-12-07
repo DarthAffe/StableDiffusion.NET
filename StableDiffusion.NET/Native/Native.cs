@@ -222,8 +222,8 @@ internal unsafe partial class Native
     [LibraryImport(LIB_NAME, EntryPoint = "sd_set_preview_callback")]
     internal static partial void sd_set_preview_callback(sd_preview_cb_t? cb, preview_t mode, int interval, [MarshalAs(UnmanagedType.I1)] bool denoised, [MarshalAs(UnmanagedType.I1)] bool noisy, void* data);
 
-    [LibraryImport(LIB_NAME, EntryPoint = "get_num_physical_cores")]
-    internal static partial int32_t get_num_physical_cores();
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_get_num_physical_cores")]
+    internal static partial int32_t sd_get_num_physical_cores();
 
     [LibraryImport(LIB_NAME, EntryPoint = "sd_get_system_info")]
     [return: MarshalAs(UnmanagedType.LPStr)]
