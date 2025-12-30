@@ -26,5 +26,7 @@ public sealed class SampleParameter
 
     public int ShiftedTimestep { get; set; } = 0;
 
+    public float[] CustomSigmas { get; set; } = [];
+
     internal SampleParameter() { }
 }

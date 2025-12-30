@@ -1,4 +1,5 @@
-﻿using HPPH;
+﻿using System.Collections.Generic;
+using HPPH;
 using JetBrains.Annotations;
 
 namespace StableDiffusion.NET;
@@ -60,6 +61,8 @@ public sealed class ImageGenerationParameter
     public TilingParameter VaeTiling { get; } = new();
 
     public EasyCache EasyCache { get; } = new();
+
+    public List<Lora> Loras { get; } = [];
 
     #endregion
 

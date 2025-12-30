@@ -1,6 +1,7 @@
 ﻿using HPPH;
 using JetBrains.Annotations;
 using System;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace StableDiffusion.NET;
 
@@ -14,6 +15,8 @@ public static unsafe class StableDiffusionCpp
     private static Native.sd_progress_cb_t? _progressCallback;
     private static Native.sd_preview_cb_t? _previewCallback;
     // ReSharper restore NotAccessedField.Local
+
+    public static string ExpectedSDCommit => "43a70e8";
 
     #endregion
 
@@ -61,6 +64,10 @@ public static unsafe class StableDiffusionCpp
     public static string GetSystemInfo() => Native.sd_get_system_info();
 
     public static int GetNumPhysicalCores() => Native.sd_get_num_physical_cores();
+
+    public static string GetSDCommit() => AnsiStringMarshaller.ConvertToManaged(Native.sd_commit()) ?? string.Empty;
+
+    public static string GetSDVersion() => AnsiStringMarshaller.ConvertToManaged(Native.sd_version()) ?? string.Empty;
 
     public static Image<ColorRGB> PreprocessCanny(CannyParameter parameter)
     {

@@ -24,5 +24,7 @@ public sealed class UpscaleModelParameter
     /// </summary>
     public bool ConvDirect { get; set; } = false;
 
+    public int TileSize { get; set; } = 128;
+
     public static UpscaleModelParameter Create() => new();
 }

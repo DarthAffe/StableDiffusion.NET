@@ -1,5 +1,6 @@
 ﻿using HPPH;
 using JetBrains.Annotations;
+using System.Collections.Generic;
 
 namespace StableDiffusion.NET;
 
@@ -39,6 +40,8 @@ public sealed class VideoGenerationParameter
     public float VaceStrength { get; set; }
 
     public EasyCache EasyCache { get; } = new();
+
+    public List<Lora> Loras { get; } = [];
 
     #endregion
 

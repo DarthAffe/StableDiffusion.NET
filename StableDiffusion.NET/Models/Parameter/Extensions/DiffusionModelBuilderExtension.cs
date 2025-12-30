@@ -37,11 +37,21 @@ public static class DiffusionModelBuilderExtension
         return parameter;
     }
 
+    [Obsolete("Use WithEmbedding instead")]
     public static DiffusionModelParameter WithEmbeddingSupport(this DiffusionModelParameter parameter, string embeddingsDirectory)
     {
         ArgumentNullException.ThrowIfNull(embeddingsDirectory);
 
         parameter.EmbeddingsDirectory = embeddingsDirectory;
+
+        return parameter;
+    }
+
+    public static DiffusionModelParameter WithEmbedding(this DiffusionModelParameter parameter, Embedding embedding)
+    {
+        ArgumentNullException.ThrowIfNull(embedding);
+
+        parameter.Embeddings.Add(embedding);
 
         return parameter;
     }

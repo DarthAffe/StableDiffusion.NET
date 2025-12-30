@@ -1,5 +1,6 @@
 ﻿// ReSharper disable MemberCanBeMadeStatic.Global
 
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
 namespace StableDiffusion.NET;
@@ -7,9 +8,9 @@ namespace StableDiffusion.NET;
 [CustomMarshaller(typeof(VideoGenerationParameter), MarshalMode.ManagedToUnmanagedIn, typeof(VideoGenerationParameterMarshallerIn))]
 [CustomMarshaller(typeof(VideoGenerationParameter), MarshalMode.ManagedToUnmanagedOut, typeof(VideoGenerationParameterMarshaller))]
 [CustomMarshaller(typeof(VideoGenerationParameter), MarshalMode.ManagedToUnmanagedRef, typeof(VideoGenerationParameterMarshallerRef))]
-internal static class VideoGenerationParameterMarshaller
+internal static unsafe class VideoGenerationParameterMarshaller
 {
-    public static unsafe VideoGenerationParameter ConvertToManaged(Native.Types.sd_vid_gen_params_t unmanaged)
+    public static VideoGenerationParameter ConvertToManaged(Native.Types.sd_vid_gen_params_t unmanaged)
     {
         VideoGenerationParameter parameter = new()
         {
@@ -37,25 +38,21 @@ internal static class VideoGenerationParameterMarshaller
             }
         };
 
+        for (int i = 0; i < unmanaged.lora_count; i++)
+        {
+            Native.Types.sd_lora_t lora = unmanaged.loras[i];
+            parameter.Loras.Add(new Lora
+            {
+                IsHighNoise = lora.is_high_noise == 1,
+                Multiplier = lora.multiplier,
+                Path = AnsiStringMarshaller.ConvertToManaged(lora.path) ?? string.Empty
+            });
+        }
+
         return parameter;
     }
 
-    public static unsafe void Free(Native.Types.sd_vid_gen_params_t unmanaged)
-    {
-        AnsiStringMarshaller.Free(unmanaged.prompt);
-        AnsiStringMarshaller.Free(unmanaged.negative_prompt);
-
-        unmanaged.init_image.Free();
-        unmanaged.end_image.Free();
-
-        if (unmanaged.control_frames != null)
-            ImageHelper.Free(unmanaged.control_frames, unmanaged.control_frames_size);
-
-        SampleParameterMarshaller.Free(unmanaged.sample_params);
-        SampleParameterMarshaller.Free(unmanaged.high_noise_sample_params);
-    }
-
-    internal unsafe ref struct VideoGenerationParameterMarshallerIn
+    internal ref struct VideoGenerationParameterMarshallerIn
     {
         private SampleParameterMarshaller.SampleParameterMarshallerIn _sampleParameterMarshaller = new();
         private SampleParameterMarshaller.SampleParameterMarshallerIn _highNoiseSampleParameterMarshaller = new();
@@ -64,6 +61,7 @@ internal static class VideoGenerationParameterMarshaller
         private Native.Types.sd_image_t _initImage;
         private Native.Types.sd_image_t _endImage;
         private Native.Types.sd_image_t* _controlFrames;
+        private Native.Types.sd_lora_t* _loras;
 
         public VideoGenerationParameterMarshallerIn() { }
 
@@ -75,7 +73,19 @@ internal static class VideoGenerationParameterMarshaller
             _initImage = managed.InitImage?.ToSdImage() ?? new Native.Types.sd_image_t();
             _endImage = managed.EndImage?.ToSdImage() ?? new Native.Types.sd_image_t();
             _controlFrames = managed.ControlFrames == null ? null : managed.ControlFrames.ToSdImage();
-            
+
+            _loras = (Native.Types.sd_lora_t*)NativeMemory.Alloc((nuint)managed.Loras.Count, (nuint)Marshal.SizeOf<Native.Types.sd_lora_t>());
+            for (int i = 0; i < managed.Loras.Count; i++)
+            {
+                Lora lora = managed.Loras[i];
+                _loras[i] = new Native.Types.sd_lora_t
+                {
+                    is_high_noise = (sbyte)(lora.IsHighNoise ? 1 : 0),
+                    multiplier = lora.Multiplier,
+                    path = AnsiStringMarshaller.ConvertToUnmanaged(lora.Path)
+                };
+            }
+
             Native.Types.sd_easycache_params_t easyCache = new()
             {
                 enabled = (sbyte)(managed.EasyCache.IsEnabled ? 1 : 0),
@@ -103,6 +113,8 @@ internal static class VideoGenerationParameterMarshaller
                 video_frames = managed.FrameCount,
                 vace_strength = managed.VaceStrength,
                 easycache = easyCache,
+                loras = _loras,
+                lora_count = (uint)managed.Loras.Count
             };
         }
 
@@ -121,6 +133,12 @@ internal static class VideoGenerationParameterMarshaller
 
             _sampleParameterMarshaller.Free();
             _highNoiseSampleParameterMarshaller.Free();
+
+            for (int i = 0; i < _vidGenParams.lora_count; i++)
+                AnsiStringMarshaller.Free(_vidGenParams.loras[i].path);
+
+            if (_loras != null)
+                NativeMemory.Free(_loras);
         }
     }
 

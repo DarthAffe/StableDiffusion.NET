@@ -9,9 +9,9 @@ namespace StableDiffusion.NET;
 [CustomMarshaller(typeof(ImageGenerationParameter), MarshalMode.ManagedToUnmanagedIn, typeof(ImageGenerationParameterMarshallerIn))]
 [CustomMarshaller(typeof(ImageGenerationParameter), MarshalMode.ManagedToUnmanagedOut, typeof(ImageGenerationParameterMarshaller))]
 [CustomMarshaller(typeof(ImageGenerationParameter), MarshalMode.ManagedToUnmanagedRef, typeof(ImageGenerationParameterMarshallerRef))]
-internal static class ImageGenerationParameterMarshaller
+internal static unsafe class ImageGenerationParameterMarshaller
 {
-    public static unsafe ImageGenerationParameter ConvertToManaged(Native.Types.sd_img_gen_params_t unmanaged)
+    public static ImageGenerationParameter ConvertToManaged(Native.Types.sd_img_gen_params_t unmanaged)
     {
         ImageGenerationParameter parameter = new()
         {
@@ -56,28 +56,21 @@ internal static class ImageGenerationParameterMarshaller
             }
         };
 
+        for (int i = 0; i < unmanaged.lora_count; i++)
+        {
+            Native.Types.sd_lora_t lora = unmanaged.loras[i];
+            parameter.Loras.Add(new Lora
+            {
+                IsHighNoise = lora.is_high_noise == 1,
+                Multiplier = lora.multiplier,
+                Path = AnsiStringMarshaller.ConvertToManaged(lora.path) ?? string.Empty
+            });
+        }
+
         return parameter;
     }
 
-    public static unsafe void Free(Native.Types.sd_img_gen_params_t unmanaged)
-    {
-        AnsiStringMarshaller.Free(unmanaged.prompt);
-        AnsiStringMarshaller.Free(unmanaged.negative_prompt);
-
-        unmanaged.init_image.Free();
-        unmanaged.mask_image.Free();
-        unmanaged.control_image.Free();
-
-        if (unmanaged.ref_images != null)
-            ImageHelper.Free(unmanaged.ref_images, unmanaged.ref_images_count);
-
-        if (unmanaged.pm_params.id_images != null)
-            ImageHelper.Free(unmanaged.pm_params.id_images, unmanaged.pm_params.id_images_count);
-
-        SampleParameterMarshaller.Free(unmanaged.sample_params);
-    }
-
-    internal unsafe ref struct ImageGenerationParameterMarshallerIn
+    internal ref struct ImageGenerationParameterMarshallerIn
     {
         private SampleParameterMarshaller.SampleParameterMarshallerIn _sampleParameterMarshaller = new();
         private Native.Types.sd_img_gen_params_t _imgGenParams;
@@ -87,6 +80,7 @@ internal static class ImageGenerationParameterMarshaller
         private Native.Types.sd_image_t _controlNetImage;
         private Native.Types.sd_image_t* _refImages;
         private Native.Types.sd_image_t* _pmIdImages;
+        private Native.Types.sd_lora_t* _loras;
 
         public ImageGenerationParameterMarshallerIn() { }
 
@@ -98,6 +92,18 @@ internal static class ImageGenerationParameterMarshaller
             _controlNetImage = managed.ControlNet.Image?.ToSdImage() ?? new Native.Types.sd_image_t();
             _refImages = managed.RefImages == null ? null : managed.RefImages.ToSdImage();
             _pmIdImages = managed.PhotoMaker.IdImages == null ? null : managed.PhotoMaker.IdImages.ToSdImage();
+
+            _loras = (Native.Types.sd_lora_t*)NativeMemory.Alloc((nuint)managed.Loras.Count, (nuint)Marshal.SizeOf<Native.Types.sd_lora_t>());
+            for (int i = 0; i < managed.Loras.Count; i++)
+            {
+                Lora lora = managed.Loras[i];
+                _loras[i] = new Native.Types.sd_lora_t
+                {
+                    is_high_noise = (sbyte)(lora.IsHighNoise ? 1 : 0),
+                    multiplier = lora.Multiplier,
+                    path = AnsiStringMarshaller.ConvertToUnmanaged(lora.Path)
+                };
+            }
 
             if (managed.MaskImage != null)
                 _maskImage = managed.MaskImage.ToSdImage(true);
@@ -161,7 +167,9 @@ internal static class ImageGenerationParameterMarshaller
                 control_strength = managed.ControlNet.Strength,
                 pm_params = photoMakerParams,
                 vae_tiling_params = tilingParams,
-                easycache = easyCache
+                easycache = easyCache,
+                loras = _loras,
+                lora_count = (uint)managed.Loras.Count
             };
         }
 
@@ -184,6 +192,12 @@ internal static class ImageGenerationParameterMarshaller
                 ImageHelper.Free(_pmIdImages, _imgGenParams.pm_params.id_images_count);
 
             _sampleParameterMarshaller.Free();
+
+            for (int i = 0; i < _imgGenParams.lora_count; i++)
+                AnsiStringMarshaller.Free(_imgGenParams.loras[i].path);
+
+            if (_loras != null)
+                NativeMemory.Free(_loras);
         }
     }
 
