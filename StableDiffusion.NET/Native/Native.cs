@@ -42,7 +42,7 @@ internal unsafe partial class Native
     internal static class Types
     {
         [StructLayout(LayoutKind.Sequential)]
-        public struct sd_tiling_params_t
+        internal struct sd_tiling_params_t
         {
             public sbyte enabled;
             public int tile_size_x;
@@ -50,6 +50,13 @@ internal unsafe partial class Native
             public float target_overlap;
             public float rel_size_x;
             public float rel_size_y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct sd_embedding_t
+        {
+            public byte* name;
+            public byte* path;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -68,7 +75,8 @@ internal unsafe partial class Native
             public byte* taesd_path;
             public byte* control_net_path;
             public byte* lora_model_dir;
-            public byte* embedding_dir;
+            public sd_embedding_t* embeddings;
+            public uint32_t embedding_count;
             public byte* photo_maker_path;
             public byte* tensor_type_rules;
             public sbyte vae_decode_only;
@@ -132,6 +140,8 @@ internal unsafe partial class Native
             public int sample_steps;
             public float eta;
             public int shifted_timestep;
+            public float* custom_sigmas;
+            public int custom_sigmas_count;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -153,8 +163,18 @@ internal unsafe partial class Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
+        internal struct sd_lora_t
+        {
+            public sbyte is_high_noise;
+            public float multiplier;
+            public byte* path;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
         internal struct sd_img_gen_params_t
         {
+            public sd_lora_t* loras;
+            public uint32_t lora_count;
             public byte* prompt;
             public byte* negative_prompt;
             public int clip_skip;
@@ -180,6 +200,8 @@ internal unsafe partial class Native
         [StructLayout(LayoutKind.Sequential)]
         internal struct sd_vid_gen_params_t
         {
+            public sd_lora_t* loras;
+            public uint32_t lora_count;
             public byte* prompt;
             public byte* negative_prompt;
             public int clip_skip;
@@ -305,7 +327,8 @@ internal unsafe partial class Native
     [LibraryImport(LIB_NAME, EntryPoint = "sd_sample_params_init")]
     internal static partial void sd_sample_params_init([MarshalUsing(typeof(SampleParameterMarshaller))] ref sd_sample_params_t sample_params);
     [LibraryImport(LIB_NAME, EntryPoint = "sd_sample_params_to_str")]
-    internal static partial char* sd_sample_params_to_str([MarshalUsing(typeof(SampleParameterMarshaller))] in sd_sample_params_t sample_params);
+    [return: MarshalAs(UnmanagedType.LPStr)]
+    internal static partial string sd_sample_params_to_str([MarshalUsing(typeof(SampleParameterMarshaller))] in sd_sample_params_t sample_params);
 
     //
 
@@ -339,7 +362,8 @@ internal unsafe partial class Native
     internal static partial upscaler_ctx_t* new_upscaler_ctx([MarshalAs(UnmanagedType.LPStr)] string esrgan_path,
                                                              [MarshalAs(UnmanagedType.I1)] bool offload_params_to_cpu,
                                                              [MarshalAs(UnmanagedType.I1)] bool direct,
-                                                             int n_threads);
+                                                             int n_threads,
+                                                             int tile_size);
 
     [LibraryImport(LIB_NAME, EntryPoint = "free_upscaler_ctx")]
     internal static partial void free_upscaler_ctx(upscaler_ctx_t* upscaler_ctx);
@@ -373,6 +397,12 @@ internal unsafe partial class Native
                                                   float weak,
                                                   float strong,
                                                   [MarshalAs(UnmanagedType.I1)] bool inverse);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_commit")]
+    internal static partial byte* sd_commit();
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_version")]
+    internal static partial byte* sd_version();
 
     #endregion
 }

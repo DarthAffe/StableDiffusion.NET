@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace StableDiffusion.NET;
@@ -24,7 +25,10 @@ public sealed class DiffusionModelParameter
     /// <summary>
     /// path to embeddings
     /// </summary>
+    [Obsolete("Use Embeddings instead")]
     public string EmbeddingsDirectory { get; set; } = string.Empty;
+
+    public List<Embedding> Embeddings { get; } = [];
 
     /// <summary>
     /// path to control net model

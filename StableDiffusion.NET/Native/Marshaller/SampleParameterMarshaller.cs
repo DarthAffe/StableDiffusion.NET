@@ -9,9 +9,9 @@ namespace StableDiffusion.NET;
 [CustomMarshaller(typeof(SampleParameter), MarshalMode.ManagedToUnmanagedIn, typeof(SampleParameterMarshallerIn))]
 [CustomMarshaller(typeof(SampleParameter), MarshalMode.ManagedToUnmanagedOut, typeof(SampleParameterMarshaller))]
 [CustomMarshaller(typeof(SampleParameter), MarshalMode.ManagedToUnmanagedRef, typeof(SampleParameterMarshallerRef))]
-internal static class SampleParameterMarshaller
+internal static unsafe class SampleParameterMarshaller
 {
-    public static unsafe SampleParameter ConvertToManaged(Native.Types.sd_sample_params_t unmanaged)
+    public static SampleParameter ConvertToManaged(Native.Types.sd_sample_params_t unmanaged)
     {
         SampleParameter parameter = new()
         {
@@ -33,31 +33,33 @@ internal static class SampleParameterMarshaller
             SampleMethod = unmanaged.sample_method,
             SampleSteps = unmanaged.sample_steps,
             Eta = unmanaged.eta,
-            ShiftedTimestep = unmanaged.shifted_timestep
+            ShiftedTimestep = unmanaged.shifted_timestep,
+            CustomSigmas = new float[unmanaged.custom_sigmas_count]
         };
 
         if (unmanaged.guidance.slg.layers != null)
             new Span<int>(unmanaged.guidance.slg.layers, (int)unmanaged.guidance.slg.layer_count).CopyTo(parameter.Guidance.Slg.Layers);
 
+        if (unmanaged.custom_sigmas != null)
+            new Span<float>(unmanaged.custom_sigmas, unmanaged.custom_sigmas_count).CopyTo(parameter.CustomSigmas);
+
         return parameter;
     }
 
-    public static unsafe void Free(Native.Types.sd_sample_params_t unmanaged)
-    {
-        if (unmanaged.guidance.slg.layers != null)
-            NativeMemory.Free(unmanaged.guidance.slg.layers);
-    }
-
-    internal unsafe ref struct SampleParameterMarshallerIn
+    internal ref struct SampleParameterMarshallerIn
     {
         private Native.Types.sd_sample_params_t _sampleParams;
 
         private int* _slgLayers;
+        private float* _customSigmas;
 
         public void FromManaged(SampleParameter managed)
         {
             _slgLayers = (int*)NativeMemory.Alloc((nuint)managed.Guidance.Slg.Layers.Length, (nuint)Marshal.SizeOf<int>());
             managed.Guidance.Slg.Layers.AsSpan().CopyTo(new Span<int>(_slgLayers, managed.Guidance.Slg.Layers.Length));
+
+            _customSigmas = (float*)NativeMemory.Alloc((nuint)managed.CustomSigmas.Length, (nuint)Marshal.SizeOf<float>());
+            managed.CustomSigmas.AsSpan().CopyTo(new Span<float>(_customSigmas, managed.CustomSigmas.Length));
 
             Native.Types.sd_slg_params_t slg = new()
             {
@@ -84,7 +86,9 @@ internal static class SampleParameterMarshaller
                 sample_method = managed.SampleMethod,
                 sample_steps = managed.SampleSteps,
                 eta = managed.Eta,
-                shifted_timestep = managed.ShiftedTimestep
+                shifted_timestep = managed.ShiftedTimestep,
+                custom_sigmas = _customSigmas,
+                custom_sigmas_count = managed.CustomSigmas.Length
             };
         }
 
@@ -94,6 +98,9 @@ internal static class SampleParameterMarshaller
         {
             if (_slgLayers != null)
                 NativeMemory.Free(_slgLayers);
+
+            if (_customSigmas != null)
+                NativeMemory.Free(_customSigmas);
         }
     }
 

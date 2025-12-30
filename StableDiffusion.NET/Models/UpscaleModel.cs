@@ -41,7 +41,8 @@ public sealed unsafe class UpscaleModel : IDisposable
         _ctx = Native.new_upscaler_ctx(ModelParameter.ModelPath,
                                        ModelParameter.OffloadParamsToCPU,
                                        ModelParameter.ConvDirect,
-                                       ModelParameter.ThreadCount);
+                                       ModelParameter.ThreadCount,
+                                       ModelParameter.TileSize);
 
         if (_ctx == null) throw new NullReferenceException("Failed to initialize upscale-model.");
     }
