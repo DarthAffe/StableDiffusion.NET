@@ -31,10 +31,10 @@ internal static unsafe class VideoGenerationParameterMarshaller
             VaceStrength = unmanaged.vace_strength,
             EasyCache =
             {
-                IsEnabled = unmanaged.easycache.enabled == 1,
-                ReuseThreshold = unmanaged.easycache.reuse_threshold,
-                StartPercent = unmanaged.easycache.start_percent,
-                EndPercent = unmanaged.easycache.end_percent
+                IsEnabled = unmanaged.cache.mode != 0,
+                ReuseThreshold = unmanaged.cache.reuse_threshold,
+                StartPercent = unmanaged.cache.start_percent,
+                EndPercent = unmanaged.cache.end_percent
             }
         };
 
@@ -86,12 +86,25 @@ internal static unsafe class VideoGenerationParameterMarshaller
                 };
             }
 
-            Native.Types.sd_easycache_params_t easyCache = new()
+            Native.Types.sd_cache_params_t easyCache = new()
             {
-                enabled = (sbyte)(managed.EasyCache.IsEnabled ? 1 : 0),
+                mode = managed.EasyCache.IsEnabled ? 1 : 0,
                 reuse_threshold = managed.EasyCache.ReuseThreshold,
                 start_percent = managed.EasyCache.StartPercent,
                 end_percent = managed.EasyCache.EndPercent,
+                error_decay_rate = 0,
+                use_relative_threshold = 0,
+                reset_error_on_compute = 0,
+                Fn_compute_blocks = 0,
+                Bn_compute_blocks = 0,
+                residual_diff_threshold = 0,
+                max_warmup_steps = 0,
+                max_cached_steps = 0,
+                max_continuous_cached_steps = 0,
+                taylorseer_n_derivatives = 0,
+                taylorseer_skip_interval = 0,
+                scm_mask = null,
+                scm_policy_dynamic = 0
             };
 
             _vidGenParams = new Native.Types.sd_vid_gen_params_t
@@ -112,7 +125,7 @@ internal static unsafe class VideoGenerationParameterMarshaller
                 seed = managed.Seed,
                 video_frames = managed.FrameCount,
                 vace_strength = managed.VaceStrength,
-                easycache = easyCache,
+                cache = easyCache,
                 loras = _loras,
                 lora_count = (uint)managed.Loras.Count
             };

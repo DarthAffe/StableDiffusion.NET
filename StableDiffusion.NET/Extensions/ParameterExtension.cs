@@ -20,7 +20,7 @@ public static class ParameterExtension
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.ThreadCount, nameof(DiffusionModelParameter.ThreadCount));
         ArgumentNullException.ThrowIfNull(parameter.VaePath, nameof(DiffusionModelParameter.VaePath));
         ArgumentNullException.ThrowIfNull(parameter.TaesdPath, nameof(DiffusionModelParameter.TaesdPath));
-        ArgumentNullException.ThrowIfNull(parameter.LoraModelDirectory, nameof(DiffusionModelParameter.LoraModelDirectory));
+        //ArgumentNullException.ThrowIfNull(parameter.LoraModelDirectory, nameof(DiffusionModelParameter.LoraModelDirectory));
         ArgumentNullException.ThrowIfNull(parameter.ControlNetPath, nameof(DiffusionModelParameter.ControlNetPath));
         ArgumentNullException.ThrowIfNull(parameter.EmbeddingsDirectory, nameof(DiffusionModelParameter.EmbeddingsDirectory));
         ArgumentNullException.ThrowIfNull(parameter.StackedIdEmbeddingsDirectory, nameof(DiffusionModelParameter.StackedIdEmbeddingsDirectory));

@@ -20,6 +20,7 @@ public sealed class DiffusionModelParameter
     /// <summary>
     /// lora model directory
     /// </summary>
+    [Obsolete("Use Loras list instead")]
     public string LoraModelDirectory { get; set; } = string.Empty;
 
     /// <summary>
@@ -158,6 +159,11 @@ public sealed class DiffusionModelParameter
     public bool ChromaUseDitMap { get; set; } = true;
     public bool ChromaEnableT5Map { get; set; } = false;
     public int ChromaT5MaskPad { get; set; } = 1;
+
+    public bool QwenImageZeroConditioning { get; set; } = false;
+
+    // New: Loras list similar to Image/Video parameters
+    public List<Lora> Loras { get; } = new();
 
     public static DiffusionModelParameter Create() => new();
 }

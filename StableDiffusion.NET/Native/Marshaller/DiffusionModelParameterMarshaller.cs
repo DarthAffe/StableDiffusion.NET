@@ -26,7 +26,6 @@ internal static unsafe class DiffusionModelParameterMarshaller
             VaePath = AnsiStringMarshaller.ConvertToManaged(unmanaged.vae_path) ?? string.Empty,
             TaesdPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.taesd_path) ?? string.Empty,
             ControlNetPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.control_net_path) ?? string.Empty,
-            LoraModelDirectory = AnsiStringMarshaller.ConvertToManaged(unmanaged.lora_model_dir) ?? string.Empty,
             StackedIdEmbeddingsDirectory = AnsiStringMarshaller.ConvertToManaged(unmanaged.photo_maker_path) ?? string.Empty,
             TensorTypeRules = AnsiStringMarshaller.ConvertToManaged(unmanaged.tensor_type_rules) ?? string.Empty,
             VaeDecodeOnly = unmanaged.vae_decode_only == 1,
@@ -49,6 +48,7 @@ internal static unsafe class DiffusionModelParameterMarshaller
             ChromaUseDitMap = unmanaged.chroma_use_dit_mask == 1,
             ChromaEnableT5Map = unmanaged.chroma_use_t5_mask == 1,
             ChromaT5MaskPad = unmanaged.chroma_t5_mask_pad,
+            QwenImageZeroConditioning = unmanaged.qwen_image_zero_cond_t == 1,
             FlowShift = unmanaged.flow_shift
         };
 
@@ -131,7 +131,6 @@ internal static unsafe class DiffusionModelParameterMarshaller
                 vae_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.VaePath),
                 taesd_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.TaesdPath),
                 control_net_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.ControlNetPath),
-                lora_model_dir = AnsiStringMarshaller.ConvertToUnmanaged(managed.LoraModelDirectory),
                 embeddings = _embeddings,
                 embedding_count = (uint)embeddings.Count,
                 photo_maker_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.StackedIdEmbeddingsDirectory),
@@ -156,6 +155,7 @@ internal static unsafe class DiffusionModelParameterMarshaller
                 chroma_use_dit_mask = (sbyte)(managed.ChromaUseDitMap ? 1 : 0),
                 chroma_use_t5_mask = (sbyte)(managed.ChromaEnableT5Map ? 1 : 0),
                 chroma_t5_mask_pad = managed.ChromaT5MaskPad,
+                qwen_image_zero_cond_t = (sbyte)(managed.QwenImageZeroConditioning ? 1 : 0),
                 flow_shift = managed.FlowShift
             };
         }
@@ -175,7 +175,7 @@ internal static unsafe class DiffusionModelParameterMarshaller
             AnsiStringMarshaller.Free(_ctxParams.vae_path);
             AnsiStringMarshaller.Free(_ctxParams.taesd_path);
             AnsiStringMarshaller.Free(_ctxParams.control_net_path);
-            AnsiStringMarshaller.Free(_ctxParams.lora_model_dir);
+            // lora_model_dir removed from new header
             AnsiStringMarshaller.Free(_ctxParams.photo_maker_path);
             AnsiStringMarshaller.Free(_ctxParams.tensor_type_rules);
 

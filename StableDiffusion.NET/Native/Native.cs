@@ -25,7 +25,7 @@ using sd_type_t = Quantization;
 using sd_vid_gen_params_t = VideoGenerationParameter;
 using lora_apply_mode_t = LoraApplyMode;
 using preview_t = Preview;
-using sd_easycache_params_t = Native.Types.sd_easycache_params_t;
+using sd_cache_params_t = Native.Types.sd_cache_params_t;
 using size_t = nuint;
 using uint32_t = uint;
 using uint8_t = byte;
@@ -74,7 +74,6 @@ internal unsafe partial class Native
             public byte* vae_path;
             public byte* taesd_path;
             public byte* control_net_path;
-            public byte* lora_model_dir;
             public sd_embedding_t* embeddings;
             public uint32_t embedding_count;
             public byte* photo_maker_path;
@@ -88,6 +87,7 @@ internal unsafe partial class Native
             public prediction_t prediction;
             public lora_apply_mode_t lora_apply_mode;
             public sbyte offload_params_to_cpu;
+            public sbyte enable_mmap;
             public sbyte keep_clip_on_cpu;
             public sbyte keep_control_net_on_cpu;
             public sbyte keep_vae_on_cpu;
@@ -95,10 +95,13 @@ internal unsafe partial class Native
             public sbyte tae_preview_only;
             public sbyte diffusion_conv_direct;
             public sbyte vae_conv_direct;
+            public sbyte circular_x;
+            public sbyte circular_y;
             public sbyte force_sdxl_vae_conv_scale;
             public sbyte chroma_use_dit_mask;
             public sbyte chroma_use_t5_mask;
             public int chroma_t5_mask_pad;
+            public sbyte qwen_image_zero_cond_t;
             public float flow_shift;
         }
 
@@ -126,7 +129,6 @@ internal unsafe partial class Native
         {
             public float txt_cfg;
             public float img_cfg;
-            public float min_cfg;
             public float distilled_guidance;
             public sd_slg_params_t slg;
         }
@@ -154,12 +156,25 @@ internal unsafe partial class Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct sd_easycache_params_t
+        internal struct sd_cache_params_t
         {
-            public sbyte enabled;
+            public int mode;
             public float reuse_threshold;
             public float start_percent;
             public float end_percent;
+            public float error_decay_rate;
+            public sbyte use_relative_threshold;
+            public sbyte reset_error_on_compute;
+            public int Fn_compute_blocks;
+            public int Bn_compute_blocks;
+            public float residual_diff_threshold;
+            public int max_warmup_steps;
+            public int max_cached_steps;
+            public int max_continuous_cached_steps;
+            public int taylorseer_n_derivatives;
+            public int taylorseer_skip_interval;
+            public byte* scm_mask;
+            public sbyte scm_policy_dynamic;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -194,7 +209,7 @@ internal unsafe partial class Native
             public float control_strength;
             public sd_pm_params_t pm_params;
             public sd_tiling_params_t vae_tiling_params;
-            public sd_easycache_params_t easycache;
+            public sd_cache_params_t cache;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -218,7 +233,7 @@ internal unsafe partial class Native
             public int64_t seed;
             public int video_frames;
             public float vace_strength;
-            public sd_easycache_params_t easycache;
+            public sd_cache_params_t cache;
         }
 
         internal struct sd_ctx_t;
@@ -302,8 +317,8 @@ internal unsafe partial class Native
     [LibraryImport(LIB_NAME, EntryPoint = "str_to_lora_apply_mode")]
     internal static partial lora_apply_mode_t str_to_lora_apply_mode([MarshalAs(UnmanagedType.LPStr)] string str);
 
-    [LibraryImport(LIB_NAME, EntryPoint = "sd_easycache_params_init")]
-    internal static partial void sd_easycache_params_init(ref sd_easycache_params_t easycache_params);
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_cache_params_init")]
+    internal static partial void sd_cache_params_init(ref sd_cache_params_t cache_params);
 
     //
 

@@ -32,7 +32,9 @@ public static class DiffusionModelBuilderExtension
     {
         ArgumentNullException.ThrowIfNull(loraModelDirectory);
 
+        // Keep legacy property for compatibility but also populate Loras list
         parameter.LoraModelDirectory = loraModelDirectory;
+        parameter.Loras.Add(new Lora(loraModelDirectory));
 
         return parameter;
     }
