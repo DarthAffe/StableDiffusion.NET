@@ -35,6 +35,6 @@ public sealed class CannyParameter
     /// 
     /// </summary>
     public bool Inverse { get; set; } = false;
-
+    
     public static CannyParameter Create() => new();
 }

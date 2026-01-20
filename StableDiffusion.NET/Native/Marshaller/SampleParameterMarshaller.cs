@@ -19,7 +19,6 @@ internal static unsafe class SampleParameterMarshaller
             {
                 TxtCfg = unmanaged.guidance.txt_cfg,
                 ImgCfg = unmanaged.guidance.img_cfg,
-                MinCfg = unmanaged.guidance.min_cfg,
                 DistilledGuidance = unmanaged.guidance.distilled_guidance,
                 Slg =
                 {
@@ -74,7 +73,6 @@ internal static unsafe class SampleParameterMarshaller
             {
                 txt_cfg = managed.Guidance.TxtCfg,
                 img_cfg = managed.Guidance.ImgCfg,
-                min_cfg = managed.Guidance.MinCfg,
                 distilled_guidance = managed.Guidance.DistilledGuidance,
                 slg = slg
             };

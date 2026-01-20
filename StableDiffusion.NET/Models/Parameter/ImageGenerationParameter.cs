@@ -45,9 +45,9 @@ public sealed class ImageGenerationParameter
     public SampleParameter SampleParameter { get; internal init; } = new();
 
     /// <summary>
-    /// strength for noising/unnoising (default: 0.7)
+    /// strength for noising/unnoising (default: 0.75)
     /// </summary>
-    public float Strength { get; set; } = 0.7f;
+    public float Strength { get; set; } = 0.75f;
 
     /// <summary>
     /// RNG seed. use -1 for a random seed (default: -1)
@@ -58,9 +58,9 @@ public sealed class ImageGenerationParameter
 
     public PhotoMakerParameter PhotoMaker { get; } = new();
 
-    public TilingParameter VaeTiling { get; } = new();
+    public TilingParameter VaeTiling { get; internal init; } = new();
 
-    public EasyCache EasyCache { get; } = new();
+    public CacheParameter Cache { get; internal init; } = new();
 
     public List<Lora> Loras { get; } = [];
 

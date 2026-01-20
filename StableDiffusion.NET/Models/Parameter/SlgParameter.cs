@@ -3,9 +3,9 @@
 public sealed class SlgParameter
 {
     /// <summary>
-    /// Layers to skip for SLG steps: (default: [7,8,9])
+    /// Layers to skip for SLG steps
     /// </summary>
-    public int[] Layers { get; set; } = [7, 8, 9];
+    public int[] Layers { get; set; } = [];
 
     /// <summary>
     /// SLG enabling point: (default: 0.01)

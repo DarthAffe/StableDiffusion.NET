@@ -99,13 +99,6 @@ public static class ImageGenerationParameterExtension
         return parameter;
     }
 
-    public static ImageGenerationParameter WithMinCfg(this ImageGenerationParameter parameter, float minCfg)
-    {
-        parameter.SampleParameter.Guidance.MinCfg = minCfg;
-
-        return parameter;
-    }
-
     public static ImageGenerationParameter WithGuidance(this ImageGenerationParameter parameter, float guidance)
     {
         parameter.SampleParameter.Guidance.DistilledGuidance = guidance;
