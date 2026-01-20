@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace StableDiffusion.NET;
@@ -17,17 +16,6 @@ public sealed class DiffusionModelParameter
     /// </summary>
     public string TaesdPath { get; set; } = string.Empty;
 
-    /// <summary>
-    /// lora model directory
-    /// </summary>
-    public string LoraModelDirectory { get; set; } = string.Empty;
-
-    /// <summary>
-    /// path to embeddings
-    /// </summary>
-    [Obsolete("Use Embeddings instead")]
-    public string EmbeddingsDirectory { get; set; } = string.Empty;
-
     public List<Embedding> Embeddings { get; } = [];
 
     /// <summary>
@@ -39,7 +27,7 @@ public sealed class DiffusionModelParameter
     /// number of threads to use during computation (default: -1)
     /// If threads = -1, then threads will be set to the number of CPU physical cores
     /// </summary>
-    public int ThreadCount { get; set; } = 1;
+    public int ThreadCount { get; set; } = -1;
 
     /// <summary>
     /// 
@@ -54,6 +42,8 @@ public sealed class DiffusionModelParameter
     public bool VaeTiling { get; set; } = false;
 
     public bool OffloadParamsToCPU { get; set; } = false;
+
+    public bool EnableMmap { get; set; } = false;
 
     /// <summary>
     /// keep clip in cpu (for low vram)
@@ -91,6 +81,9 @@ public sealed class DiffusionModelParameter
     /// </summary>
     public bool VaeConvDirect { get; set; } = false;
 
+    public bool CircularX { get; set; } = false;
+    public bool CircularY { get; set; } = false;
+
     /// <summary>
     /// RNG (default: Standard)
     /// </summary>
@@ -108,7 +101,7 @@ public sealed class DiffusionModelParameter
     /// </summary>
     public Quantization Quantization { get; set; } = Quantization.Unspecified;
 
-    public float FlowShift { get; set; } = 0;
+    public float FlowShift { get; set; } = float.PositiveInfinity;
 
     public bool ForceSdxlVaeConvScale { get; set; } = false;
 
@@ -144,12 +137,8 @@ public sealed class DiffusionModelParameter
     /// </summary>
     public string T5xxlPath { get; set; } = string.Empty;
 
-    [Obsolete("Use LLMPath instead")]
-    public string Qwen2VLPath { get => LLMPath; set => LLMPath = value; }
     public string LLMPath { get; set; } = string.Empty;
 
-    [Obsolete("Use LLMVisionPath instead")]
-    public string Qwen2VLVisionPath { get => LLMVisionPath; set => LLMVisionPath = value; }
     public string LLMVisionPath { get; set; } = string.Empty;
 
     public string ClipVisionPath { get; set; } = string.Empty;
@@ -158,6 +147,8 @@ public sealed class DiffusionModelParameter
     public bool ChromaUseDitMap { get; set; } = true;
     public bool ChromaEnableT5Map { get; set; } = false;
     public int ChromaT5MaskPad { get; set; } = 1;
+
+    public bool QwenImageZeroCondT { get; set; } = false;
 
     public static DiffusionModelParameter Create() => new();
 }

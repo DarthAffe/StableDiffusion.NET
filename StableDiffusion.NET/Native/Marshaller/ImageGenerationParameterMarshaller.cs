@@ -38,22 +38,8 @@ internal static unsafe class ImageGenerationParameterMarshaller
                 IdEmbedPath =  AnsiStringMarshaller.ConvertToManaged(unmanaged.pm_params.id_embed_path) ?? string.Empty,
                 StyleStrength = unmanaged.pm_params.style_strength,
             },
-            VaeTiling =
-            {
-                IsEnabled = unmanaged.vae_tiling_params.enabled == 1,
-                TileSizeX = unmanaged.vae_tiling_params.tile_size_x,
-                TileSizeY = unmanaged.vae_tiling_params.tile_size_y,
-                TargetOverlap = unmanaged.vae_tiling_params.target_overlap,
-                RelSizeX = unmanaged.vae_tiling_params.rel_size_x,
-                RelSizeY = unmanaged.vae_tiling_params.rel_size_y
-            },
-            EasyCache =
-            {
-                IsEnabled = unmanaged.easycache.enabled == 1,
-                ReuseThreshold = unmanaged.easycache.reuse_threshold,
-                StartPercent = unmanaged.easycache.start_percent,
-                EndPercent = unmanaged.easycache.end_percent
-            }
+            VaeTiling = TilingParameterMarshaller.ConvertToManaged(unmanaged.vae_tiling_params),
+            Cache = CacheParameterMarshaller.ConvertToManaged(unmanaged.cache)
         };
 
         for (int i = 0; i < unmanaged.lora_count; i++)
@@ -73,6 +59,8 @@ internal static unsafe class ImageGenerationParameterMarshaller
     internal ref struct ImageGenerationParameterMarshallerIn
     {
         private SampleParameterMarshaller.SampleParameterMarshallerIn _sampleParameterMarshaller = new();
+        private TilingParameterMarshaller.TilingParameterMarshallerIn _tilingParameterMarshaller = new();
+        private CacheParameterMarshaller.CacheParameterMarshallerIn _cacheParameterMarshaller = new();
         private Native.Types.sd_img_gen_params_t _imgGenParams;
 
         private Native.Types.sd_image_t _initImage;
@@ -87,6 +75,8 @@ internal static unsafe class ImageGenerationParameterMarshaller
         public void FromManaged(ImageGenerationParameter managed)
         {
             _sampleParameterMarshaller.FromManaged(managed.SampleParameter);
+            _tilingParameterMarshaller.FromManaged(managed.VaeTiling);
+            _cacheParameterMarshaller.FromManaged(managed.Cache);
 
             _initImage = managed.InitImage?.ToSdImage() ?? new Native.Types.sd_image_t();
             _controlNetImage = managed.ControlNet.Image?.ToSdImage() ?? new Native.Types.sd_image_t();
@@ -129,24 +119,6 @@ internal static unsafe class ImageGenerationParameterMarshaller
                 style_strength = managed.PhotoMaker.StyleStrength
             };
 
-            Native.Types.sd_tiling_params_t tilingParams = new()
-            {
-                enabled = (sbyte)(managed.VaeTiling.IsEnabled ? 1 : 0),
-                tile_size_x = managed.VaeTiling.TileSizeX,
-                tile_size_y = managed.VaeTiling.TileSizeY,
-                target_overlap = managed.VaeTiling.TargetOverlap,
-                rel_size_x = managed.VaeTiling.RelSizeX,
-                rel_size_y = managed.VaeTiling.RelSizeY
-            };
-
-            Native.Types.sd_easycache_params_t easyCache = new()
-            {
-                enabled = (sbyte)(managed.EasyCache.IsEnabled ? 1 : 0),
-                reuse_threshold = managed.EasyCache.ReuseThreshold,
-                start_percent = managed.EasyCache.StartPercent,
-                end_percent = managed.EasyCache.EndPercent,
-            };
-
             _imgGenParams = new Native.Types.sd_img_gen_params_t
             {
                 prompt = AnsiStringMarshaller.ConvertToUnmanaged(managed.Prompt),
@@ -166,10 +138,10 @@ internal static unsafe class ImageGenerationParameterMarshaller
                 control_image = _controlNetImage,
                 control_strength = managed.ControlNet.Strength,
                 pm_params = photoMakerParams,
-                vae_tiling_params = tilingParams,
-                easycache = easyCache,
+                vae_tiling_params = _tilingParameterMarshaller.ToUnmanaged(),
+                cache = _cacheParameterMarshaller.ToUnmanaged(),
                 loras = _loras,
-                lora_count = (uint)managed.Loras.Count
+                lora_count = (uint)managed.Loras.Count,
             };
         }
 
@@ -192,6 +164,8 @@ internal static unsafe class ImageGenerationParameterMarshaller
                 ImageHelper.Free(_pmIdImages, _imgGenParams.pm_params.id_images_count);
 
             _sampleParameterMarshaller.Free();
+            _tilingParameterMarshaller.Free();
+            _cacheParameterMarshaller.Free();
 
             for (int i = 0; i < _imgGenParams.lora_count; i++)
                 AnsiStringMarshaller.Free(_imgGenParams.loras[i].path);

@@ -20,9 +20,7 @@ public static class ParameterExtension
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameter.ThreadCount, nameof(DiffusionModelParameter.ThreadCount));
         ArgumentNullException.ThrowIfNull(parameter.VaePath, nameof(DiffusionModelParameter.VaePath));
         ArgumentNullException.ThrowIfNull(parameter.TaesdPath, nameof(DiffusionModelParameter.TaesdPath));
-        ArgumentNullException.ThrowIfNull(parameter.LoraModelDirectory, nameof(DiffusionModelParameter.LoraModelDirectory));
         ArgumentNullException.ThrowIfNull(parameter.ControlNetPath, nameof(DiffusionModelParameter.ControlNetPath));
-        ArgumentNullException.ThrowIfNull(parameter.EmbeddingsDirectory, nameof(DiffusionModelParameter.EmbeddingsDirectory));
         ArgumentNullException.ThrowIfNull(parameter.StackedIdEmbeddingsDirectory, nameof(DiffusionModelParameter.StackedIdEmbeddingsDirectory));
 
         if (!string.IsNullOrWhiteSpace(parameter.VaePath) && !string.IsNullOrWhiteSpace(parameter.TaesdPath)) throw new ArgumentException("VAE and TAESD are mutually exclusive.");
@@ -93,7 +91,6 @@ public static class ParameterExtension
 
         ArgumentOutOfRangeException.ThrowIfNegative(parameter.ImgCfg);
         ArgumentOutOfRangeException.ThrowIfNegative(parameter.DistilledGuidance);
-        ArgumentOutOfRangeException.ThrowIfNegative(parameter.MinCfg);
         ArgumentOutOfRangeException.ThrowIfNegative(parameter.TxtCfg);
 
         parameter.Slg.Validate();

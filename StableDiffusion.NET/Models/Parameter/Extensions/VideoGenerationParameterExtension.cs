@@ -85,13 +85,6 @@ public static class VideoGenerationParameterExtension
         return parameter;
     }
 
-    public static VideoGenerationParameter WithMinCfg(this VideoGenerationParameter parameter, float minCfg)
-    {
-        parameter.SampleParameter.Guidance.MinCfg = minCfg;
-
-        return parameter;
-    }
-
     public static VideoGenerationParameter WithGuidance(this VideoGenerationParameter parameter, float guidance)
     {
         parameter.SampleParameter.Guidance.DistilledGuidance = guidance;
@@ -192,13 +185,6 @@ public static class VideoGenerationParameterExtension
     public static VideoGenerationParameter WithHighNoiseImgCfg(this VideoGenerationParameter parameter, float imgCfg)
     {
         parameter.HighNoiseSampleParameter.Guidance.ImgCfg = imgCfg;
-
-        return parameter;
-    }
-
-    public static VideoGenerationParameter WithHighNoiseMinCfg(this VideoGenerationParameter parameter, float minCfg)
-    {
-        parameter.HighNoiseSampleParameter.Guidance.MinCfg = minCfg;
 
         return parameter;
     }

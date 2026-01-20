@@ -16,7 +16,7 @@ public static unsafe class StableDiffusionCpp
     private static Native.sd_preview_cb_t? _previewCallback;
     // ReSharper restore NotAccessedField.Local
 
-    public static string ExpectedSDCommit => "43a70e8";
+    public static string ExpectedSDCommit => "b87fe13";
 
     #endregion
 
@@ -51,14 +51,14 @@ public static unsafe class StableDiffusionCpp
         Native.sd_set_preview_callback(_previewCallback, mode, interval, denoised, noisy, null);
     }
 
-    public static void Convert(string modelPath, string vaePath, Quantization quantization, string outputPath, string tensorTypeRules = "")
+    public static void Convert(string modelPath, string vaePath, Quantization quantization, string outputPath, bool convertName = false, string tensorTypeRules = "")
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(nameof(modelPath));
         ArgumentException.ThrowIfNullOrWhiteSpace(nameof(outputPath));
         ArgumentNullException.ThrowIfNull(vaePath);
         if (!Enum.IsDefined(quantization)) throw new ArgumentOutOfRangeException(nameof(quantization));
 
-        Native.convert(modelPath, vaePath, outputPath, quantization, tensorTypeRules);
+        Native.convert(modelPath, vaePath, outputPath, quantization, tensorTypeRules, convertName);
     }
 
     public static string GetSystemInfo() => Native.sd_get_system_info();

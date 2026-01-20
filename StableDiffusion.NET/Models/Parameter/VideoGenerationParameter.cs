@@ -21,25 +21,27 @@ public sealed class VideoGenerationParameter
 
     public IImage[]? ControlFrames { get; set; }
 
-    public int Width { get; set; }
+    public int Width { get; set; } = 512;
 
-    public int Height { get; set; }
+    public int Height { get; set; } = 512;
 
     public SampleParameter SampleParameter { get; internal init; } = new();
 
-    public SampleParameter HighNoiseSampleParameter { get; internal init; } = new();
+    public SampleParameter HighNoiseSampleParameter { get; internal init; } = new() { SampleSteps = -1 };
 
-    public float MoeBoundry { get; set; }
+    public float MoeBoundry { get; set; } = 0.875f;
 
-    public float Strength { get; set; }
+    public float Strength { get; set; } = 0.75f;
 
-    public long Seed { get; set; }
+    public long Seed { get; set; } = -1;
 
-    public int FrameCount { get; set; }
+    public int FrameCount { get; set; } = 6;
 
-    public float VaceStrength { get; set; }
+    public float VaceStrength { get; set; } = 1.0f;
 
-    public EasyCache EasyCache { get; } = new();
+    public TilingParameter VaeTiling { get; internal init; } = new();
+
+    public CacheParameter Cache { get; internal init; } = new();
 
     public List<Lora> Loras { get; } = [];
 

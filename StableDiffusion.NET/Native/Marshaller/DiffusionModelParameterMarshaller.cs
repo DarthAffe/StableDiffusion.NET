@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
 namespace StableDiffusion.NET;
@@ -26,7 +24,6 @@ internal static unsafe class DiffusionModelParameterMarshaller
             VaePath = AnsiStringMarshaller.ConvertToManaged(unmanaged.vae_path) ?? string.Empty,
             TaesdPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.taesd_path) ?? string.Empty,
             ControlNetPath = AnsiStringMarshaller.ConvertToManaged(unmanaged.control_net_path) ?? string.Empty,
-            LoraModelDirectory = AnsiStringMarshaller.ConvertToManaged(unmanaged.lora_model_dir) ?? string.Empty,
             StackedIdEmbeddingsDirectory = AnsiStringMarshaller.ConvertToManaged(unmanaged.photo_maker_path) ?? string.Empty,
             TensorTypeRules = AnsiStringMarshaller.ConvertToManaged(unmanaged.tensor_type_rules) ?? string.Empty,
             VaeDecodeOnly = unmanaged.vae_decode_only == 1,
@@ -38,6 +35,7 @@ internal static unsafe class DiffusionModelParameterMarshaller
             Prediction = unmanaged.prediction,
             LoraApplyMode = unmanaged.lora_apply_mode,
             OffloadParamsToCPU = unmanaged.offload_params_to_cpu == 1,
+            EnableMmap = unmanaged.enable_mmap == 1,
             KeepClipOnCPU = unmanaged.keep_clip_on_cpu == 1,
             KeepControlNetOnCPU = unmanaged.keep_control_net_on_cpu == 1,
             KeepVaeOnCPU = unmanaged.keep_vae_on_cpu == 1,
@@ -45,10 +43,13 @@ internal static unsafe class DiffusionModelParameterMarshaller
             TaePreviewOnly = unmanaged.tae_preview_only == 1,
             DiffusionConvDirect = unmanaged.diffusion_conv_direct == 1,
             VaeConvDirect = unmanaged.vae_conv_direct == 1,
+            CircularX = unmanaged.circular_x == 1,
+            CircularY = unmanaged.circular_y == 1,
             ForceSdxlVaeConvScale = unmanaged.force_sdxl_vae_conv_scale == 1,
             ChromaUseDitMap = unmanaged.chroma_use_dit_mask == 1,
             ChromaEnableT5Map = unmanaged.chroma_use_t5_mask == 1,
             ChromaT5MaskPad = unmanaged.chroma_t5_mask_pad,
+            QwenImageZeroCondT = unmanaged.qwen_image_zero_cond_t == 1,
             FlowShift = unmanaged.flow_shift
         };
 
@@ -75,46 +76,17 @@ internal static unsafe class DiffusionModelParameterMarshaller
 
         public void FromManaged(DiffusionModelParameter managed)
         {
-            //_embeddings = (Native.Types.sd_embedding_t*)NativeMemory.Alloc((nuint)managed.Embeddings.Count, (nuint)Marshal.SizeOf<Native.Types.sd_embedding_t>());
+            _embeddings = (Native.Types.sd_embedding_t*)NativeMemory.Alloc((nuint)managed.Embeddings.Count, (nuint)Marshal.SizeOf<Native.Types.sd_embedding_t>());
 
-            //for (int i = 0; i < managed.Embeddings.Count; i++)
-            //{
-            //    Embedding embedding = managed.Embeddings[i];
-
-            //    _embeddings[i] = new Native.Types.sd_embedding_t
-            //    {
-            //        name = AnsiStringMarshaller.ConvertToUnmanaged(embedding.Name),
-            //        path = AnsiStringMarshaller.ConvertToUnmanaged(embedding.Path),
-            //    };
-            //}
-
-            //HACK DarthAffe 25.12.2025 Workaround to support EmbeddingsDir till the next major release
-            List<Embedding> embeddings = [];
+            for (int i = 0; i < managed.Embeddings.Count; i++)
             {
-                embeddings.AddRange(managed.Embeddings);
+                Embedding embedding = managed.Embeddings[i];
 
-                try
+                _embeddings[i] = new Native.Types.sd_embedding_t
                 {
-                    if (!string.IsNullOrWhiteSpace(managed.EmbeddingsDirectory) && Directory.Exists(managed.EmbeddingsDirectory))
-                    {
-                        foreach (string file in Directory.GetFiles(managed.EmbeddingsDirectory))
-                            embeddings.Add(new Embedding(Path.GetFileNameWithoutExtension(file), file));
-                    }
-                }
-                catch { /**/ }
-
-                _embeddings = (Native.Types.sd_embedding_t*)NativeMemory.Alloc((nuint)embeddings.Count, (nuint)Marshal.SizeOf<Native.Types.sd_embedding_t>());
-
-                for (int i = 0; i < embeddings.Count; i++)
-                {
-                    Embedding embedding = embeddings[i];
-
-                    _embeddings[i] = new Native.Types.sd_embedding_t
-                    {
-                        name = AnsiStringMarshaller.ConvertToUnmanaged(embedding.Name),
-                        path = AnsiStringMarshaller.ConvertToUnmanaged(embedding.Path),
-                    };
-                }
+                    name = AnsiStringMarshaller.ConvertToUnmanaged(embedding.Name),
+                    path = AnsiStringMarshaller.ConvertToUnmanaged(embedding.Path),
+                };
             }
 
             _ctxParams = new Native.Types.sd_ctx_params_t
@@ -131,9 +103,8 @@ internal static unsafe class DiffusionModelParameterMarshaller
                 vae_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.VaePath),
                 taesd_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.TaesdPath),
                 control_net_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.ControlNetPath),
-                lora_model_dir = AnsiStringMarshaller.ConvertToUnmanaged(managed.LoraModelDirectory),
                 embeddings = _embeddings,
-                embedding_count = (uint)embeddings.Count,
+                embedding_count = (uint)managed.Embeddings.Count,
                 photo_maker_path = AnsiStringMarshaller.ConvertToUnmanaged(managed.StackedIdEmbeddingsDirectory),
                 tensor_type_rules = AnsiStringMarshaller.ConvertToUnmanaged(managed.TensorTypeRules),
                 vae_decode_only = (sbyte)(managed.VaeDecodeOnly ? 1 : 0),
@@ -145,6 +116,7 @@ internal static unsafe class DiffusionModelParameterMarshaller
                 prediction = managed.Prediction,
                 lora_apply_mode = managed.LoraApplyMode,
                 offload_params_to_cpu = (sbyte)(managed.OffloadParamsToCPU ? 1 : 0),
+                enable_mmap = (sbyte)(managed.EnableMmap ? 1 : 0),
                 keep_clip_on_cpu = (sbyte)(managed.KeepClipOnCPU ? 1 : 0),
                 keep_control_net_on_cpu = (sbyte)(managed.KeepControlNetOnCPU ? 1 : 0),
                 keep_vae_on_cpu = (sbyte)(managed.KeepVaeOnCPU ? 1 : 0),
@@ -152,10 +124,13 @@ internal static unsafe class DiffusionModelParameterMarshaller
                 tae_preview_only = (sbyte)(managed.TaePreviewOnly ? 1 : 0),
                 diffusion_conv_direct = (sbyte)(managed.DiffusionConvDirect ? 1 : 0),
                 vae_conv_direct = (sbyte)(managed.VaeConvDirect ? 1 : 0),
+                circular_x = (sbyte)(managed.CircularX ? 1 : 0),
+                circular_y = (sbyte)(managed.CircularY ? 1 : 0),
                 force_sdxl_vae_conv_scale = (sbyte)(managed.ForceSdxlVaeConvScale ? 1 : 0),
                 chroma_use_dit_mask = (sbyte)(managed.ChromaUseDitMap ? 1 : 0),
                 chroma_use_t5_mask = (sbyte)(managed.ChromaEnableT5Map ? 1 : 0),
                 chroma_t5_mask_pad = managed.ChromaT5MaskPad,
+                qwen_image_zero_cond_t = (sbyte)(managed.QwenImageZeroCondT ? 1 : 0),
                 flow_shift = managed.FlowShift
             };
         }
@@ -164,7 +139,6 @@ internal static unsafe class DiffusionModelParameterMarshaller
 
         public void Free()
         {
-
             AnsiStringMarshaller.Free(_ctxParams.model_path);
             AnsiStringMarshaller.Free(_ctxParams.clip_l_path);
             AnsiStringMarshaller.Free(_ctxParams.clip_g_path);
@@ -175,7 +149,6 @@ internal static unsafe class DiffusionModelParameterMarshaller
             AnsiStringMarshaller.Free(_ctxParams.vae_path);
             AnsiStringMarshaller.Free(_ctxParams.taesd_path);
             AnsiStringMarshaller.Free(_ctxParams.control_net_path);
-            AnsiStringMarshaller.Free(_ctxParams.lora_model_dir);
             AnsiStringMarshaller.Free(_ctxParams.photo_maker_path);
             AnsiStringMarshaller.Free(_ctxParams.tensor_type_rules);
 

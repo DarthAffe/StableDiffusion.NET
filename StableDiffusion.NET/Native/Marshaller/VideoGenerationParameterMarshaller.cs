@@ -29,13 +29,8 @@ internal static unsafe class VideoGenerationParameterMarshaller
             Seed = unmanaged.seed,
             FrameCount = unmanaged.video_frames,
             VaceStrength = unmanaged.vace_strength,
-            EasyCache =
-            {
-                IsEnabled = unmanaged.easycache.enabled == 1,
-                ReuseThreshold = unmanaged.easycache.reuse_threshold,
-                StartPercent = unmanaged.easycache.start_percent,
-                EndPercent = unmanaged.easycache.end_percent
-            }
+            VaeTiling = TilingParameterMarshaller.ConvertToManaged(unmanaged.vae_tiling_params),
+            Cache = CacheParameterMarshaller.ConvertToManaged(unmanaged.cache),
         };
 
         for (int i = 0; i < unmanaged.lora_count; i++)
@@ -55,7 +50,9 @@ internal static unsafe class VideoGenerationParameterMarshaller
     internal ref struct VideoGenerationParameterMarshallerIn
     {
         private SampleParameterMarshaller.SampleParameterMarshallerIn _sampleParameterMarshaller = new();
+        private TilingParameterMarshaller.TilingParameterMarshallerIn _tilingParameterMarshaller = new();
         private SampleParameterMarshaller.SampleParameterMarshallerIn _highNoiseSampleParameterMarshaller = new();
+        private CacheParameterMarshaller.CacheParameterMarshallerIn _cacheParameterMarshaller = new();
         private Native.Types.sd_vid_gen_params_t _vidGenParams;
 
         private Native.Types.sd_image_t _initImage;
@@ -68,7 +65,9 @@ internal static unsafe class VideoGenerationParameterMarshaller
         public void FromManaged(VideoGenerationParameter managed)
         {
             _sampleParameterMarshaller.FromManaged(managed.SampleParameter);
+            _tilingParameterMarshaller.FromManaged(managed.VaeTiling);
             _highNoiseSampleParameterMarshaller.FromManaged(managed.HighNoiseSampleParameter);
+            _cacheParameterMarshaller.FromManaged(managed.Cache);
 
             _initImage = managed.InitImage?.ToSdImage() ?? new Native.Types.sd_image_t();
             _endImage = managed.EndImage?.ToSdImage() ?? new Native.Types.sd_image_t();
@@ -85,14 +84,6 @@ internal static unsafe class VideoGenerationParameterMarshaller
                     path = AnsiStringMarshaller.ConvertToUnmanaged(lora.Path)
                 };
             }
-
-            Native.Types.sd_easycache_params_t easyCache = new()
-            {
-                enabled = (sbyte)(managed.EasyCache.IsEnabled ? 1 : 0),
-                reuse_threshold = managed.EasyCache.ReuseThreshold,
-                start_percent = managed.EasyCache.StartPercent,
-                end_percent = managed.EasyCache.EndPercent,
-            };
 
             _vidGenParams = new Native.Types.sd_vid_gen_params_t
             {
@@ -112,7 +103,8 @@ internal static unsafe class VideoGenerationParameterMarshaller
                 seed = managed.Seed,
                 video_frames = managed.FrameCount,
                 vace_strength = managed.VaceStrength,
-                easycache = easyCache,
+                vae_tiling_params = _tilingParameterMarshaller.ToUnmanaged(),
+                cache = _cacheParameterMarshaller.ToUnmanaged(),
                 loras = _loras,
                 lora_count = (uint)managed.Loras.Count
             };
@@ -132,7 +124,9 @@ internal static unsafe class VideoGenerationParameterMarshaller
                 ImageHelper.Free(_controlFrames, _vidGenParams.control_frames_size);
 
             _sampleParameterMarshaller.Free();
+            _tilingParameterMarshaller.Free();
             _highNoiseSampleParameterMarshaller.Free();
+            _cacheParameterMarshaller.Free();
 
             for (int i = 0; i < _vidGenParams.lora_count; i++)
                 AnsiStringMarshaller.Free(_vidGenParams.loras[i].path);

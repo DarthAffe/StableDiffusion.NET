@@ -10,6 +10,7 @@ public enum Scheduler
     SGM_Uniform,
     Simple,
     Smoothstep,
+    KlOptimal,
     LCM,
     Default
 }

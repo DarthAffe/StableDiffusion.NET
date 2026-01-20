@@ -28,25 +28,6 @@ public static class DiffusionModelBuilderExtension
         return parameter;
     }
 
-    public static DiffusionModelParameter WithLoraSupport(this DiffusionModelParameter parameter, string loraModelDirectory)
-    {
-        ArgumentNullException.ThrowIfNull(loraModelDirectory);
-
-        parameter.LoraModelDirectory = loraModelDirectory;
-
-        return parameter;
-    }
-
-    [Obsolete("Use WithEmbedding instead")]
-    public static DiffusionModelParameter WithEmbeddingSupport(this DiffusionModelParameter parameter, string embeddingsDirectory)
-    {
-        ArgumentNullException.ThrowIfNull(embeddingsDirectory);
-
-        parameter.EmbeddingsDirectory = embeddingsDirectory;
-
-        return parameter;
-    }
-
     public static DiffusionModelParameter WithEmbedding(this DiffusionModelParameter parameter, Embedding embedding)
     {
         ArgumentNullException.ThrowIfNull(embedding);
@@ -246,8 +227,6 @@ public static class DiffusionModelBuilderExtension
         return parameter;
     }
 
-    [Obsolete("Use WithLLMPath instead")]
-    public static DiffusionModelParameter WithQwen2VLPath(this DiffusionModelParameter parameter, string qwen2VLPath) => parameter.WithLLMPath(qwen2VLPath);
     public static DiffusionModelParameter WithLLMPath(this DiffusionModelParameter parameter, string llmPath)
     {
         parameter.LLMPath = llmPath;
@@ -255,8 +234,6 @@ public static class DiffusionModelBuilderExtension
         return parameter;
     }
 
-    [Obsolete("Use WithLLMVisionPath instead")]
-    public static DiffusionModelParameter WithQwen2VLVisionPath(this DiffusionModelParameter parameter, string qwen2VLVisionPath) => parameter.WithLLMVisionPath(qwen2VLVisionPath);
     public static DiffusionModelParameter WithLLMVisionPath(this DiffusionModelParameter parameter, string llmVisionPath)
     {
         parameter.LLMVisionPath = llmVisionPath;
