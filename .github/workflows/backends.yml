@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -58,7 +58,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -100,7 +100,7 @@ jobs:
     steps:          
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -183,7 +183,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -230,7 +230,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -263,7 +263,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -304,7 +304,7 @@ jobs:
     
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -331,7 +331,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -376,10 +376,13 @@ jobs:
    
     steps:
       - run: apt-get update && apt-get install -y git
-      - name: Clone
+      
+      - name: Checkout
         id: checkout
         uses: actions/checkout@v6
         with:
+          repository: 'leejet/stable-diffusion.cpp'
+          ref: '${{ github.event.inputs.commit }}'
           submodules: recursive
 
       - name: Free disk space
@@ -483,7 +486,7 @@ jobs:
     steps:          
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
         with:
           repository: 'leejet/stable-diffusion.cpp'
           ref: '${{ github.event.inputs.commit }}'
@@ -523,7 +526,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
       
       - name: Download artifacts
         id: download_artifacts
