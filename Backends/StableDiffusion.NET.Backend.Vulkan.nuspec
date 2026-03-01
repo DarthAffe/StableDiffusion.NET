@@ -19,6 +19,7 @@
     <file src="StableDiffusion.NET.Backend.props" target="build/net8.0/StableDiffusion.NET.Backend.Vulkan.props" />
 
     <file src="windows-vulkan/stable-diffusion.dll" target="runtimes\win-x64\native\vulkan\stable-diffusion.dll" />
+    <file src="linux-vulkan/stable-diffusion.dll" target="runtimes\linux-x64\native\vulkan\stable-diffusion.dll" />
     
     <file src="sd_net_vulkan.png" target="sd_net_vulkan.png" />
     <file src="readme.md" target="readme.md" />

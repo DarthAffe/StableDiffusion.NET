@@ -13,7 +13,7 @@ public class VulkanBackend : IBackend
 
     public int Priority { get; set; } = 5;
 
-    public bool IsAvailable => RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+    public bool IsAvailable => (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                             && (RuntimeInformation.OSArchitecture == Architecture.X64);
 
     public string PathPart => "vulkan";

@@ -535,6 +535,7 @@ jobs:
       - windows-hip
       - windows-vulkan
       - linux-cpu
+      - linux-wulkan
       - linux-cuda12
       - linux-sycl
       - linux-hip
