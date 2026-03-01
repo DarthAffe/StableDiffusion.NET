@@ -161,6 +161,13 @@ public static class VideoGenerationParameterExtension
         return parameter;
     }
 
+    public static VideoGenerationParameter WithFlowShift(this VideoGenerationParameter parameter, float flowShift)
+    {
+        parameter.SampleParameter.FlowShift = flowShift;
+
+        return parameter;
+    }
+
     #endregion
 
     #region HighNoiseSampleParameter

@@ -120,6 +120,13 @@ public static class DiffusionModelBuilderExtension
         return parameter;
     }
 
+    public static DiffusionModelParameter WithDiffusionFlashAttention(this DiffusionModelParameter parameter, bool flashAttention = true)
+    {
+        parameter.DiffusionFlashAttention = flashAttention;
+
+        return parameter;
+    }
+
     public static DiffusionModelParameter WithDiffusionConvDirect(this DiffusionModelParameter parameter, bool diffusionConvDirect = true)
     {
         parameter.DiffusionConvDirect = diffusionConvDirect;
@@ -155,13 +162,6 @@ public static class DiffusionModelBuilderExtension
         if (!Enum.IsDefined(quantization)) throw new ArgumentOutOfRangeException(nameof(quantization));
 
         parameter.Quantization = quantization;
-
-        return parameter;
-    }
-
-    public static DiffusionModelParameter WithFlowShift(this DiffusionModelParameter parameter, float flowShift)
-    {
-        parameter.FlowShift = flowShift;
 
         return parameter;
     }

@@ -48,6 +48,8 @@ enum sample_method_t {
     LCM_SAMPLE_METHOD,
     DDIM_TRAILING_SAMPLE_METHOD,
     TCD_SAMPLE_METHOD,
+    RES_MULTISTEP_SAMPLE_METHOD,
+    RES_2S_SAMPLE_METHOD,
     SAMPLE_METHOD_COUNT
 };
 
@@ -62,6 +64,7 @@ enum scheduler_t {
     SMOOTHSTEP_SCHEDULER,
     KL_OPTIMAL_SCHEDULER,
     LCM_SCHEDULER,
+    BONG_TANGENT_SCHEDULER,
     SCHEDULER_COUNT
 };
 
@@ -186,6 +189,7 @@ typedef struct {
     bool keep_clip_on_cpu;
     bool keep_control_net_on_cpu;
     bool keep_vae_on_cpu;
+    bool flash_attn;
     bool diffusion_flash_attn;
     bool tae_preview_only;
     bool diffusion_conv_direct;
@@ -197,7 +201,7 @@ typedef struct {
     bool chroma_use_t5_mask;
     int chroma_t5_mask_pad;
     bool qwen_image_zero_cond_t;
-    float flow_shift;
+					 
 } sd_ctx_params_t;
 
 typedef struct {
@@ -231,6 +235,7 @@ typedef struct {
     int shifted_timestep;
     float* custom_sigmas;
     int custom_sigmas_count;
+    float flow_shift;
 } sd_sample_params_t;
 
 typedef struct {

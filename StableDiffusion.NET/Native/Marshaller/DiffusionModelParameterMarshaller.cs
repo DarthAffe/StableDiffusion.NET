@@ -39,7 +39,8 @@ internal static unsafe class DiffusionModelParameterMarshaller
             KeepClipOnCPU = unmanaged.keep_clip_on_cpu == 1,
             KeepControlNetOnCPU = unmanaged.keep_control_net_on_cpu == 1,
             KeepVaeOnCPU = unmanaged.keep_vae_on_cpu == 1,
-            FlashAttention = unmanaged.diffusion_flash_attn == 1,
+            DiffusionFlashAttention = unmanaged.diffusion_flash_attn == 1,
+            FlashAttention = unmanaged.flash_attn == 1,
             TaePreviewOnly = unmanaged.tae_preview_only == 1,
             DiffusionConvDirect = unmanaged.diffusion_conv_direct == 1,
             VaeConvDirect = unmanaged.vae_conv_direct == 1,
@@ -50,7 +51,6 @@ internal static unsafe class DiffusionModelParameterMarshaller
             ChromaEnableT5Map = unmanaged.chroma_use_t5_mask == 1,
             ChromaT5MaskPad = unmanaged.chroma_t5_mask_pad,
             QwenImageZeroCondT = unmanaged.qwen_image_zero_cond_t == 1,
-            FlowShift = unmanaged.flow_shift
         };
 
         for (int i = 0; i < unmanaged.embedding_count; i++)
@@ -120,7 +120,8 @@ internal static unsafe class DiffusionModelParameterMarshaller
                 keep_clip_on_cpu = (sbyte)(managed.KeepClipOnCPU ? 1 : 0),
                 keep_control_net_on_cpu = (sbyte)(managed.KeepControlNetOnCPU ? 1 : 0),
                 keep_vae_on_cpu = (sbyte)(managed.KeepVaeOnCPU ? 1 : 0),
-                diffusion_flash_attn = (sbyte)(managed.FlashAttention ? 1 : 0),
+                diffusion_flash_attn = (sbyte)(managed.DiffusionFlashAttention ? 1 : 0),
+                flash_attn = (sbyte)(managed.FlashAttention ? 1 : 0),
                 tae_preview_only = (sbyte)(managed.TaePreviewOnly ? 1 : 0),
                 diffusion_conv_direct = (sbyte)(managed.DiffusionConvDirect ? 1 : 0),
                 vae_conv_direct = (sbyte)(managed.VaeConvDirect ? 1 : 0),
@@ -130,8 +131,7 @@ internal static unsafe class DiffusionModelParameterMarshaller
                 chroma_use_dit_mask = (sbyte)(managed.ChromaUseDitMap ? 1 : 0),
                 chroma_use_t5_mask = (sbyte)(managed.ChromaEnableT5Map ? 1 : 0),
                 chroma_t5_mask_pad = managed.ChromaT5MaskPad,
-                qwen_image_zero_cond_t = (sbyte)(managed.QwenImageZeroCondT ? 1 : 0),
-                flow_shift = managed.FlowShift
+                qwen_image_zero_cond_t = (sbyte)(managed.QwenImageZeroCondT ? 1 : 0)
             };
         }
 

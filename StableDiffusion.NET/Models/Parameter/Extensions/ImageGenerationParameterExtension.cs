@@ -175,6 +175,13 @@ public static class ImageGenerationParameterExtension
         return parameter;
     }
 
+    public static ImageGenerationParameter WithFlowShift(this ImageGenerationParameter parameter, float flowShift)
+    {
+        parameter.SampleParameter.FlowShift = flowShift;
+
+        return parameter;
+    }
+
     #endregion
 
     public static ImageGenerationParameter WithStrength(this ImageGenerationParameter parameter, float strength)

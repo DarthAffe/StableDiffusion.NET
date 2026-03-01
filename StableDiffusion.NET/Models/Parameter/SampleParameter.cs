@@ -28,5 +28,7 @@ public sealed class SampleParameter
 
     public float[] CustomSigmas { get; set; } = [];
 
+    public float FlowShift { get; set; } = float.PositiveInfinity;
+
     internal SampleParameter() { }
 }

@@ -92,6 +92,7 @@ internal unsafe partial class Native
             public sbyte keep_clip_on_cpu;
             public sbyte keep_control_net_on_cpu;
             public sbyte keep_vae_on_cpu;
+            public sbyte flash_attn;
             public sbyte diffusion_flash_attn;
             public sbyte tae_preview_only;
             public sbyte diffusion_conv_direct;
@@ -103,7 +104,6 @@ internal unsafe partial class Native
             public sbyte chroma_use_t5_mask;
             public int chroma_t5_mask_pad;
             public sbyte qwen_image_zero_cond_t;
-            public float flow_shift;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -145,6 +145,7 @@ internal unsafe partial class Native
             public int shifted_timestep;
             public float* custom_sigmas;
             public int custom_sigmas_count;
+            public float flow_shift;
         }
 
         [StructLayout(LayoutKind.Sequential)]
