@@ -33,7 +33,8 @@ internal static unsafe class SampleParameterMarshaller
             SampleSteps = unmanaged.sample_steps,
             Eta = unmanaged.eta,
             ShiftedTimestep = unmanaged.shifted_timestep,
-            CustomSigmas = new float[unmanaged.custom_sigmas_count]
+            CustomSigmas = new float[unmanaged.custom_sigmas_count],
+            FlowShift = unmanaged.flow_shift
         };
 
         if (unmanaged.guidance.slg.layers != null)
@@ -86,7 +87,8 @@ internal static unsafe class SampleParameterMarshaller
                 eta = managed.Eta,
                 shifted_timestep = managed.ShiftedTimestep,
                 custom_sigmas = _customSigmas,
-                custom_sigmas_count = managed.CustomSigmas.Length
+                custom_sigmas_count = managed.CustomSigmas.Length,
+                flow_shift = managed.FlowShift
             };
         }
 

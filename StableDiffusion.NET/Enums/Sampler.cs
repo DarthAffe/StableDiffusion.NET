@@ -14,5 +14,7 @@ public enum Sampler
     LCM,
     DDIM_Trailing,
     TCD,
+    ResMultistep,
+    Res2S,
     Default
 }

@@ -12,5 +12,6 @@ public enum Scheduler
     Smoothstep,
     KlOptimal,
     LCM,
+    BongTangent,
     Default
 }

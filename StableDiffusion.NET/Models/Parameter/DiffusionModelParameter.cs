@@ -60,12 +60,14 @@ public sealed class DiffusionModelParameter
     /// </summary>
     public bool KeepVaeOnCPU { get; set; } = false;
 
+    public bool FlashAttention { get; set; } = false;
+
     /// <summary>
     /// use flash attention in the diffusion model (for low vram)
     /// Might lower quality, since it implies converting k and v to f16.
     /// This might crash if it is not supported by the backend.
     /// </summary>
-    public bool FlashAttention { get; set; } = false;
+    public bool DiffusionFlashAttention { get; set; } = false;
 
     public bool TaePreviewOnly { get; set; } = false;
 
@@ -100,8 +102,6 @@ public sealed class DiffusionModelParameter
     /// not really useful in most cases
     /// </summary>
     public Quantization Quantization { get; set; } = Quantization.Unspecified;
-
-    public float FlowShift { get; set; } = float.PositiveInfinity;
 
     public bool ForceSdxlVaeConvScale { get; set; } = false;
 
