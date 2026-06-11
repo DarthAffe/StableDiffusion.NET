@@ -62,6 +62,8 @@ public sealed class ImageGenerationParameter
 
     public CacheParameter Cache { get; internal init; } = new();
 
+    public HiresParameter Hires { get; internal set; } = new();
+
     public List<Lora> Loras { get; } = [];
 
     #endregion

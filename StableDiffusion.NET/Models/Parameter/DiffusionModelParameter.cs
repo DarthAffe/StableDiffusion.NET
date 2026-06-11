@@ -150,5 +150,7 @@ public sealed class DiffusionModelParameter
 
     public bool QwenImageZeroCondT { get; set; } = false;
 
+    public float MaxVRam { get; set; }
+
     public static DiffusionModelParameter Create() => new();
 }

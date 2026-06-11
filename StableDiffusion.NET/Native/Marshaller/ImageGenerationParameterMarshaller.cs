@@ -39,7 +39,8 @@ internal static unsafe class ImageGenerationParameterMarshaller
                 StyleStrength = unmanaged.pm_params.style_strength,
             },
             VaeTiling = TilingParameterMarshaller.ConvertToManaged(unmanaged.vae_tiling_params),
-            Cache = CacheParameterMarshaller.ConvertToManaged(unmanaged.cache)
+            Cache = CacheParameterMarshaller.ConvertToManaged(unmanaged.cache),
+            Hires = HiresParameterMarshaller.ConvertToManaged(unmanaged.hires)
         };
 
         for (int i = 0; i < unmanaged.lora_count; i++)
@@ -61,6 +62,7 @@ internal static unsafe class ImageGenerationParameterMarshaller
         private SampleParameterMarshaller.SampleParameterMarshallerIn _sampleParameterMarshaller = new();
         private TilingParameterMarshaller.TilingParameterMarshallerIn _tilingParameterMarshaller = new();
         private CacheParameterMarshaller.CacheParameterMarshallerIn _cacheParameterMarshaller = new();
+        private HiresParameterMarshaller.HiresParameterMarshallerIn _hiresParameterMarshaller = new();
         private Native.Types.sd_img_gen_params_t _imgGenParams;
 
         private Native.Types.sd_image_t _initImage;
@@ -77,6 +79,7 @@ internal static unsafe class ImageGenerationParameterMarshaller
             _sampleParameterMarshaller.FromManaged(managed.SampleParameter);
             _tilingParameterMarshaller.FromManaged(managed.VaeTiling);
             _cacheParameterMarshaller.FromManaged(managed.Cache);
+            _hiresParameterMarshaller.FromManaged(managed.Hires);
 
             _initImage = managed.InitImage?.ToSdImage() ?? new Native.Types.sd_image_t();
             _controlNetImage = managed.ControlNet.Image?.ToSdImage() ?? new Native.Types.sd_image_t();
@@ -140,6 +143,7 @@ internal static unsafe class ImageGenerationParameterMarshaller
                 pm_params = photoMakerParams,
                 vae_tiling_params = _tilingParameterMarshaller.ToUnmanaged(),
                 cache = _cacheParameterMarshaller.ToUnmanaged(),
+                hires = _hiresParameterMarshaller.ToUnmanaged(),
                 loras = _loras,
                 lora_count = (uint)managed.Loras.Count,
             };
@@ -166,6 +170,7 @@ internal static unsafe class ImageGenerationParameterMarshaller
             _sampleParameterMarshaller.Free();
             _tilingParameterMarshaller.Free();
             _cacheParameterMarshaller.Free();
+            _hiresParameterMarshaller.Free();
 
             for (int i = 0; i < _imgGenParams.lora_count; i++)
                 AnsiStringMarshaller.Free(_imgGenParams.loras[i].path);

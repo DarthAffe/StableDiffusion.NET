@@ -30,7 +30,14 @@ internal static unsafe class CacheParameterMarshaller
             TaylorseerNDerivatives = unmanaged.taylorseer_n_derivatives,
             TaylorseerSkipInterval = unmanaged.taylorseer_skip_interval,
             ScmMask = AnsiStringMarshaller.ConvertToManaged(unmanaged.scm_mask),
-            ScmPolicyDynamic = unmanaged.scm_policy_dynamic == 1
+            ScmPolicyDynamic = unmanaged.scm_policy_dynamic == 1,
+            SpectrumW = unmanaged.spectrum_w,
+            SpectrumM = unmanaged.spectrum_m,
+            SpectrumLam = unmanaged.spectrum_lam,
+            SpectrumWindowSize = unmanaged.spectrum_window_size,
+            SpectrumFlexWindow = unmanaged.spectrum_flex_window,
+            SpectrumWarmupSteps = unmanaged.spectrum_warmup_steps,
+            SpectrumStopPercent = unmanaged.spectrum_stop_percent
         };
 
         return parameter;
@@ -39,7 +46,7 @@ internal static unsafe class CacheParameterMarshaller
     internal ref struct CacheParameterMarshallerIn
     {
         private Native.Types.sd_cache_params_t _cacheParams;
-        
+
         public void FromManaged(CacheParameter managed)
         {
 
@@ -61,7 +68,14 @@ internal static unsafe class CacheParameterMarshaller
                 taylorseer_n_derivatives = managed.TaylorseerNDerivatives,
                 taylorseer_skip_interval = managed.TaylorseerSkipInterval,
                 scm_mask = AnsiStringMarshaller.ConvertToUnmanaged(managed.ScmMask),
-                scm_policy_dynamic = (sbyte)(managed.ScmPolicyDynamic ? 1 : 0)
+                scm_policy_dynamic = (sbyte)(managed.ScmPolicyDynamic ? 1 : 0),
+                spectrum_w = managed.SpectrumW,
+                spectrum_m = managed.SpectrumM,
+                spectrum_lam = managed.SpectrumLam,
+                spectrum_window_size = managed.SpectrumWindowSize,
+                spectrum_flex_window = managed.SpectrumFlexWindow,
+                spectrum_warmup_steps = managed.SpectrumWarmupSteps,
+                spectrum_stop_percent = managed.SpectrumStopPercent
             };
         }
 

@@ -16,5 +16,6 @@ public enum Sampler
     TCD,
     ResMultistep,
     Res2S,
+    ER_SDE,
     Default
 }

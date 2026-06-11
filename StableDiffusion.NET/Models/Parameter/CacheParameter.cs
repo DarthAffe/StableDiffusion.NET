@@ -22,6 +22,13 @@ public sealed class CacheParameter
     public int TaylorseerSkipInterval { get; set; } = 1;
     public string? ScmMask { get; set; } = null;
     public bool ScmPolicyDynamic { get; set; } = true;
+    public float SpectrumW { get; set; }
+    public int SpectrumM { get; set; }
+    public float SpectrumLam { get; set; }
+    public int SpectrumWindowSize { get; set; }
+    public float SpectrumFlexWindow { get; set; }
+    public int SpectrumWarmupSteps { get; set; }
+    public float SpectrumStopPercent { get; set; }
 
     internal CacheParameter() { }
 }

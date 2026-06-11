@@ -16,7 +16,7 @@ public static unsafe class StableDiffusionCpp
     private static Native.sd_preview_cb_t? _previewCallback;
     // ReSharper restore NotAccessedField.Local
 
-    public static string ExpectedSDCommit => "5792c66";
+    public static string ExpectedSDCommit => "90e87bc";
 
     #endregion
 

@@ -8,4 +8,5 @@ public enum CacheMode
     DBCache,
     Taylorseer,
     CacheDit,
+    Spectrum,
 }

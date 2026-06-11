@@ -15,6 +15,9 @@ public sealed unsafe class DiffusionModel : IDisposable
 
     private Native.Types.sd_ctx_t* _ctx;
 
+    public bool SupportsImageGeneration => Native.sd_ctx_supports_image_generation(_ctx);
+    public bool SupportsVideoGeneration => Native.sd_ctx_supports_video_generation(_ctx);
+
     #endregion
 
     #region Constructors
@@ -50,7 +53,7 @@ public sealed unsafe class DiffusionModel : IDisposable
         if (_ctx == null) throw new NullReferenceException("The model is not initialized.");
 
         parameter.Validate();
-        
+
         Native.Types.sd_image_t* result = Native.generate_image(_ctx, parameter);
         if (result == null) return null;
 

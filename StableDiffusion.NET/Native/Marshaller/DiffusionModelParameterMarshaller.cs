@@ -51,6 +51,7 @@ internal static unsafe class DiffusionModelParameterMarshaller
             ChromaEnableT5Map = unmanaged.chroma_use_t5_mask == 1,
             ChromaT5MaskPad = unmanaged.chroma_t5_mask_pad,
             QwenImageZeroCondT = unmanaged.qwen_image_zero_cond_t == 1,
+            MaxVRam = unmanaged.max_vram
         };
 
         for (int i = 0; i < unmanaged.embedding_count; i++)
@@ -131,7 +132,8 @@ internal static unsafe class DiffusionModelParameterMarshaller
                 chroma_use_dit_mask = (sbyte)(managed.ChromaUseDitMap ? 1 : 0),
                 chroma_use_t5_mask = (sbyte)(managed.ChromaEnableT5Map ? 1 : 0),
                 chroma_t5_mask_pad = managed.ChromaT5MaskPad,
-                qwen_image_zero_cond_t = (sbyte)(managed.QwenImageZeroCondT ? 1 : 0)
+                qwen_image_zero_cond_t = (sbyte)(managed.QwenImageZeroCondT ? 1 : 0),
+                max_vram = managed.MaxVRam
             };
         }
 

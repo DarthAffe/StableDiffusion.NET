@@ -11,22 +11,24 @@ namespace StableDiffusion.NET;
 
 using int32_t = int;
 using int64_t = long;
+using lora_apply_mode_t = LoraApplyMode;
+using prediction_t = Prediction;
+using preview_t = Preview;
 using rng_type_t = RngType;
 using sample_method_t = Sampler;
 using scheduler_t = Scheduler;
-using prediction_t = Prediction;
 using sd_cache_mode_t = CacheMode;
 using sd_cache_params_t = CacheParameter;
+using sd_hires_params_t = HiresParameter;
 using sd_ctx_params_t = DiffusionModelParameter;
 using sd_ctx_t = Native.Types.sd_ctx_t;
+using sd_hires_upscaler_t = HiresUpscaler;
 using sd_image_t = Native.Types.sd_image_t;
-using sd_sample_params_t = SampleParameter;
 using sd_img_gen_params_t = ImageGenerationParameter;
 using sd_log_level_t = LogLevel;
+using sd_sample_params_t = SampleParameter;
 using sd_type_t = Quantization;
 using sd_vid_gen_params_t = VideoGenerationParameter;
-using lora_apply_mode_t = LoraApplyMode;
-using preview_t = Preview;
 using size_t = nuint;
 using uint32_t = uint;
 using uint8_t = byte;
@@ -104,6 +106,7 @@ internal unsafe partial class Native
             public sbyte chroma_use_t5_mask;
             public int chroma_t5_mask_pad;
             public sbyte qwen_image_zero_cond_t;
+            public float max_vram;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -177,6 +180,13 @@ internal unsafe partial class Native
             public int taylorseer_skip_interval;
             public byte* scm_mask;
             public sbyte scm_policy_dynamic;
+            public float spectrum_w;
+            public int spectrum_m;
+            public float spectrum_lam;
+            public int spectrum_window_size;
+            public float spectrum_flex_window;
+            public int spectrum_warmup_steps;
+            public float spectrum_stop_percent;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -185,6 +195,20 @@ internal unsafe partial class Native
             public sbyte is_high_noise;
             public float multiplier;
             public byte* path;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct sd_hires_params_t
+        {
+            public sbyte enabled;
+            public sd_hires_upscaler_t upscaler;
+            public byte* model_path;
+            public float scale;
+            public int target_width;
+            public int target_height;
+            public int steps;
+            public float denoising_strength;
+            public int upscale_tile_size;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -212,6 +236,7 @@ internal unsafe partial class Native
             public sd_pm_params_t pm_params;
             public sd_tiling_params_t vae_tiling_params;
             public sd_cache_params_t cache;
+            public sd_hires_params_t hires;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -269,6 +294,15 @@ internal unsafe partial class Native
     [return: MarshalAs(UnmanagedType.LPStr)]
     internal static partial string sd_get_system_info();
 
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_ctx_supports_image_generation")]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool sd_ctx_supports_image_generation(sd_ctx_t* sd_ctx);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_ctx_supports_video_generation")]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool sd_ctx_supports_video_generation(sd_ctx_t* sd_ctx);
+
+
     //
 
     [LibraryImport(LIB_NAME, EntryPoint = "sd_type_name")]
@@ -320,8 +354,18 @@ internal unsafe partial class Native
     [LibraryImport(LIB_NAME, EntryPoint = "str_to_lora_apply_mode")]
     internal static partial lora_apply_mode_t str_to_lora_apply_mode([MarshalAs(UnmanagedType.LPStr)] string str);
 
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_hires_upscaler_name")]
+    [return: MarshalAs(UnmanagedType.LPStr)]
+    internal static partial string sd_hires_upscaler_name(sd_hires_upscaler_t upscaler);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "str_to_sd_hires_upscaler")]
+    internal static partial sd_hires_upscaler_t str_to_sd_hires_upscaler([MarshalAs(UnmanagedType.LPStr)] string str);
+
     [LibraryImport(LIB_NAME, EntryPoint = "sd_cache_params_init")]
     internal static partial void sd_cache_params_init([MarshalUsing(typeof(CacheParameterMarshaller))] ref sd_cache_params_t cache_params);
+
+    [LibraryImport(LIB_NAME, EntryPoint = "sd_hires_params_init")]
+    internal static partial void sd_hires_params_init([MarshalUsing(typeof(HiresParameterMarshaller))] ref sd_hires_params_t hires_params);
 
     //
 
